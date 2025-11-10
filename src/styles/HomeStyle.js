@@ -1,0 +1,1215 @@
+import { StyleSheet } from "react-native";
+import LayoutStyle from "./LayoutStyle";
+import Colors from "./Colors";
+import { deviceHight, deviceWidth } from "../utils/DeviceInfo";
+import FontFamily from "../assets/FontFamily";
+import CommonStyles from "./CommonStyles";
+
+const HomeStyle = StyleSheet.create({
+  mainContainer: {},
+  homeContainer: {
+    backgroundColor: Colors.goastWhite,
+  },
+  profileImgContainer: {
+    ...CommonStyles.directionRowCenter,
+  },
+  homePadding20: {},
+  iconPadding10: {
+    ...LayoutStyle.paddingHorizontal10,
+  },
+  formContainer: {
+    height: deviceHight,
+    width: deviceWidth,
+  },
+  profileView: {
+    ...LayoutStyle.padding5,
+    borderRadius: 50,
+    backgroundColor: Colors.gray,
+  },
+  profileImg: {
+    width: 30,
+    height: 30,
+  },
+  userName: {
+    color: Colors.blackText,
+    ...LayoutStyle.fontSize12,
+    fontFamily: FontFamily.RobotoSemiBold,
+    ...LayoutStyle.paddingLeft15,
+  },
+  headerContainer: {
+    ...CommonStyles.directionRowSB,
+    backgroundColor: Colors.white,
+    ...LayoutStyle.paddingVertical10,
+    ...LayoutStyle.paddingHorizontal20,
+  },
+  cateContainer: {
+    ...LayoutStyle.marginRight10,
+    ...LayoutStyle.marginVertical20,
+    backgroundColor: Colors.white,
+    borderBottomEndRadius: 10,
+    borderBottomStartRadius: 10,
+    ...LayoutStyle.paddingBottom15,
+  },
+  categoryImg: {
+    height: deviceHight / 9,
+    width: deviceWidth / 2.5,
+  },
+  categoryLabel: {
+    fontFamily: FontFamily.RobotoMedium,
+    ...LayoutStyle.fontSize12,
+    color: Colors.blackText,
+  },
+  cateRoundContainer: {
+    ...CommonStyles.directionRowCenter,
+  },
+  round: {
+    padding: 2,
+    backgroundColor: Colors.black,
+    borderRadius: 20,
+    marginRight: 6,
+  },
+  cateDesc: {
+    fontFamily: FontFamily.RobotoRegular,
+    ...LayoutStyle.fontSize10,
+    color: Colors.blackText,
+  },
+  iconContainer: { ...CommonStyles.directionRowCenter },
+  smallRound: {
+    borderRadius: 20,
+    backgroundColor: Colors.red,
+    alignSelf: "center",
+    alignItems: "center",
+    marginTop: -22,
+    padding: 3.5,
+    ...LayoutStyle.marginBottom20,
+    ...LayoutStyle.marginLeft10,
+  },
+  homeBanner: {
+    width: deviceWidth - 45,
+    resizeMode: "contain",
+    alignSelf: "center",
+    height: deviceHight / 3.5,
+    resizeMode: "contain",
+    borderRadius: 20,
+  },
+  searchView: {
+    ...LayoutStyle.marginTop20,
+    ...LayoutStyle.paddingHorizontal20,
+  },
+  searchInput: {
+    height: 40,
+    ...LayoutStyle.fontSize10,
+    alignSelf: "center",
+    fontFamily: FontFamily.RobotoMedium,
+  },
+  groupText: {
+    ...LayoutStyle.marginTop20,
+    ...CommonStyles.directionRowCenter,
+  },
+  blueTextSmall: {
+    ...LayoutStyle.fontSize10,
+    color: Colors.secondary,
+    fontFamily: FontFamily.RobotoBold,
+  },
+  blackTextSmall: {
+    ...LayoutStyle.fontSize10,
+    color: Colors.blackText,
+    fontFamily: FontFamily.RobotoRegular,
+  },
+  blackTextMid: {
+    ...LayoutStyle.fontSize18,
+    color: Colors.blackText,
+    fontFamily: FontFamily.RobotoMedium,
+  },
+  blackTextbig: {
+    ...LayoutStyle.fontSize20,
+    color: Colors.blackText,
+    fontFamily: FontFamily.RobotoMedium,
+  },
+  trendingPGCard: {
+    ...CommonStyles.directionRowSB,
+    ...LayoutStyle.marginTop20,
+  },
+  workCard: {
+    alignItems: "center",
+    ...LayoutStyle.marginTop20,
+  },
+  searchImg: {
+    height: 100,
+    width: 100,
+    resizeMode: "contain",
+  },
+  homeDescImg: {
+    height: 110,
+    width: 110,
+    resizeMode: "contain",
+  },
+  descImgContainer: {
+    width: deviceWidth / 3.5,
+
+    alignItems: "center",
+  },
+  descText: {
+    height: 100,
+    marginTop: 30,
+    textAlign: "center",
+    fontFamily: FontFamily.RobotoRegular,
+    ...LayoutStyle.fontSize12,
+    color: Colors.blackText,
+  },
+  chooseCard: {
+    backgroundColor: Colors.primary,
+  },
+  aboutContainer: {
+    backgroundColor: Colors.charcol,
+    ...LayoutStyle.marginTop30,
+
+    borderRadius: 10,
+  },
+  aboutTextContainer: {
+    ...LayoutStyle.paddingHorizontal30,
+    ...CommonStyles.directionRowSB,
+    ...LayoutStyle.paddingVertical10,
+  },
+  whiteTextBig: {
+    ...LayoutStyle.fontSize20,
+    color: Colors.goastWhite,
+    fontFamily: FontFamily.RobotoBold,
+  },
+  whiteTextMid: {
+    ...LayoutStyle.fontSize12,
+    color: Colors.goastWhite,
+    fontFamily: FontFamily.RobotoRegular,
+  },
+  mainServicesContainer: {
+    ...LayoutStyle.paddingTop30,
+  },
+  servicesContainer: {
+    ...LayoutStyle.paddingTop20,
+  },
+  servicesContainerRight: {
+    ...LayoutStyle.paddingTop20,
+    justifyContent: "flex-end",
+    alignItems: "flex-end",
+  },
+  servicesText: {
+    fontFamily: FontFamily.RobotoMedium,
+    ...LayoutStyle.fontSize14,
+    color: Colors.blackText,
+    ...LayoutStyle.marginTop20,
+    ...LayoutStyle.marginBottom10,
+    textTransform: "uppercase",
+  },
+  servicesTextRight: {
+    fontFamily: FontFamily.RobotoMedium,
+    ...LayoutStyle.fontSize14,
+    color: Colors.blackText,
+    ...LayoutStyle.marginTop20,
+    ...LayoutStyle.marginBottom10,
+    textTransform: "uppercase",
+    textAlign: "right",
+  },
+  servicesDesc: {
+    fontFamily: FontFamily.RobotoLight,
+    ...LayoutStyle.fontSize12,
+    color: Colors.blackText,
+    ...LayoutStyle.marginVertical10,
+    lineHeight: 22,
+    letterSpacing: 0.3,
+    width: deviceWidth / 1.2,
+  },
+  servicesDescRight: {
+    fontFamily: FontFamily.RobotoLight,
+    ...LayoutStyle.fontSize12,
+    color: Colors.blackText,
+    ...LayoutStyle.marginVertical10,
+    lineHeight: 22,
+    width: deviceWidth / 1.2,
+    textAlign: "right",
+  },
+  officeIcon: {
+    height: 50,
+    width: 50,
+    resizeMode: "contain",
+  },
+  feedbackComponent: {
+    backgroundColor: Colors.black,
+    ...LayoutStyle.margin20,
+
+    borderTopEndRadius: 20,
+    borderBottomStartRadius: 20,
+    marginTop: "20%",
+  },
+  feedbackProfile: {
+    alignItems: "center",
+    backgroundColor: "#019FFF",
+    alignSelf: "center",
+    borderRadius: 200,
+    marginTop: -70,
+  },
+  clientImg: {
+    height: 100,
+    width: 100,
+    borderRadius: 200,
+    resizeMode: "contain",
+  },
+  feedbackNameContainer: {
+    ...LayoutStyle.marginTop20,
+    alignItems: "center",
+  },
+  rateImgViewFeedback: {
+    ...LayoutStyle.marginVertical10,
+  },
+  feedbackDesc: {
+    ...LayoutStyle.fontSize12,
+    color: Colors.goastWhite,
+    fontFamily: FontFamily.RobotoRegular,
+    textAlign: "center",
+    lineHeight: 26,
+  },
+  feedbackName: {
+    ...LayoutStyle.fontSize18,
+    color: Colors.goastWhite,
+    fontFamily: FontFamily.RobotoRegular,
+  },
+  whiteTextSmall: {
+    ...LayoutStyle.fontSize8,
+    color: Colors.goastWhite,
+    fontFamily: FontFamily.RobotoRegular,
+  },
+  rateContainer: {
+    backgroundColor: Colors.secondary,
+    ...LayoutStyle.margin20,
+  },
+  musicImg: {
+    height: 130,
+    width: 140,
+    resizeMode: "contain",
+  },
+  rateList: {
+    ...LayoutStyle.marginLeft5,
+    flexDirection: "row",
+  },
+  whiteBold: {
+    ...LayoutStyle.fontSize14,
+    color: Colors.goastWhite,
+    fontFamily: FontFamily.RobotoMedium,
+  },
+  whiteTextRate: {
+    ...LayoutStyle.fontSize10,
+    color: Colors.goastWhite,
+    fontFamily: FontFamily.RobotoRegular,
+    letterSpacing: 0.2,
+  },
+  rateImgView: {
+    ...CommonStyles.directionRowCenter,
+    ...LayoutStyle.marginTop5,
+  },
+  friendContainer: {
+    ...LayoutStyle.paddingHorizontal20,
+    ...CommonStyles.directionRowSB,
+    marginBottom: "40%",
+  },
+  appImg: {
+    height: deviceHight / 5,
+    width: deviceWidth / 2,
+    resizeMode: "contain",
+    marginLeft: -10,
+  },
+  refFriend: {
+    ...LayoutStyle.fontSize12,
+    color: Colors.blackText,
+    fontFamily: FontFamily.RobotoMedium,
+  },
+  refFriendDesc: {
+    ...LayoutStyle.fontSize12,
+    color: Colors.blackText,
+    fontFamily: FontFamily.RobotoMedium,
+  },
+  chatImg: {
+    height: 100,
+    width: 100,
+    resizeMode: "contain",
+  },
+  chatContainer: {
+    alignSelf: "flex-end",
+    marginBottom: 100,
+    position: "absolute",
+    bottom: 20,
+    right: 20,
+    width: 60,
+    height: 60,
+
+    alignItems: "center",
+    ...LayoutStyle.paddingRight20,
+  },
+  headerContainerBlue: {
+    ...CommonStyles.directionRowSB,
+    backgroundColor: Colors.secondary,
+    ...LayoutStyle.paddingVertical20,
+    ...LayoutStyle.paddingHorizontal20,
+  },
+  screenNameWhite: {
+    color: Colors.white,
+    ...LayoutStyle.fontSize12,
+    fontFamily: FontFamily.RobotoSemiBold,
+    ...LayoutStyle.paddingLeft15,
+  },
+  PgListContainer: {},
+  imageListContainer: {
+    alignItems: "center",
+  },
+  pgImgaeBig: {
+    height: deviceHight / 2,
+    width: deviceWidth - 40,
+  },
+  pgImgaesmall: {
+    height: 100,
+    width: 100,
+    ...LayoutStyle.marginVertical20,
+    ...LayoutStyle.marginRight10,
+  },
+  bedListContainer: {
+    ...LayoutStyle.padding15,
+    ...LayoutStyle.marginVertical10,
+    borderWidth: 1,
+    borderRadius: 10,
+    borderColor: Colors.grayBorder,
+    backgroundColor: Colors.white,
+    ...CommonStyles.directionRowSB,
+  },
+  bedimg: {
+    height: 140,
+    width: 150,
+    resizeMode: "contain",
+  },
+  hostelTitle: {
+    color: Colors.black,
+    fontFamily: FontFamily.RobotoMedium,
+    ...LayoutStyle.fontSize14,
+  },
+  genderView: {
+    ...LayoutStyle.paddingVertical10,
+    ...LayoutStyle.paddingHorizontal15,
+    ...LayoutStyle.marginVertical5,
+    borderRadius: 20,
+    backgroundColor: Colors.blueLight,
+    alignSelf: "flex-start",
+  },
+  servicesName: {
+    color: Colors.blue,
+    fontFamily: FontFamily.RobotoRegular,
+    ...LayoutStyle.fontSize10,
+  },
+  areaName: {
+    color: Colors.gray,
+    fontFamily: FontFamily.RobotoRegular,
+    ...LayoutStyle.fontSize12,
+  },
+  reviewText: {
+    color: Colors.gray,
+    fontFamily: FontFamily.RobotoRegular,
+    ...LayoutStyle.fontSize10,
+  },
+  price: {
+    color: Colors.red,
+    fontFamily: FontFamily.RobotoMedium,
+    ...LayoutStyle.fontSize10,
+  },
+  rateImg: {
+    ...CommonStyles.directionRowCenter,
+  },
+  trendingFilter: {
+    backgroundColor: Colors.black,
+    alignSelf: "center",
+    marginBottom: 100,
+    position: "absolute",
+    bottom: 20,
+    height: 65,
+
+    alignItems: "center",
+    borderRadius: 50,
+    elevation: 5,
+  },
+  filterIconText: {
+    ...LayoutStyle.paddingHorizontal30,
+    alignItems: "center",
+  },
+  iconFilter: {
+    height: 20,
+    width: 20,
+    resizeMode: "contain",
+  },
+  filterName: {
+    color: Colors.goastWhite,
+    fontFamily: FontFamily.RobotoRegular,
+    ...LayoutStyle.fontSize8,
+    ...LayoutStyle.marginTop5,
+  },
+  bottomSheetHeight: {
+    height: deviceHight / 2.5,
+  },
+  blackTextbigCenter: {
+    ...LayoutStyle.fontSize20,
+    color: Colors.blackText,
+    fontFamily: FontFamily.RobotoMedium,
+    alignItems: "center",
+    textAlign: "center",
+  },
+  option: {
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.grayBorder,
+    ...LayoutStyle.paddingVertical15,
+  },
+  optionText: {
+    ...LayoutStyle.fontSize12,
+    color: Colors.blackText,
+    fontFamily: FontFamily.RobotoRegular,
+  },
+  selectedOption: {
+    borderBottomColor: Colors.secondary,
+  },
+  selectedText: {
+    color: Colors.secondary,
+  },
+  // Filter Container
+  filterContainer: {
+    backgroundColor: Colors.goastWhite,
+  },
+  filterTitle: {
+    ...LayoutStyle.fontSize14,
+    fontFamily: FontFamily.RobotoRegular,
+    color: Colors.black,
+    ...LayoutStyle.marginVertical20,
+  },
+  sectionTitle: {
+    ...LayoutStyle.fontSize10,
+    fontFamily: FontFamily.RobotoRegular,
+    color: Colors.grayText,
+    ...LayoutStyle.marginLeft5,
+  },
+  gendercontainer: {
+    borderWidth: 0.5,
+    borderColor: Colors.grayBorder,
+    ...LayoutStyle.padding15,
+    borderRadius: 10,
+  },
+  genderSection: {
+    flexWrap: "wrap",
+    ...CommonStyles.directionRowCenter,
+  },
+  genderBox: {
+    ...LayoutStyle.paddingHorizontal10,
+    ...LayoutStyle.marginRight10,
+    ...LayoutStyle.marginTop30,
+    ...LayoutStyle.padding5,
+    borderWidth: 0.5,
+    backgroundColor: Colors.whiteText,
+    width: 90,
+    borderRadius: 20,
+    borderColor: Colors.grayText,
+  },
+  selectedGenderBox: {
+    ...LayoutStyle.marginTop30,
+    ...LayoutStyle.paddingHorizontal10,
+    borderColor: Colors.selectedGreen,
+    borderWidth: 0.5,
+    backgroundColor: Colors.selectedGreen,
+    width: 100,
+    borderRadius: 10,
+    borderRadius: 20,
+  },
+  genderText: {
+    ...LayoutStyle.fontSize10,
+    fontFamily: FontFamily.RobotoRegular,
+    color: Colors.blackText,
+    textAlign: "center",
+  },
+  selectedGenderText: {
+    ...LayoutStyle.fontSize10,
+    fontFamily: FontFamily.RobotoRegular,
+    textAlign: "center",
+    color: Colors.whiteText,
+  },
+  roomTypeContainer: {
+    ...CommonStyles.directionRowCenter,
+  },
+  roomTypeBox: {
+    ...LayoutStyle.paddingHorizontal5,
+    ...LayoutStyle.marginTop20,
+    ...LayoutStyle.paddingVertical30,
+    backgroundColor: Colors.whiteText,
+    width: 70,
+    borderRadius: 10,
+    borderColor: Colors.grayText,
+  },
+  selectedRoomTypeBox: {
+    ...LayoutStyle.paddingHorizontal5,
+    ...LayoutStyle.marginTop20,
+    ...LayoutStyle.paddingVertical30,
+    backgroundColor: Colors.selectedGreen,
+    width: 70,
+    borderRadius: 10,
+    borderColor: Colors.grayText,
+  },
+  stars: {
+    ...LayoutStyle.fontSize24,
+    marginLeft: 10,
+    color: Colors.primary,
+  },
+  ratingRow: {
+    ...LayoutStyle.marginVertical5,
+  },
+  amenityButton: {
+    borderRadius: 10,
+    backgroundColor: Colors.white,
+    ...LayoutStyle.marginTop10,
+    ...LayoutStyle.marginRight10,
+    paddingHorizontal: 2,
+  },
+  selectedAmenity: {
+    borderRadius: 10,
+    backgroundColor: Colors.selectedGreen,
+    paddingHorizontal: 2,
+  },
+  textIconContainer: {
+    alignItems: "center",
+    width: deviceHight / 12,
+    height: 70,
+  },
+  amenityText: {
+    ...LayoutStyle.fontSize6,
+    fontFamily: FontFamily.RobotoRegular,
+    color: Colors.blackText,
+    textAlign: "center",
+    ...LayoutStyle.marginTop5,
+  },
+  selectedAmenityText: {
+    ...LayoutStyle.fontSize6,
+    fontFamily: FontFamily.RobotoRegular,
+    textAlign: "center",
+    color: Colors.whiteText,
+    ...LayoutStyle.marginTop5,
+  },
+  sliderContainer: {
+    ...LayoutStyle.paddingTop10,
+  },
+  btnFilterContainer: {
+    ...CommonStyles.directionRowSB,
+    ...LayoutStyle.paddingTop20,
+    flexGrow: 1,
+  },
+  btnStyle: {
+    backgroundColor: Colors.white,
+    borderWidth: 1,
+    borderColor: Colors.secondary,
+  },
+  screenTitle: {
+    ...LayoutStyle.fontSize14,
+    fontFamily: FontFamily.RobotoMedium,
+    color: Colors.black,
+  },
+  pgDesc: {
+    ...LayoutStyle.fontSize10,
+    fontFamily: FontFamily.RobotoRegular,
+    color: Colors.gray,
+    lineHeight: 20,
+    ...LayoutStyle.marginTop10,
+  },
+  iconServicesName: {
+    color: Colors.gray,
+    fontFamily: FontFamily.RobotoRegular,
+    ...LayoutStyle.fontSize10,
+    ...LayoutStyle.marginLeft5,
+    ...LayoutStyle.marginRight20,
+  },
+  viewallText: {
+    color: Colors.gray,
+    fontFamily: FontFamily.RobotoRegular,
+    ...LayoutStyle.fontSize10,
+  },
+  listContainer: {
+    ...CommonStyles.directionRowSB,
+    ...LayoutStyle.marginVertical20,
+  },
+  sharingContainer: {
+    borderWidth: 1,
+
+    ...LayoutStyle.marginRight10,
+    borderColor: Colors.gray,
+    borderRadius: 10,
+
+    alignItems: "center",
+    ...LayoutStyle.marginTop20,
+  },
+  sharingText: {
+    ...LayoutStyle.fontSize10,
+    color: Colors.gray,
+    fontFamily: FontFamily.RobotoRegular,
+  },
+  sharingPrice: {
+    ...LayoutStyle.fontSize16,
+    color: Colors.blackText,
+    fontFamily: FontFamily.RobotoMedium,
+  },
+  ownerImg: {
+    height: 70,
+    width: 70,
+    borderRadius: 200,
+    resizeMode: "contain",
+  },
+  ownerName: {
+    ...LayoutStyle.fontSize14,
+    color: Colors.blackText,
+    fontFamily: FontFamily.RobotoMedium,
+  },
+  ownerTag: {
+    ...LayoutStyle.fontSize12,
+    color: Colors.grayText,
+    fontFamily: FontFamily.RobotoMedium,
+  },
+  iconCall: {
+    backgroundColor: Colors.primary,
+    ...LayoutStyle.padding15,
+    borderRadius: 30,
+  },
+  mapContainer: {
+    ...LayoutStyle.marginTop20,
+    flexDirection: "row",
+  },
+  pgDescIcon: {
+    ...LayoutStyle.fontSize10,
+    fontFamily: FontFamily.RobotoRegular,
+    color: Colors.gray,
+    lineHeight: 20,
+    ...LayoutStyle.marginLeft10,
+    width: deviceWidth - 70,
+  },
+  mapImg: {
+    height: deviceHight / 2.5,
+    width: deviceWidth - 40,
+    ...LayoutStyle.marginTop10,
+    borderRadius: 20,
+
+    alignItems: "center",
+    alignSelf: "center",
+  },
+  pathContainer: {
+    ...LayoutStyle.marginTop15,
+    ...LayoutStyle.paddingBottom5,
+    borderBottomWidth: 2,
+    borderBottomColor: Colors.grayBorder,
+  },
+  kmContainer: {
+    ...CommonStyles.directionRowSB,
+  },
+  pathHeading: {
+    ...LayoutStyle.fontSize10,
+    fontFamily: FontFamily.RobotoRegular,
+    color: Colors.gray,
+  },
+  kmText: {
+    ...LayoutStyle.fontSize10,
+    fontFamily: FontFamily.RobotoRegular,
+    color: Colors.gray,
+  },
+  pathText: {
+    ...LayoutStyle.fontSize14,
+    fontFamily: FontFamily.RobotoMedium,
+    color: Colors.secondary,
+    ...LayoutStyle.marginLeft20,
+  },
+  viewallTextIcon: {
+    ...LayoutStyle.fontSize14,
+    fontFamily: FontFamily.RobotoSemiBold,
+    color: Colors.grayText,
+    ...LayoutStyle.marginRight10,
+  },
+  iconViewAll: {
+    ...LayoutStyle.marginTop10,
+  },
+  reviewerImg: {
+    height: 50,
+    width: 50,
+    borderRadius: 50,
+  },
+  btnBookingContainer: {
+    ...CommonStyles.directionRowSB,
+  },
+  btnRadius: {
+    borderRadius: 10,
+  },
+  propertyImg: {
+    height: 105,
+    width: 100,
+    borderRadius: 20,
+  },
+  propertyName: {
+    ...LayoutStyle.fontSize10,
+    color: Colors.grayText,
+    fontFamily: FontFamily.RobotoMedium,
+    width: 105,
+    ...LayoutStyle.marginTop5,
+  },
+  propertyPrice: {
+    ...LayoutStyle.fontSize10,
+    color: Colors.blackText,
+    fontFamily: FontFamily.RobotoMedium,
+    ...LayoutStyle.marginVertical5,
+  },
+  propertyKm: {
+    ...LayoutStyle.fontSize18,
+    color: Colors.grayText,
+    fontFamily: FontFamily.RobotoRegular,
+  },
+  withinKmContainer: {
+    ...LayoutStyle.padding5,
+    backgroundColor: Colors.paleBlue,
+    borderRadius: 30,
+    alignSelf: "baseline",
+    ...LayoutStyle.marginTop10,
+  },
+  withinKm: {
+    ...LayoutStyle.fontSize8,
+    color: Colors.blackText,
+    fontFamily: FontFamily.RobotoRegular,
+    marginHorizontal: 2,
+  },
+  btnHeighRadius: {
+    borderRadius: 10,
+  },
+  iconBtnContainer: {
+    backgroundColor: Colors.secondary,
+
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  iconChat: {
+    ...LayoutStyle.fontSize12,
+    color: Colors.goastWhite,
+    fontFamily: FontFamily.RobotoMedium,
+    ...LayoutStyle.marginTop10,
+  },
+  myselfContainer: {},
+  selfBookingContainer: {
+    alignSelf: "center",
+  },
+  bookingTitle: {
+    ...LayoutStyle.fontSize16,
+    color: Colors.blackText,
+    fontFamily: FontFamily.RobotoMedium,
+    ...LayoutStyle.marginLeft10,
+  },
+  radioBtn: {
+    ...CommonStyles.directionRowCenter,
+  },
+  visitText: {
+    ...LayoutStyle.fontSize12,
+    color: Colors.blackText,
+    fontFamily: FontFamily.RobotoRegular,
+    ...LayoutStyle.marginLeft5,
+    ...LayoutStyle.marginVertical10,
+  },
+  dateText: {
+    ...LayoutStyle.fontSize12,
+    color: Colors.grayText,
+    fontFamily: FontFamily.RobotoRegular,
+    ...LayoutStyle.marginRight20,
+  },
+  dateContainer: {
+    ...LayoutStyle.marginTop20,
+  },
+  dateView: {
+    borderWidth: 1,
+    ...LayoutStyle.padding15,
+    borderRadius: 6,
+    ...LayoutStyle.marginTop20,
+    borderColor: Colors.grayBorder,
+  },
+  textDate: {
+    ...LayoutStyle.fontSize12,
+    color: Colors.grayText,
+    fontFamily: FontFamily.RobotoRegular,
+  },
+  optionContainer: {
+    ...LayoutStyle.marginTop20,
+  },
+  optionBoldText: {
+    ...LayoutStyle.fontSize12,
+    color: Colors.blackText,
+    fontFamily: FontFamily.RobotoMedium,
+  },
+  optionListContainer: {
+    borderWidth: 1,
+    borderColor: Colors.grayBorder,
+    ...LayoutStyle.paddingHorizontal15,
+    ...LayoutStyle.paddingVertical20,
+    borderRadius: 10,
+  },
+  selectOptionListContainer: {
+    ...LayoutStyle.paddingHorizontal15,
+    ...LayoutStyle.paddingVertical20,
+    borderRadius: 10,
+    backgroundColor: Colors.secondary,
+  },
+  optionListText: {
+    ...LayoutStyle.fontSize12,
+    color: Colors.blackText,
+    fontFamily: FontFamily.RobotoRegular,
+    width: 90,
+    textAlign: "center",
+    ...LayoutStyle.paddingVertical10,
+  },
+  selectOptionListText: {
+    ...LayoutStyle.fontSize12,
+    color: Colors.whiteText,
+    fontFamily: FontFamily.RobotoRegular,
+    width: 90,
+    textAlign: "center",
+    ...LayoutStyle.paddingVertical10,
+  },
+  bottomTextContainer: {
+    marginBottom: "20%",
+  },
+  bottomText: {
+    ...LayoutStyle.fontSize12,
+    color: Colors.blackText,
+    fontFamily: FontFamily.RobotoRegular,
+    textAlign: "center",
+    ...LayoutStyle.marginVertical10,
+  },
+  bottomTextMid: {
+    ...LayoutStyle.fontSize12,
+    color: Colors.blackText,
+    fontFamily: FontFamily.RobotoMedium,
+    textAlign: "center",
+  },
+  policyContainer: {
+    backgroundColor: Colors.white,
+  },
+  policyTitle: {
+    ...LayoutStyle.fontSize16,
+    color: Colors.blackText,
+    fontFamily: FontFamily.RobotoBold,
+  },
+
+  text: {
+    ...LayoutStyle.fontSize10,
+    color: Colors.grayText,
+    fontFamily: FontFamily.RobotoRegular,
+  },
+  listItem: {
+    flexDirection: "row", // Aligns number & text horizontally
+    alignItems: "flex-start", // Aligns numbers at the top
+    ...LayoutStyle.marginVertical10,
+  },
+  number: {
+    ...LayoutStyle.fontSize10,
+    color: Colors.grayText,
+    fontFamily: FontFamily.RobotoRegular,
+    width: 20, // Ensures spacing is maintained
+    textAlign: "right", // Aligns numbers to the right
+    marginRight: 8,
+  },
+  optionSelectText: {
+    ...LayoutStyle.fontSize10,
+    color: Colors.blackText,
+    fontFamily: FontFamily.RobotoMedium,
+    ...LayoutStyle.marginVertical20,
+  },
+  bottomTextGroup: {
+    ...LayoutStyle.paddingTop30,
+  },
+  bottomLabel: {
+    ...LayoutStyle.fontSize12,
+    color: Colors.blackText,
+    fontFamily: FontFamily.RobotoRegular,
+    textAlign: "center",
+    ...LayoutStyle.marginTop10,
+  },
+  numbOf: {
+    ...LayoutStyle.fontSize12,
+    color: Colors.blackText,
+    fontFamily: FontFamily.RobotoRegular,
+    ...LayoutStyle.marginTop20,
+    ...LayoutStyle.marginBottom10,
+  },
+  dropdownMonth: {
+    ...LayoutStyle.fontSize12,
+    color: Colors.blackText,
+    fontFamily: FontFamily.RobotoRegular,
+  },
+  btnTapStyle: {
+    backgroundColor: Colors.goastWhite,
+    borderWidth: 1,
+    borderColor: Colors.grayBorder,
+    ...LayoutStyle.padding15,
+    borderRadius: 10,
+  },
+  btnTapSelf: {
+    ...LayoutStyle.padding15,
+    borderRadius: 10,
+  },
+  btnTapFlexStyle: {
+    ...CommonStyles.directionRowSB,
+    ...LayoutStyle.paddingTop20,
+  },
+  inputLabel: {
+    ...LayoutStyle.fontSize12,
+    color: Colors.blackText,
+    fontFamily: FontFamily.RobotoRegular,
+    ...LayoutStyle.marginBottom10,
+  },
+  inputMobileLabel: {
+    ...LayoutStyle.fontSize12,
+    color: Colors.blackText,
+    fontFamily: FontFamily.RobotoRegular,
+    ...LayoutStyle.marginVertical10,
+  },
+  inputName: {
+    borderWidth: 1,
+    height: 55,
+    width: "55%",
+    fontFamily: FontFamily.PoppinsRegular,
+    ...LayoutStyle.fontSize14,
+    marginTop: Platform.OS === "android" ? 2 : 0,
+    borderColor: Colors.grayBorder,
+    borderRadius: 10,
+  },
+  inputMobile: {
+    borderWidth: 1,
+    height: 55,
+    width: "55%",
+    fontFamily: FontFamily.PoppinsRegular,
+    ...LayoutStyle.fontSize14,
+    marginTop: Platform.OS === "android" ? 2 : 0,
+    borderColor: Colors.grayBorder,
+    borderTopLeftRadius: 10,
+    borderBottomLeftRadius: 10,
+  },
+  inputAge: {
+    borderWidth: 1,
+    height: 55,
+    width: "16%",
+    fontFamily: FontFamily.PoppinsRegular,
+    ...LayoutStyle.fontSize12,
+    marginTop: Platform.OS === "android" ? 2 : 0,
+    borderColor: Colors.grayBorder,
+    borderRadius: 10,
+    textAlign: "center",
+  },
+  paynowBtn: {
+    borderRadius: 10,
+    marginTop: "20%",
+  },
+  genderIconContainer: {
+    borderWidth: 1,
+    borderColor: Colors.grayBorder,
+    borderRadius: 10,
+    ...LayoutStyle.paddingHorizontal10,
+    ...LayoutStyle.paddingVertical5,
+  },
+  genderRadioView: {
+    ...CommonStyles.directionRowSB,
+  },
+  inputLabelGender: {
+    ...LayoutStyle.fontSize12,
+    color: Colors.blackText,
+    fontFamily: FontFamily.RobotoRegular,
+  },
+  verifyOTPContainer: {
+    height: 55,
+    borderTopRightRadius: 10,
+    borderBottomRightRadius: 10,
+    width: "45%",
+    backgroundColor: Colors.secondary,
+
+    alignItems: "center",
+  },
+  verifyOtpText: {
+    ...LayoutStyle.fontSize14,
+    color: Colors.whiteText,
+    fontFamily: FontFamily.RobotoRegular,
+    alignSelf: "center",
+  },
+  uploadContainer: {
+    ...CommonStyles.directionRowCenter,
+  },
+  inputMobileImg: {
+    ...LayoutStyle.marginTop20,
+    ...LayoutStyle.marginBottom10,
+    ...LayoutStyle.fontSize12,
+    color: Colors.blackText,
+    fontFamily: FontFamily.RobotoRegular,
+  },
+  idproof: {
+    ...LayoutStyle.fontSize12,
+    color: Colors.blackText,
+    fontFamily: FontFamily.RobotoRegular,
+    ...LayoutStyle.marginTop20,
+    ...LayoutStyle.marginBottom10,
+  },
+  iconTextContain: {
+    ...CommonStyles.directionRowCenter,
+  },
+  iconText: {
+    ...LayoutStyle.fontSize10,
+    color: Colors.grayText,
+    fontFamily: FontFamily.RobotoRegular,
+  },
+  iconTextBold: {
+    ...LayoutStyle.fontSize10,
+    color: Colors.blackText,
+    fontFamily: FontFamily.RobotoMedium,
+  },
+  filterOption: {
+    ...CommonStyles.directionRowSB,
+    ...LayoutStyle.paddingVertical10,
+    backgroundColor: Colors.white,
+  },
+  checkoutContainer: {
+    ...CommonStyles.directionRowCenter,
+  },
+  dateStyle: {
+    borderRadius: 10,
+    borderWidth: 1,
+
+    alignItems: "center",
+    textAlign: "center",
+    borderColor: Colors.grayBorder,
+    ...LayoutStyle.paddingVertical5,
+    ...LayoutStyle.paddingHorizontal10,
+  },
+  textMini: {
+    ...LayoutStyle.fontSize10,
+    color: Colors.grayText,
+    fontFamily: FontFamily.RobotoRegular,
+  },
+  textBudge: {
+    ...LayoutStyle.fontSize10,
+    color: Colors.blackText,
+    fontFamily: FontFamily.RobotoMedium,
+  },
+  legendRow: {
+    ...CommonStyles.directionRowCenter,
+    ...LayoutStyle.marginVertical30,
+  },
+  legendBox: {
+    width: 16,
+    height: 16,
+    marginRight: 4,
+  },
+  legendLabel: {
+    ...LayoutStyle.fontSize10,
+    fontFamily: FontFamily.RobotoRegular,
+    color: Colors.blackText,
+  },
+  floorContainer: {
+    ...LayoutStyle.paddingVertical10,
+  },
+  floorTitle: {
+    ...LayoutStyle.fontSize10,
+    fontFamily: FontFamily.RobotoMedium,
+    color: Colors.blackText,
+    ...LayoutStyle.marginBottom10,
+  },
+  roomBox: {
+    width: 70,
+    height: 45,
+    borderRadius: 12,
+
+    alignItems: "center",
+    position: "relative",
+    ...LayoutStyle.marginBottom10,
+  },
+  available: {
+    backgroundColor: Colors.selectedGreen,
+  },
+  unavailable: {
+    backgroundColor: Colors.lightGray,
+  },
+  selectedStyle: {
+    backgroundColor: Colors.primary,
+  },
+  roomText: {
+    ...LayoutStyle.fontSize10,
+    fontFamily: FontFamily.RobotoMedium,
+    color: Colors.blackText,
+  },
+  greenStripContainer: {
+    position: "absolute",
+    right: 4,
+    top: "25%",
+    bottom: "25%",
+    width: 6,
+    backgroundColor: "transparent",
+
+    alignItems: "center",
+  },
+  greenStrip: {
+    width: 4,
+    height: "100%",
+    backgroundColor: Colors.selectedGreen,
+    borderTopLeftRadius: 4,
+    borderBottomLeftRadius: 4,
+  },
+  grayStrip: {
+    width: 4,
+    height: "100%",
+    backgroundColor: Colors.lightGray,
+    borderTopLeftRadius: 4,
+    borderBottomLeftRadius: 4,
+  },
+  pgDetailsImg: {
+    height: 200,
+    width: deviceWidth - 80,
+  },
+  pgDetailsContainer: {
+    backgroundColor: Colors.white,
+
+    borderRadius: 20,
+  },
+  centerView: {
+    alignItems: "center",
+  },
+  graybg: {
+    backgroundColor: Colors.gray,
+  },
+  textIconTitle: {
+    ...CommonStyles.directionRowSB,
+    ...LayoutStyle.marginVertical20,
+  },
+  titleText: {
+    ...LayoutStyle.fontSize14,
+    fontFamily: FontFamily.RobotoMedium,
+    color: Colors.blackText,
+  },
+  pageHeader: {
+    ...LayoutStyle.fontSize14,
+    fontFamily: FontFamily.RobotoRegular,
+    color: Colors.whiteText,
+    ...LayoutStyle.marginLeft10,
+  },
+  vacateRoomContainer: {},
+  textarea: {
+    height: 100,
+    borderColor: "#ccc",
+    borderWidth: 1,
+    borderRadius: 5,
+    textAlignVertical: "top",
+    ...LayoutStyle.marginTop20,
+    ...LayoutStyle.paddingHorizontal10,
+  },
+  vacateBtnBottom: {
+    ...LayoutStyle.paddingBottom30,
+  },
+  textRadioBtn: {
+    ...LayoutStyle.paddingLeft5,
+    ...LayoutStyle.fontSize10,
+    fontFamily: FontFamily.RobotoMedium,
+    color: Colors.blackText,
+    width: deviceWidth / 1.2,
+  },
+});
+
+export default HomeStyle;

@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "948960032829",
+    "project_id": "livyco-b65f5",
+    "storage_bucket": "livyco-b65f5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:948960032829:android:e03975abe0e6f9c9fd5254",
+        "android_client_info": {
+          "package_name": "com.livyco"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "948960032829-23aknnjh5cu963319ibuifdqteerm8si.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.livyco",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "948960032829-u4a5t24tob5qp9p8ksc2ibe90beah108.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAvq819yWgzs5SGpBuxYFPryeTTcokF6cU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "948960032829-u4a5t24tob5qp9p8ksc2ibe90beah108.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
