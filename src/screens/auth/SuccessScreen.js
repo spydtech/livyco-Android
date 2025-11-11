@@ -13,7 +13,7 @@ const SuccessScreen = props => {
   return (
     <View style={[AuthStyle.mainContainer]}>
       <StatusBar barStyle="dark-content" backgroundColor={Colors.goastWhite} />
-      <View style={[AuthStyle.successContainer]}>
+      <View style={[AuthStyle.successContainer, {height: "100%", width: "100%"}]}>
         <Image style={AuthStyle.successLogo} source={IMAGES.successCheck} />
         <Text style={[AuthStyle.successText]}>{'Logged in successfully'}</Text>
       </View>

@@ -19,9 +19,10 @@ import Colors from '../../styles/Colors';
 import AuthStyle from '../../styles/AuthStyle';
 import LayoutStyle from '../../styles/LayoutStyle';
 import CommonStyles from '../../styles/CommonStyles';
-import {verifyFirebaseOTP} from '../../services/authService';
+import {verifyFirebaseOTP, verifyOTP} from '../../services/authService';
 import {setUserToken} from '../../utils/Api';
 import {verifyFirebaseOTPCode, sendFirebaseOTP} from '../../config/firebase';
+import {isDevelopment} from '../../utils/Environment';
 
 const OtpScreen = props => {
   const inputRefs = useRef([]);
@@ -81,7 +82,7 @@ const OtpScreen = props => {
       return;
     }
 
-    if (!confirmation) {
+    if (!confirmation && !isDevelopment()) {
       setError('OTP session expired. Please request a new OTP.');
       return;
     }
@@ -90,8 +91,42 @@ const OtpScreen = props => {
     setError('');
 
     try {
+      // In development, use backend API directly
+      if (isDevelopment() && confirmation?.isDevelopment) {
+        const formattedPhone = phoneNumber.startsWith('+') 
+          ? phoneNumber.replace('+91', '') 
+          : phoneNumber;
+        
+        const backendResponse = await verifyOTP({
+          phone: formattedPhone,
+          otp: otpString,
+        });
+        
+        console.log("Backend Response (Dev)", backendResponse);
+
+        if (backendResponse.success && backendResponse.data?.token) {
+          // Store token
+          await setUserToken(backendResponse.data.token);
+
+          Alert.alert('Success', backendResponse.message || 'Verification successful!', [
+            {
+              text: 'OK',
+              onPress: () => {
+                props.navigation.navigate('Success');
+              },
+            },
+          ]);
+        } else {
+          const errorMessage = backendResponse.message || 'Verification failed. Please try again.';
+          setError(errorMessage);
+          console.error('Backend verification error:', backendResponse);
+        }
+        setLoading(false);
+        return;
+      }
+
+      // In production, use Firebase flow
       // Step 1: Verify OTP with Firebase
-      // Pass original phone number for dev mode handling
       const firebaseResult = await verifyFirebaseOTPCode(
         confirmation, 
         otpString,
@@ -106,27 +141,22 @@ const OtpScreen = props => {
       }
 
       // Step 2: Send ID token to backend for verification and login
-      // Don't send role - let backend determine user's role from database
+      // Use /verify-firebase-otp endpoint in production
       const backendResponse = await verifyFirebaseOTP({
         idToken: firebaseResult.idToken,
         // role is not sent - backend will verify token and return user's actual role
       });
-      console.log("Backend Response", backendResponse);
+      console.log("Backend Response (Prod)", backendResponse);
 
       if (backendResponse.success && backendResponse.data?.token) {
         // Store token
-        setUserToken(backendResponse.data.token);
+        await setUserToken(backendResponse.data.token);
 
         Alert.alert('Success', backendResponse.message || 'Verification successful!', [
           {
             text: 'OK',
             onPress: () => {
-              // Navigate to success screen or dashboard based on flow
-              if (isLogin) {
-                props.navigation.navigate('Success');
-              } else {
-                props.navigation.navigate('Success');
-              }
+              props.navigation.navigate('Success');
             },
           },
         ]);

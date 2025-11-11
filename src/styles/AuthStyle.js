@@ -272,7 +272,7 @@ const AuthStyle = StyleSheet.create({
   },
   successContainer: {
     backgroundColor: Colors.goastWhite,
-
+    justifyContent: "center",
     alignItems: "center",
   },
   successText: {
@@ -295,6 +295,7 @@ const AuthStyle = StyleSheet.create({
   // Register screen
   registerContainer: {
     backgroundColor: Colors.goastWhite,
+    flex:1
   },
   photoContainer: {},
   photoView: {
@@ -302,7 +303,7 @@ const AuthStyle = StyleSheet.create({
     width: 120,
     backgroundColor: Colors.lightGray,
     borderRadius: 100,
-
+justifyContent: "center",
     alignItems: "center",
     ...LayoutStyle.marginTop20,
     alignSelf: "center",
@@ -410,27 +411,40 @@ const AuthStyle = StyleSheet.create({
   bottomSheetHeight: {
     height: deviceHight / 2.5,
   },
+  bottomSheetContent: {
+    ...LayoutStyle.paddingHorizontal30,
+    ...LayoutStyle.paddingVertical20,
+    paddingBottom: 30,
+  },
   imgOpenName: {
     color: Colors.secondary,
     fontFamily: FontFamily.RobotoMedium,
     ...LayoutStyle.fontSize14,
-    ...LayoutStyle.marginTop5,
+    ...LayoutStyle.marginTop10,
+    textAlign: "center",
   },
   imgOptionContainer: {
     ...CommonStyles.directionRowSB,
+    ...LayoutStyle.marginTop30,
+    paddingHorizontal: 10,
   },
   optionView: {
     width: deviceWidth / 3,
     borderWidth: 1,
     borderColor: Colors.secondary,
-
     alignItems: "center",
+    justifyContent: "center",
     borderRadius: 10,
+    ...LayoutStyle.paddingVertical20,
+    ...LayoutStyle.paddingHorizontal10,
+    minHeight: 120,
   },
   selectOption: {
     color: Colors.blackText,
     fontFamily: FontFamily.RobotoMedium,
     ...LayoutStyle.fontSize16,
+    textAlign: "center",
+    ...LayoutStyle.marginBottom10,
   },
 });
 

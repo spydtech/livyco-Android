@@ -141,7 +141,6 @@ function HomeTabs() {
           tabBarStyle: {
             alignItems: 'center',
             alignSelf: 'center',
-
             height: 65,
           },
           tabBarLabelStyle: {

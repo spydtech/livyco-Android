@@ -1,31 +1,55 @@
 // Firebase Configuration
 import auth from '@react-native-firebase/auth';
-import { isDevelopment, DEV_STATIC_OTP, DEV_STATIC_PHONE_FORMATTED } from '../utils/Environment';
+import {sendOTP} from '../services/authService';
+import {isDevelopment} from '../utils/Environment';
 
 /**
- * Send OTP to phone number using Firebase Authentication
- * In development mode, uses actual phone number but accepts static OTP "123456"
- * In production mode, uses normal Firebase OTP flow
- * @param {string} phoneNumber - Phone number in E.164 format (e.g., +919876543210)
+ * Send OTP to phone number
+ * In development mode, uses backend API (/send-otp) to reduce Firebase costs
+ * In production mode, uses Firebase Authentication
+ * @param {string} phoneNumber - Phone number (10 digits or E.164 format)
  * @returns {Promise<Object>} Confirmation result
  */
 export const sendFirebaseOTP = async (phoneNumber) => {
-  try {
-    if (isDevelopment()) {
-      // Dev mode: Skip Firebase OTP sending, create mock confirmation
-      const mockConfirmation = {
-        _isDevMode: true,
-        _staticPhone: DEV_STATIC_PHONE_FORMATTED,
-        _originalPhone: phoneNumber.startsWith('+') ? phoneNumber : `+91${phoneNumber}`,
-        confirm: async () => null,
-      };
+  // In development, use backend API instead of Firebase
+  if (isDevelopment()) {
+    try {
+      const formattedPhone = phoneNumber.startsWith('+') 
+        ? phoneNumber.replace('+91', '') 
+        : phoneNumber;
+      
+      const response = await sendOTP({ phone: formattedPhone });
+      
+      if (response.success) {
+        // Return a mock confirmation object for development
+        // The actual OTP verification will be done via backend
+        return {
+          success: true,
+          confirmation: {
+            phoneNumber: formattedPhone,
+            isDevelopment: true,
+          },
+          message: response.message || 'OTP sent successfully',
+        };
+      } else {
+        return {
+          success: false,
+          error: response.error,
+          message: response.message || 'Failed to send OTP',
+        };
+      }
+    } catch (error) {
+      console.error('Backend OTP send error:', error);
       return {
-        success: true,
-        confirmation: mockConfirmation,
-        message: `OTP sent successfully. In development mode, use static OTP "${DEV_STATIC_OTP}" to verify.`,
+        success: false,
+        error: error.message,
+        message: 'Failed to send OTP. Please try again.',
       };
     }
-    
+  }
+  
+  // In production, use Firebase
+  try {
     const formattedPhone = phoneNumber.startsWith('+') 
       ? phoneNumber 
       : `+91${phoneNumber}`;
@@ -47,32 +71,58 @@ export const sendFirebaseOTP = async (phoneNumber) => {
 };
 
 /**
- * Verify OTP code with Firebase
- * In development mode, accepts static OTP "123456" and uses actual phone number for token
- * In production mode, uses normal Firebase verification
+ * Verify OTP code
+ * In development mode, uses backend API (/verify-otp) to reduce Firebase costs
+ * In production mode, uses Firebase Authentication
  * @param {Object} confirmation - Confirmation object from sendFirebaseOTP
  * @param {string} code - OTP code entered by user
- * @param {string} originalPhoneNumber - Original phone number (for dev mode)
- * @returns {Promise<Object>} User credential with ID token
+ * @param {string} originalPhoneNumber - Original phone number
+ * @returns {Promise<Object>} User credential with ID token (or token from backend in dev)
  */
 export const verifyFirebaseOTPCode = async (confirmation, code, originalPhoneNumber = null) => {
-  try {
-    if (isDevelopment() && code === DEV_STATIC_OTP) {
-      // Dev mode: Use Firebase test number to get valid token without sending OTP
-      const testPhone = '+918469084711';
-      const testConfirmation = await auth().signInWithPhoneNumber(testPhone);
-      const testCredential = await testConfirmation.confirm(code);
-      const testIdToken = await testCredential.user.getIdToken();
+  // In development, use backend API instead of Firebase
+  if (isDevelopment() && confirmation?.isDevelopment) {
+    try {
+      const phone = confirmation.phoneNumber || originalPhoneNumber;
+      const formattedPhone = phone?.startsWith('+') 
+        ? phone.replace('+91', '') 
+        : phone;
       
+      // Import verifyOTP from authService
+      const {verifyOTP} = require('../services/authService');
+      const response = await verifyOTP({ 
+        phone: formattedPhone, 
+        otp: code 
+      });
+      
+      if (response.success && response.data?.token) {
+        // Return a format similar to Firebase for compatibility
+        return {
+          success: true,
+          idToken: response.data.token, // In dev, we return the JWT token directly
+          token: response.data.token, // Also include token for direct use
+          user: response.data.user,
+          message: response.message || 'OTP verified successfully',
+        };
+      } else {
+        return {
+          success: false,
+          error: response.error,
+          message: response.message || 'Invalid OTP. Please try again.',
+        };
+      }
+    } catch (error) {
+      console.error('Backend OTP verification error:', error);
       return {
-        success: true,
-        idToken: testIdToken,
-        user: testCredential.user,
-        message: 'OTP verified successfully (Dev Mode)',
-        isDevMode: true,
+        success: false,
+        error: error.message,
+        message: 'Failed to verify OTP. Please try again.',
       };
     }
-    
+  }
+  
+  // In production, use Firebase
+  try {
     const userCredential = await confirmation.confirm(code);
     const idToken = await userCredential.user.getIdToken();
     
@@ -84,14 +134,6 @@ export const verifyFirebaseOTPCode = async (confirmation, code, originalPhoneNum
     };
   } catch (error) {
     console.error('Firebase OTP verification error:', error);
-    
-    if (isDevelopment() && code === DEV_STATIC_OTP) {
-      return {
-        success: false,
-        error: error.message,
-        message: `In development mode, please use the static OTP "${DEV_STATIC_OTP}".`,
-      };
-    }
     
     return {
       success: false,

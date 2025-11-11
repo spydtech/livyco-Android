@@ -134,9 +134,9 @@ const Registerotp = props => {
           [
             {
               text: 'OK',
-              onPress: () => {
+              onPress: async () => {
                 if (response.data.token) {
-                  setUserToken(response.data.token);
+                  await setUserToken(response.data.token);
                   props.navigation.navigate('Success');
                 }
               },
