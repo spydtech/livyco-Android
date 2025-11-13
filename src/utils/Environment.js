@@ -4,7 +4,7 @@
  */
 
 export const isDevelopment = () => {
-  return __DEV__;
+  return !__DEV__;
 };
 
 export const isProduction = () => {

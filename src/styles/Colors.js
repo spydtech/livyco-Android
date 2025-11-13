@@ -40,6 +40,9 @@ const Colors = {
   transparentBlue: '#0827B2CC',
   modalTransparent: '#0000009F',
   blackTransparent: '#00000040',
+
+  darkYellowButton: '#FACC15',
+  lightYellowBackground: '#FFDC82',
 };
 
 export default Colors;

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -13,12 +13,12 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import IMAGES from '../../assets/Images';
-import {Button, Icons} from '../../components';
+import { Button, Icons } from '../../components';
 import Colors from '../../styles/Colors';
 import AuthStyle from '../../styles/AuthStyle';
 import LayoutStyle from '../../styles/LayoutStyle';
-import {checkUserExists} from '../../services/authService';
-import {sendFirebaseOTP} from '../../config/firebase';
+import { checkUserExists } from '../../services/authService';
+import { sendFirebaseOTP } from '../../config/firebase';
 
 const LoginScreen = props => {
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -51,31 +51,31 @@ const LoginScreen = props => {
 
     try {
       // First check if user exists
-//       const checkResponse = await checkUserExists({
-//         phone: phoneNumber.trim(),
-//         role: 'user', // You can make this dynamic if needed
-//       });
-// console.log("Chheck response", checkResponse);
+      const checkResponse = await checkUserExists({
+        phone: phoneNumber.trim(),
+        role: 'user', // You can make this dynamic if needed
+      });
+      console.log("Chheck response", checkResponse);
 
-//       if (!checkResponse.success) {
-//         Alert.alert(
-//           'User Not Found',
-//           checkResponse.message || 'This phone number is not registered. Please register first.',
-//           [
-//             {
-//               text: 'Register',
-//               onPress: () => props.navigation.navigate('Registerotp'),
-//             },
-//             {text: 'Cancel', style: 'cancel'},
-//           ],
-//         );
-//         setLoading(false);
-//         return;
-//       }
+      if (!checkResponse.success) {
+        Alert.alert(
+          'User Not Found',
+          checkResponse.message || 'This phone number is not registered. Please register first.',
+          [
+            {
+              text: 'Register',
+              onPress: () => props.navigation.navigate('Registerotp'),
+            },
+            { text: 'Cancel', style: 'cancel' },
+          ],
+        );
+        setLoading(false);
+        return;
+      }
 
       // User exists, send OTP using Firebase
       const otpResponse = await sendFirebaseOTP(phoneNumber.trim());
-console.log("otpResponse", otpResponse);
+      console.log("otpResponse", otpResponse);
       if (otpResponse.success) {
         // Navigate to OTP screen with phone number and confirmation object
         props.navigation.navigate('Otp', {
@@ -127,8 +127,8 @@ console.log("otpResponse", otpResponse);
               <Image source={IMAGES.indianFlag} style={AuthStyle.flag} />
               <Text style={AuthStyle.code}>{'+91'}</Text>
               <Icons
-                iconSetName={'FontAwesome6'}
-                iconName={'caret-down'}
+                iconSetName={'Ionicons'}
+                iconName={'chevron-down'}
                 iconColor={Colors.gray}
                 iconSize={18}
               />
@@ -154,11 +154,11 @@ console.log("otpResponse", otpResponse);
             />
           </View>
           {error ? (
-            <Text style={[AuthStyle.inputLabel, {color: Colors.danger, fontSize: 12, marginTop: 5}]}>
+            <Text style={[AuthStyle.inputLabel, { color: Colors.danger, fontSize: 12, marginTop: 5 }]}>
               {error}
             </Text>
           ) : null}
-          <View style={{...LayoutStyle.paddingTop30}}>
+          <View style={{ ...LayoutStyle.paddingTop30 }}>
             <Button
               onPress={handleSendOTP}
               btnName={loading ? 'SENDING...' : 'SEND OTP'}
@@ -168,7 +168,7 @@ console.log("otpResponse", otpResponse);
             />
           </View>
           {loading && (
-            <View style={{...LayoutStyle.marginTop10, alignItems: 'center'}}>
+            <View style={{ ...LayoutStyle.marginTop10, alignItems: 'center' }}>
               <ActivityIndicator size="small" color={Colors.secondary} />
             </View>
           )}
@@ -181,7 +181,7 @@ console.log("otpResponse", otpResponse);
             <Image source={IMAGES.google} style={AuthStyle.googleImg} />
             <Text style={AuthStyle.googleButtonText}>Sign up with Google</Text>
           </TouchableOpacity>
-          <View style={{...LayoutStyle.marginVertical10}}>
+          <View style={{ ...LayoutStyle.marginVertical10 }}>
             <Text style={AuthStyle.termsText}>
               {'By signing up, you agree to our '}
               <Text style={AuthStyle.linkText}>{'Terms of Use'}</Text> {'and'}
@@ -193,7 +193,7 @@ console.log("otpResponse", otpResponse);
             onPress={() => gotoGuest()}>
             <Text style={AuthStyle.guestText}>{'Join as a Guest'}</Text>
           </TouchableOpacity>
-          <View style={{...LayoutStyle.paddingTop30}}>
+          <View style={{ ...LayoutStyle.paddingTop30 }}>
             <Button
               onPress={() => gotoVerifyregister()}
               btnName={'REGISTER WITH OTP'}

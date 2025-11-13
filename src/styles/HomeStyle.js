@@ -102,6 +102,97 @@ const HomeStyle = StyleSheet.create({
     alignSelf: "center",
     fontFamily: FontFamily.RobotoMedium,
   },
+  searchContainer: {
+    backgroundColor: Colors.lightYellowBackground,
+    borderRadius: 20,
+    padding: 20,
+    marginTop: 10,
+  },
+  genderButtonsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 15,
+  },
+  genderButton: {
+    flex: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 8,
+    marginHorizontal: 4,
+    borderRadius: 20,
+    backgroundColor: Colors.white,
+    alignItems: "center",
+  },
+  genderButtonSelected: {
+    backgroundColor: Colors.secondary,
+    borderColor: Colors.secondary,
+  },
+  genderButtonText: {
+    fontSize: 12,
+    fontFamily: FontFamily.RobotoMedium,
+    color: Colors.blackText,
+  },
+  genderButtonTextSelected: {
+    color: Colors.white,
+  },
+  dropdownsContainer: {
+    flexDirection: "row",
+    marginBottom: 15,
+  },
+  dropdownWrapper: {
+    flex: 1,
+  },
+  dropdownStyle: {
+    height: 45,
+    backgroundColor: Colors.white,
+    borderRadius: 25
+  },
+  selectCityButton: {
+    backgroundColor: Colors.darkYellowButton,
+    borderRadius: 10,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 15,
+  },
+  selectCityText: {
+    fontSize: 14,
+    fontFamily: FontFamily.RobotoMedium,
+    color: Colors.black,
+    marginLeft: 8,
+  },
+  moveInContainer: {
+    marginBottom: 15,
+  },
+  moveInLabel: {
+    fontSize: 12,
+    fontFamily: FontFamily.RobotoRegular,
+    color: Colors.blackText,
+    marginBottom: 8,
+  },
+  dateInputContainer: {
+    backgroundColor: Colors.white,
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  dateInputText: {
+    fontSize: 12,
+    fontFamily: FontFamily.RobotoRegular,
+    color: Colors.blackText,
+    flex: 1,
+  },
+  dateInputPlaceholder: {
+    color: Colors.placeholder,
+  },
+  searchButtonStyle: {
+    paddingVertical: 15,
+    borderRadius: 10,
+  },
   groupText: {
     ...LayoutStyle.marginTop20,
     ...CommonStyles.directionRowCenter,
@@ -259,6 +350,7 @@ const HomeStyle = StyleSheet.create({
   },
   rateImgViewFeedback: {
     ...LayoutStyle.marginVertical10,
+    flexDirection: "row"
   },
   feedbackDesc: {
     ...LayoutStyle.fontSize12,
@@ -335,7 +427,7 @@ const HomeStyle = StyleSheet.create({
     alignSelf: "flex-end",
     marginBottom: 100,
     position: "absolute",
-    bottom: 20,
+    bottom: 70,
     right: 20,
     width: 60,
     height: 60,
@@ -424,9 +516,10 @@ const HomeStyle = StyleSheet.create({
     alignSelf: "center",
     marginBottom: 100,
     position: "absolute",
-    bottom: 20,
+    bottom: 50,
     height: 65,
-
+    flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
     borderRadius: 50,
     elevation: 5,
@@ -447,7 +540,7 @@ const HomeStyle = StyleSheet.create({
     ...LayoutStyle.marginTop5,
   },
   bottomSheetHeight: {
-    height: deviceHight / 2.5,
+    height: deviceHight / 2,
   },
   blackTextbigCenter: {
     ...LayoutStyle.fontSize20,

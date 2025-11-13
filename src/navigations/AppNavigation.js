@@ -130,7 +130,7 @@ function HomeTabs() {
   return (
     <>
       <Tab.Navigator
-        screenOptions={({route}) => ({
+        screenOptions={({ route }) => ({
           tabBarShowLabel: false,
           headerShown: false,
           gestureEnabled: true,
@@ -139,16 +139,16 @@ function HomeTabs() {
           tabBarHideOnKeyboard: true,
           unmountOnBlur: true,
           tabBarStyle: {
-            alignItems: 'center',
-            alignSelf: 'center',
-            height: 65,
+            // alignItems: 'center',
+            // alignSelf: 'center',
+            backgroundColor: "transparent",
           },
           tabBarLabelStyle: {
             fontSize: 12,
             fontWeight: '500',
             color: '#FFF',
           },
-          tabBarIcon: ({focused}) => {
+          tabBarIcon: ({ focused }) => {
             let iconSetName;
             let iconName;
             let label;
@@ -181,21 +181,19 @@ function HomeTabs() {
                 break;
             }
             return (
-              <View>
-                <View
-                  style={{
-                    alignItems: 'center',
-                    backgroundColor: focused
-                      ? Colors.goastWhite
-                      : Colors.charcol,
-                    marginBottom: 1,
-                  }}>
-                  <Svg
-                    width={deviceWidth / 5}
-                    height="100"
-                    viewBox="0 0 800 300">
-                    <Path
-                      d="M0 0
+              <View
+                style={{
+                  alignItems: 'center',
+                  backgroundColor: focused ? 'transparent' : Colors.charcol,
+                }}
+              >
+                <Svg
+                  width={deviceWidth / 5}
+                  height={65}
+                  viewBox="0 140 800 400"
+                >
+                  <Path
+                    d="M0 0
                       L0 22
                       C220 40, 200 420, 420 420
                       C620 420, 620 70, 820 20
@@ -203,32 +201,33 @@ function HomeTabs() {
                       V1000
                       H0
                       Z"
-                      fill={Colors.charcol}
+                    fill={Colors.charcol}
+                  />
+                  <View
+                    style={{
+                      alignItems: 'center',
+                      borderRadius: focused ? 100 : 0,
+                      width: "40",
+                      alignSelf: 'center',
+                      padding: 10,
+                      backgroundColor: Colors.charcol,
+                      marginTop: focused ? -10 : 10,
+                      marginLeft: focused ? 3 : 0,
+                    }}
+                  >
+                    <Icons
+                      iconSetName={iconSetName}
+                      iconName={iconName}
+                      iconColor={focused ? Colors.primary : Colors.white}
+                      iconSize={20}
                     />
-                    <View
-                      style={{
-                        alignItems: 'center',
-                        borderRadius: focused ? 100 : 0,
-                        alignSelf: 'center',
-                        paddingVertical: focused ? 6 : 20,
-                        paddingHorizontal: focused ? 6 : 20,
-                        backgroundColor: Colors.charcol,
-                        marginTop: 40,
-                        marginLeft: 4,
-                      }}>
-                      <Icons
-                        iconSetName={iconSetName}
-                        iconName={iconName}
-                        iconColor={Colors.primary}
-                        iconSize={20}
-                      />
-                    </View>
-                  </Svg>
-                </View>
+                  </View>
+                </Svg>
               </View>
             );
           },
-        })}>
+        })}
+      >
         <Tab.Screen name="HomeTab" component={HomeStackScreen} />
         <Tab.Screen name="PayTab" component={PaymentStackScreen} />
         <Tab.Screen name="ChatsTab" component={ChatsStackScreen} />

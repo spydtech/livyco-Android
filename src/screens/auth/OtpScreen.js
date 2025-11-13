@@ -23,6 +23,7 @@ import {verifyFirebaseOTP, verifyOTP} from '../../services/authService';
 import {setUserToken} from '../../utils/Api';
 import {verifyFirebaseOTPCode, sendFirebaseOTP} from '../../config/firebase';
 import {isDevelopment} from '../../utils/Environment';
+import { deviceHight } from '../../utils/DeviceInfo';
 
 const OtpScreen = props => {
   const inputRefs = useRef([]);
@@ -112,7 +113,7 @@ const OtpScreen = props => {
             {
               text: 'OK',
               onPress: () => {
-                props.navigation.navigate('Success');
+                props.navigation.replace('Success');
               },
             },
           ]);
@@ -124,6 +125,7 @@ const OtpScreen = props => {
         setLoading(false);
         return;
       }
+console.log("confirmation", confirmation);
 
       // In production, use Firebase flow
       // Step 1: Verify OTP with Firebase
@@ -156,7 +158,7 @@ const OtpScreen = props => {
           {
             text: 'OK',
             onPress: () => {
-              props.navigation.navigate('Success');
+              props.navigation.replace('Success');
             },
           },
         ]);
@@ -227,7 +229,7 @@ const OtpScreen = props => {
       <View style={[AuthStyle.loginLogoContainer]}>
         <Image source={IMAGES.logo} style={AuthStyle.loginLogo} />
       </View>
-      <View style={AuthStyle.loginWhiteCard}>
+      <View style={[AuthStyle.loginWhiteCard, {height: deviceHight}]}>
         <ScrollView keyboardShouldPersistTaps="handled">
           <View style={AuthStyle.loginForm}>
             <Text style={AuthStyle.loginTitle}>{'OTP Verification'}</Text>
@@ -251,6 +253,7 @@ const OtpScreen = props => {
                 autoFocus={index === 0}
                 onChangeText={text => handleChange(text, index)}
                 onKeyPress={e => handleKeyPress(e, index)}
+                selectTextOnFocus={true}
               />
             ))}
           </View>
@@ -273,15 +276,15 @@ const OtpScreen = props => {
               <ActivityIndicator size="small" color={Colors.secondary} />
             </View>
           )}
-          <View style={{...LayoutStyle.marginVertical30}}>
+          <View style={{...LayoutStyle.marginVertical30, flexDirection: "row", justifyContent: "center", alignItems: "center"}}>
             <Text style={AuthStyle.termsText}>
               {`Didn't receive OTP?`}
-              <TouchableOpacity onPress={handleResendOTP} disabled={loading}>
-                <Text style={[AuthStyle.linkText, {color: Colors.secondary}]}>
+            </Text>
+            <TouchableOpacity onPress={handleResendOTP} disabled={loading}>
+                <Text style={[AuthStyle.linkText, {color: Colors.secondary, marginLeft: 5}]}>
                   {'Resend'}
                 </Text>
               </TouchableOpacity>
-            </Text>
           </View>
         </ScrollView>
       </View>

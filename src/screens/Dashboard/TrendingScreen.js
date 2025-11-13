@@ -216,6 +216,7 @@ const TrendingScreen = props => {
               keyboardShouldPersistTaps="handled"
               contentContainerStyle={{
                 flexGrow: 1,
+                padding: 20,
                 ...LayoutStyle.paddingBottom30,
               }}
               showsVerticalScrollIndicator={false}>
@@ -270,7 +271,7 @@ const TrendingScreen = props => {
               renderContent={() => {
                 return (
                   <View style={[HomeStyle.bottomSheetHeight]}>
-                    <Text style={[HomeStyle.blackTextbigCenter]}>
+                    <Text style={[HomeStyle.blackTextbigCenter, {marginTop: 20}]}>
                       {'Sort By'}
                     </Text>
                     {options.map((item, index) => (
@@ -279,6 +280,7 @@ const TrendingScreen = props => {
                         style={[
                           HomeStyle.option,
                           selected === item && HomeStyle.selectedOption,
+                          {paddingHorizontal: 20}
                         ]}
                         onPress={() => setSelected(item)}>
                         <Text

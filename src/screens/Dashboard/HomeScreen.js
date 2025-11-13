@@ -18,10 +18,10 @@ import HomeStyle from '../../styles/HomeStyle';
 import Colors from '../../styles/Colors';
 import FastImage from 'react-native-fast-image';
 import LayoutStyle from '../../styles/LayoutStyle';
-import { Button, Icons, Input } from '../../components';
+import { Button, Icons, Input, DropDown } from '../../components';
 import IMAGES from '../../assets/Images';
 import CommonStyles from '../../styles/CommonStyles';
-import Carousel from 'react-native-reanimated-carousel';
+import { Dropdown } from "react-native-element-dropdown";
 import { deviceHight, deviceWidth } from '../../utils/DeviceInfo';
 import DatePicker from 'react-native-date-picker';
 import moment from 'moment';
@@ -43,6 +43,27 @@ const HomeScreen = props => {
   const [loading, setLoading] = useState(true);
   const [selectedGender, setSelectedGender] = useState('For Him');
   const [sharingType, setSharingType] = useState('');
+  const [budget, setBudget] = useState('');
+  const [selectedCity, setSelectedCity] = useState('');
+  const [moveInDate, setMoveInDate] = useState('');
+  const [moveInDateOpen, setMoveInDateOpen] = useState(false);
+
+  // Dropdown data
+  const sharingTypeData = [
+    { label: 'Single', value: 'single' },
+    { label: 'Double', value: 'double' },
+    { label: 'Triple', value: 'triple' },
+    { label: 'Four', value: 'four' },
+  ];
+
+  const budgetData = [
+    { label: '₹ 0 - ₹ 5,000', value: '0-5000' },
+    { label: '₹ 5,000 - ₹ 10,000', value: '5000-10000' },
+    { label: '₹ 10,000 - ₹ 15,000', value: '10000-15000' },
+    { label: '₹ 15,000 - ₹ 20,000', value: '15000-20000' },
+    { label: '₹ 20,000 - ₹ 25,000', value: '20000-25000' },
+    { label: '₹ 25,000+', value: '25000+' },
+  ];
 
   // Category data
   const categories = [
@@ -304,6 +325,12 @@ const HomeScreen = props => {
     setCheckOut(formattedDate);
   };
 
+  const handleMoveInDate = date => {
+    setMoveInDateOpen(false);
+    const formattedDate = moment(date).format('MM/DD/YYYY');
+    setMoveInDate(formattedDate);
+  };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -364,170 +391,167 @@ const HomeScreen = props => {
 
             {/* Search Section */}
             <View style={HomeStyle.searchView}>
-              <Input
-                placeholder={'Search for locality or landmark'}
-                inputStyle={HomeStyle.searchInput}
-                leftIcon={true}
-                leftIconSet={'Ionicons'}
-                leftIconName={'search-outline'}
-                leftIconColor={Colors.gray}
-                leftIconSize={18}
-                rightIcon={true}
-                rightIconSet={'MaterialIcons'}
-                rightIconName={'my-location'}
-                rightIconColor={Colors.black}
-                rightIconSize={20}
-              />
-
-              {/* Filter Options */}
-              <View style={[HomeStyle.filterOption]}>
-                {!shortVisit ? (
-                  <TouchableOpacity>
-                    <View style={[HomeStyle.iconTextContain]}>
-                      <Icons
-                        iconSetName={'Ionicons'}
-                        iconName={'calendar-clear-outline'}
-                        iconColor={Colors.gray}
-                        iconSize={20}
-                      />
-                      <Text style={[HomeStyle.iconText, { ...LayoutStyle.marginLeft10 }]}>
-                        {'Move In'}
+              {/* Yellow Background Container */}
+              <View style={HomeStyle.searchContainer}>
+                {/* Gender Filter Buttons */}
+                <View style={HomeStyle.genderButtonsContainer}>
+                  {['For Him', 'For Her', 'Co Living'].map((gender) => (
+                    <TouchableOpacity
+                      key={gender}
+                      onPress={() => setSelectedGender(gender)}
+                      style={[
+                        HomeStyle.genderButton,
+                        selectedGender === gender && HomeStyle.genderButtonSelected
+                      ]}>
+                      <Text style={[
+                        HomeStyle.genderButtonText,
+                        selectedGender === gender && HomeStyle.genderButtonTextSelected
+                      ]}>
+                        {gender}
                       </Text>
-                    </View>
-                  </TouchableOpacity>
-                ) : (
-                  <View style={[HomeStyle.checkoutContainer]}>
-                    {checkIn === '' ? (
-                      <TouchableOpacity onPress={() => setOpen(true)}>
-                        <View style={[HomeStyle.iconTextContain]}>
-                          <Icons
-                            iconSetName={'Ionicons'}
-                            iconName={'calendar-clear-outline'}
-                            iconColor={Colors.gray}
-                            iconSize={18}
-                          />
-                          <Text style={[HomeStyle.iconText]}>
-                            {'Check - In'}
-                          </Text>
-                        </View>
-                        <DatePicker
-                          mode={'date'}
-                          modal
-                          open={open}
-                          date={new Date()}
-                          onConfirm={handleCheckInDate}
-                          onCancel={() => setOpen(false)}
+                    </TouchableOpacity>
+                  ))}
+                </View>
+
+                {/* Sharing Type and Budget Dropdowns */}
+                <View style={HomeStyle.dropdownsContainer}>
+                  <View style={HomeStyle.dropdownWrapper}>
+                    <Dropdown
+                      data={sharingTypeData}
+                      value={sharingType}
+                      placeholder='Sharing Type'
+                      onChange={(item) => setSharingType(item.value)}
+                      labelField="label"
+                      valueField="value"
+                      style={{
+                        height: 45,
+                        backgroundColor: Colors.white,
+                        borderRadius: 25,
+                        paddingHorizontal: 15,
+                      }}
+                      placeholderStyle={{
+                        color: Colors.grayBorder
+                      }}
+                      renderRightIcon={() => (
+                        <Icons
+                          iconSetName={'Ionicons'}
+                          iconName={'chevron-down'}
+                          iconColor={Colors.grayBorder}
+                          iconSize={18}
                         />
-                      </TouchableOpacity>
-                    ) : (
-                      <View style={[HomeStyle.dateStyle]}>
-                        <Text style={[HomeStyle.iconTextBold]}>{'Check - In'}</Text>
-                        <Text style={[HomeStyle.iconText]}>{checkIn}</Text>
-                      </View>
-                    )}
-                    {checkOut === '' ? (
-                      <TouchableOpacity
-                        style={{ ...LayoutStyle.marginLeft15 }}
-                        onPress={() => setOpen(true)}>
-                        <View style={[HomeStyle.iconTextContain]}>
-                          <Icons
-                            iconSetName={'Ionicons'}
-                            iconName={'calendar-clear-outline'}
-                            iconColor={Colors.gray}
-                            iconSize={18}
-                          />
-                          <Text style={[HomeStyle.iconText]}>
-                            {'Check - out'}
-                          </Text>
-                        </View>
-                        <DatePicker
-                          mode={'date'}
-                          modal
-                          open={open}
-                          date={new Date()}
-                          onConfirm={handleCheckOutDate}
-                          onCancel={() => setOpen(false)}
+                      )}
+                    />
+                    {/* <DropDown
+                      placeholder="Sharing Type"
+                      dropdownData={sharingTypeData}
+                      value={sharingType}
+                      onChange={(item) => setSharingType(item.value)}
+                      labelField="label"
+                      valueField="value"
+                      mainDropdownStyle={HomeStyle.dropdownStyle}
+                      renderRightIcon={() => (
+                        <Icons
+                          iconSetName={'Ionicons'}
+                          iconName={'chevron-down'}
+                          iconColor={Colors.gray}
+                          iconSize={18}
                         />
-                      </TouchableOpacity>
-                    ) : (
-                      <View style={[HomeStyle.dateStyle, { ...LayoutStyle.marginLeft10 }]}>
-                        <Text style={[HomeStyle.iconTextBold]}>{'Check - Out'}</Text>
-                        <Text style={[HomeStyle.iconText]}>{checkOut}</Text>
-                      </View>
-                    )}
+                      )}
+                    /> */}
                   </View>
-                )}
-                <TouchableOpacity onPress={gotoUpdateShortVisit}>
-                  <View style={[HomeStyle.iconTextContain]}>
+                  <View style={[HomeStyle.dropdownWrapper, { marginLeft: 10 }]}>
+                  <Dropdown
+                      data={budgetData}
+                      value={budget}
+                      placeholder='Budget'
+                      onChange={(item) => setBudget(item.value)}
+                      labelField="label"
+                      valueField="value"
+                      style={{
+                        height: 45,
+                        backgroundColor: Colors.white,
+                        borderRadius: 25,
+                        paddingHorizontal: 15,
+                      }}
+                      placeholderStyle={{
+                        color: Colors.grayBorder
+                      }}
+                      renderRightIcon={() => (
+                        <Icons
+                          iconSetName={'Ionicons'}
+                          iconName={'chevron-down'}
+                          iconColor={Colors.grayBorder}
+                          iconSize={18}
+                        />
+                      )}
+                    />
+                    {/* <DropDown
+                      placeholder="Budget"
+                      dropdownData={budgetData}
+                      value={budget}
+                      onChange={(item) => setBudget(item.value)}
+                      labelField="label"
+                      valueField="value"
+                      mainDropdownStyle={HomeStyle.dropdownStyle}
+                      renderRightIcon={() => (
+                        <Icons
+                          iconSetName={'Ionicons'}
+                          iconName={'chevron-down'}
+                          iconColor={Colors.gray}
+                          iconSize={18}
+                        />
+                      )}
+                    /> */}
+                  </View>
+                </View>
+
+                {/* Select City Button */}
+                <TouchableOpacity style={HomeStyle.selectCityButton}>
+                  <Icons
+                    iconSetName={'Ionicons'}
+                    iconName={'location'}
+                    iconColor={Colors.black}
+                    iconSize={20}
+                  />
+                  <Text style={HomeStyle.selectCityText}>Select City</Text>
+                </TouchableOpacity>
+
+                {/* Move In Date */}
+                <View style={HomeStyle.moveInContainer}>
+                  <Text style={HomeStyle.moveInLabel}>Move In</Text>
+                  <TouchableOpacity
+                    style={HomeStyle.dateInputContainer}
+                    onPress={() => setMoveInDateOpen(true)}>
+                    <Text style={[
+                      HomeStyle.dateInputText,
+                      !moveInDate && HomeStyle.dateInputPlaceholder
+                    ]}>
+                      {moveInDate || 'mm/dd/yyyy'}
+                    </Text>
                     <Icons
                       iconSetName={'Ionicons'}
-                      iconName={shortVisit ? 'radio-button-on' : 'radio-button-off-outline'}
-                      iconColor={Colors.gray}
-                      iconSize={20}
+                      iconName={'calendar-outline'}
+                      iconColor={Colors.black}
+                      iconSize={18}
                     />
-                    <Text style={[HomeStyle.iconText, { ...LayoutStyle.marginLeft10 }]}>
-                      {'Short Visit'}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              </View>
-
-              {/* Sharing Type Dropdown */}
-              <View style={{ marginTop: 10 }}>
-                <Text style={[HomeStyle.iconText, { marginBottom: 8 }]}>{'Sharing type'}</Text>
-                {/* Dropdown can be added here */}
-              </View>
-
-              {/* Gender Filter Buttons */}
-              <View style={{
-                flexDirection: 'row',
-                marginTop: 15,
-                justifyContent: 'space-between',
-              }}>
-                {['For Him', 'For Her', 'Co-living'].map((gender) => (
-                  <TouchableOpacity
-                    key={gender}
-                    onPress={() => setSelectedGender(gender)}
-                    style={{
-                      flex: 1,
-                      paddingVertical: 12,
-                      paddingHorizontal: 10,
-                      marginHorizontal: 5,
-                      borderRadius: 20,
-                      backgroundColor: selectedGender === gender ? Colors.primary : Colors.white,
-                      borderWidth: 1,
-                      borderColor: selectedGender === gender ? Colors.primary : Colors.grayBorder,
-                      alignItems: 'center',
-                    }}>
-                    <Text style={{
-                      fontSize: 12,
-                      fontFamily: 'Roboto-Medium',
-                      color: selectedGender === gender ? Colors.black : Colors.gray,
-                    }}>
-                      {gender}
-                    </Text>
                   </TouchableOpacity>
-                ))}
-              </View>
+                  <DatePicker
+                    mode={'date'}
+                    modal
+                    open={moveInDateOpen}
+                    date={new Date()}
+                    onConfirm={handleMoveInDate}
+                    onCancel={() => setMoveInDateOpen(false)}
+                  />
+                </View>
 
-              {/* Search Button */}
-              <View style={{ ...LayoutStyle.marginTop20 }}>
+                {/* Search Button */}
                 <Button
-                  btnName={'SEARCH'}
-                  btnTextColor={Colors.blackText}
-                  bgColor={Colors.primary}
-                  btnStyle={{ ...LayoutStyle.padding15 }}
+                  btnName={'Search'}
+                  btnTextColor={Colors.black}
+                  bgColor={Colors.darkYellowButton}
+                  btnStyle={HomeStyle.searchButtonStyle}
                 />
-              </View>
-
-              {/* Group Booking Link */}
-              <View style={HomeStyle.groupText}>
-                <Text style={HomeStyle.blackTextSmall}>
-                  {'Booking for a group? '}
-                </Text>
-                <TouchableOpacity onPress={() => gotoGroupBooking()}>
-                  <Text style={HomeStyle.blueTextSmall}>{'Click here'}</Text>
-                </TouchableOpacity>
               </View>
             </View>
 
@@ -808,11 +832,11 @@ const HomeScreen = props => {
           </ScrollView>
 
           {/* Floating Chat Button */}
-          <TouchableOpacity>
-            <View style={[HomeStyle.chatContainer]}>
+          <>
+            <TouchableOpacity style={[HomeStyle.chatContainer]}>
               <Image source={IMAGES.chat} style={[HomeStyle.chatImg]} />
-            </View>
-          </TouchableOpacity>
+            </TouchableOpacity>
+          </>
         </ImageBackground>
       </SafeAreaView>
     </KeyboardAvoidingView>

@@ -97,8 +97,8 @@ const OnboardingScreen = props => {
                   onPress={() => nextItem()}
                 >
                   <Icons
-                    iconSetName={'FontAwesome6'}
-                    iconName={'arrow-right-long'}
+                    iconSetName={'Ionicons'}
+                    iconName={'arrow-forward'}
                     iconColor={Colors.white}
                     iconSize={18}
                   />

@@ -7,7 +7,7 @@ import Colors from '../../styles/Colors';
 const SuccessScreen = props => {
   useEffect(() => {
     setTimeout(() => {
-      props.navigation.navigate('Register');
+      props.navigation.replace('Register');
     }, 3000);
   }, []);
   return (

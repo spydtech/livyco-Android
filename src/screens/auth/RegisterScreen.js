@@ -25,38 +25,39 @@ import moment from "moment";
 import ImagePicker from "react-native-image-crop-picker";
 import { deviceHight } from "../../utils/DeviceInfo";
 import {setUserToken, getUserTokenSync} from "../../utils/Api";
-import Api from "../../utils/Api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { isDevelopment } from "../../utils/Environment";
+import { BASE_URL } from "../../config/BaseUrl";
 
 const RegisterScreen = (props) => {
   // Basic Details fields
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [name, setName] = useState(isDevelopment() ? "John Doe" : "");
+  const [email, setEmail] = useState(isDevelopment() ? "john.doe@example.com" : "");
   const [gender, setGender] = useState("male");
   const [dob, setDob] = useState("DD/MM/YYYY");
   const [dobDate, setDobDate] = useState(null); // Store actual date object
   
   // Contact Information fields
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [location, setLocation] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState(isDevelopment() ? "9876543210" : "");
+  const [location, setLocation] = useState(isDevelopment() ? "New York" : "");
   const [selected, setSelected] = useState('student'); // Changed to match backend enum
   const [isEnabled, setIsEnabled] = useState(false);
-  const [organizationName, setOrganizationName] = useState("");
-  const [emergencyContactName, setEmergencyContactName] = useState("");
-  const [emergencyContactNumber, setEmergencyContactNumber] = useState("");
-  const [instituteName, setInstituteName] = useState("");
-  const [guardianName, setGuardianName] = useState("");
-  const [guardianContact, setGuardianContact] = useState("");
+  const [organizationName, setOrganizationName] = useState(isDevelopment() ? "ABC Organization" : "");
+  const [emergencyContactName, setEmergencyContactName] = useState(isDevelopment() ? "John Doe" : "");
+  const [emergencyContactNumber, setEmergencyContactNumber] = useState(isDevelopment() ? "9876543210" : "");
+  const [instituteName, setInstituteName] = useState(isDevelopment() ? "ABC Institute" : "");
+  const [guardianName, setGuardianName] = useState(isDevelopment() ? "John Doe" : "");
+  const [guardianContact, setGuardianContact] = useState(isDevelopment() ? "9876543210" : "");
   
   // KYC fields
-  const [aadhaarNumber, setAadhaarNumber] = useState("");
+  const [aadhaarNumber, setAadhaarNumber] = useState(isDevelopment() ? "123456789012" : null);
   const [aadharPhotoPath, setAadharPhotoPath] = useState(""); // Store the actual file path
   
   // UI state
   const [screenName, setScreenName] = useState("first");
   const [open, setOpen] = useState(false);
   const [profile, setProfile] = useState("");
-  const [doc, setDoc] = useState("");
+  const [doc, setDoc] = useState(isDevelopment() ? "aadhar.jpg" : "");
   const [pickerType, setPickerType] = useState("");
   const [isBottomSheet, setIsBottomSheet] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -192,20 +193,37 @@ const RegisterScreen = (props) => {
         return;
       }
 
+      // Format file path for React Native (add file:// prefix if needed for Android)
+      let fileUri = aadharPhotoPath;
+      if (Platform.OS === 'android' && !fileUri.startsWith('file://') && !fileUri.startsWith('content://')) {
+        fileUri = fileUri.startsWith('/') ? `file://${fileUri}` : `file:///${fileUri}`;
+      }
+
+      // Determine file type from extension
+      const getFileType = (filename) => {
+        const ext = filename?.toLowerCase().split('.').pop();
+        if (ext === 'png') return 'image/png';
+        if (ext === 'jpg' || ext === 'jpeg') return 'image/jpeg';
+        return 'image/jpeg'; // default
+      };
+
+      const fileName = doc || 'aadhar.jpg';
+      const fileType = getFileType(fileName);
+
       const formData = new FormData();
       
-      // Add Aadhar photo (required)
+      // Add Aadhar photo (required) - React Native FormData format
       formData.append('aadharPhoto', {
-        uri: aadharPhotoPath,
-        type: 'image/jpeg',
-        name: doc || 'aadhar.jpg',
+        uri: fileUri,
+        type: fileType,
+        name: fileName,
       });
 
       // Add basic details fields
-      formData.append('name', name);
-      formData.append('email', email);
-      formData.append('phone', phoneNumber);
-      formData.append('location', location);
+      formData.append('name', name.trim());
+      formData.append('email', email.trim());
+      formData.append('phone', phoneNumber.trim());
+      formData.append('location', location.trim());
       if (gender) formData.append('gender', gender);
       if (dobDate) {
         // Format date as YYYY-MM-DD for backend
@@ -222,54 +240,103 @@ const RegisterScreen = (props) => {
 
       // Add user type specific fields
       if (selected === "student") {
-        if (instituteName) formData.append('instituteName', instituteName);
-        if (guardianName) formData.append('guardianName', guardianName);
-        if (guardianContact) formData.append('guardianContact', guardianContact);
+        if (instituteName) formData.append('instituteName', instituteName.trim());
+        if (guardianName) formData.append('guardianName', guardianName.trim());
+        if (guardianContact) formData.append('guardianContact', guardianContact.trim());
+      } else if (selected === "professional") {
+        // Add professional fields if needed
+        if (organizationName) formData.append('organizationName', organizationName.trim());
+        if (emergencyContactName) formData.append('emergencyContactName', emergencyContactName.trim());
+        if (emergencyContactNumber) formData.append('emergencyContactNumber', emergencyContactNumber.trim());
       }
 
-      console.log("FormData being sent:", formData);
+      console.log("FormData being sent - File URI:", fileUri);
+      console.log("FormData being sent - Phone:", phoneNumber);
+      console.log("FormData being sent - Name:", name);
+      console.log("Base URL:", BASE_URL);
 
-      // Use existing Api.js structure for FormData
-      // The interceptor will automatically handle FormData headers
-      const response = await Api.post('auth/client/register-by-client', formData);
+      // Use fetch API directly instead of custom Api instance
+      const url = `${BASE_URL}auth/client/register-by-client`;
+      console.log("Full URL:", url);
 
-      console.log("Response of register by client:", response.data);
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json',
+          // Don't set Content-Type - let fetch set it automatically with boundary for FormData
+        },
+        body: formData,
+      });
 
-      if (response.data && response.data.success) {
+      console.log("Response status:", response.status);
+      console.log("Response ok:", response.ok);
+      console.log("Response headers:", response.headers);
+
+      // Parse response - handle both success and error cases
+      let responseData;
+      try {
+        const responseText = await response.text();
+        console.log("Response text:", responseText);
+        responseData = responseText ? JSON.parse(responseText) : {};
+      } catch (parseError) {
+        console.error("Failed to parse response as JSON:", parseError);
+        throw new Error("Invalid response from server. Please try again.");
+      }
+
+      console.log("Response data:", responseData);
+
+      if (response.ok && responseData && responseData.success) {
         // Store the new token if provided
-        if (response.data.token) {
-          await setUserToken(response.data.token);
+        if (responseData.token) {
+          await setUserToken(responseData.token);
         }
         
-        Alert.alert("Success", response.data.message || "Registration successful", [
+        Alert.alert("Success", responseData.message || "Registration successful", [
           {
             text: "OK",
             onPress: () => gotoRegister(),
           },
         ]);
       } else {
-        const errorMessage = response.data?.message || "Failed to register. Please try again.";
+        // Handle error responses
+        let errorMessage = responseData?.message || "Failed to register. Please try again.";
+        
+        // Handle specific HTTP status codes
+        if (response.status === 400) {
+          errorMessage = responseData?.message || "Invalid data. Please check all fields.";
+        } else if (response.status === 401) {
+          errorMessage = "Authentication failed. Please login again.";
+        } else if (response.status === 409) {
+          errorMessage = responseData?.message || "User already exists with this phone or Aadhaar number.";
+        } else if (response.status === 500) {
+          errorMessage = "Server error. Please try again later.";
+        }
+        
         Alert.alert("Error", errorMessage);
       }
     } catch (error) {
       console.error("Register by client error:", error);
+      console.error("Error details:", {
+        message: error.message,
+        name: error.name,
+        stack: error.stack,
+      });
       
       let errorMessage = "Failed to register. Please try again.";
       
-      if (error.response) {
-        // Server responded with error status
-        errorMessage = error.response.data?.message || error.response.statusText || errorMessage;
-        console.error("Error response:", error.response.status, error.response.data);
-      } else if (error.request) {
-        // Request was made but no response received
-        errorMessage = "Network error. Please check your internet connection.";
-        console.error("Network error - No response:", error.request);
-      } else {
-        // Something else happened
-        errorMessage = error.message || errorMessage;
-        console.error("Request setup error:", error.message);
+      // Handle different types of errors
+      if (error.message) {
+        if (error.message.includes('Network request failed') || error.message.includes('Failed to fetch')) {
+          errorMessage = "Network error. Please check your internet connection and try again.";
+        } else if (error.message.includes('JSON')) {
+          errorMessage = "Invalid response from server. Please try again.";
+        } else {
+          errorMessage = error.message;
+        }
       }
       
+      console.error("Final error message:", errorMessage);
       Alert.alert("Error", errorMessage);
     } finally {
       setIsLoading(false);
@@ -422,8 +489,8 @@ const RegisterScreen = (props) => {
                   <Image source={IMAGES.indianFlag} style={AuthStyle.flag} />
                   <Text style={AuthStyle.code}>{"+91"}</Text>
                   <Icons
-                    iconSetName={"FontAwesome6"}
-                    iconName={"caret-down"}
+                    iconSetName={'Ionicons'}
+                    iconName={'chevron-down'}
                     iconColor={Colors.gray}
                     iconSize={18}
                   />
