@@ -5,12 +5,13 @@ import {
   StatusBar,
   SafeAreaView,
   TouchableOpacity,
-  ScrollView,
   ImageBackground,
   FlatList,
   Image,
+  Platform,
+  ActivityIndicator,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import HomeStyle from '../../styles/HomeStyle';
 import Colors from '../../styles/Colors';
 import {BottomSheet, Icons, Input} from '../../components';
@@ -20,6 +21,8 @@ import CommonStyles from '../../styles/CommonStyles';
 import {deviceHight} from '../../utils/DeviceInfo';
 import FilterComponent from './FilterComponent';
 import {CommonActions} from '@react-navigation/native';
+import {getAllProperties} from '../../services/homeService';
+import FastImage from 'react-native-fast-image';
 
 const TrendingScreen = props => {
   const [rating, setRating] = useState(4);
@@ -27,33 +30,30 @@ const TrendingScreen = props => {
   const [sortByModal, setSortByModal] = useState(false);
   const [isFilterl, setIsFilterl] = useState(false);
   const [statusColor, setStatusColor] = useState(Colors.secondary);
+  const [pgList, setPgList] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const pgList = [
-    {
-      id: 1,
-      name: '',
-    },
-    {
-      id: 2,
-      name: '',
-    },
-    {
-      id: 3,
-      name: '',
-    },
-    {
-      id: 4,
-      name: '',
-    },
-    {
-      id: 5,
-      name: '',
-    },
-    {
-      id: 6,
-      name: '',
-    },
-  ];
+  useEffect(() => {
+    fetchPGList();
+  }, []);
+
+  const fetchPGList = async () => {
+    try {
+      setLoading(true);
+      const response = await getAllProperties();
+      if (response.success && response.data) {
+        // Filter only approved properties with PG data
+        const approvedPGProperties = response.data.filter(
+          item => item.property?.status === 'approved' && item.pgProperty
+        );
+        setPgList(approvedPGProperties);
+      }
+    } catch (error) {
+      console.error('Error fetching PG list:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
   const options = [
     'Relevance',
     'Price - Low to High',
@@ -61,92 +61,116 @@ const TrendingScreen = props => {
     'Freshness',
   ];
 
-  const gotoBooking = () => {
-    props.navigation.navigate('PGBooking');
+  const gotoBooking = (propertyData) => {
+    props.navigation.navigate('PGBooking', { propertyData });
   };
   const handleRating = selectedRating => {
     setRating(selectedRating);
   };
-  const renderPGList = (data, index) => {
+  const renderPGList = ({item, index}) => {
+    if (!item || !item.property || !item.pgProperty) return null;
+
+    const property = item.property;
+    const pgProperty = item.pgProperty;
+    const media = item.media;
+    const rooms = item.rooms;
+
+    // Get first image or default
+    const propertyImage = media?.images?.[0]?.url || IMAGES.bed;
+    const propertyName = property.name || 'PG Property';
+    const gender = pgProperty.gender || 'Co Living';
+    const location = `${property.locality || ''}, ${property.city || ''}`.trim();
+    
+    // Get minimum price from room types
+    let minPrice = 0;
+    if (rooms?.roomTypes && rooms.roomTypes.length > 0) {
+      const prices = rooms.roomTypes.map(room => room.price || 0).filter(p => p > 0);
+      minPrice = prices.length > 0 ? Math.min(...prices) : 0;
+    }
+
+    // Get amenities (first few for display)
+    const amenities = pgProperty.amenities || [];
+    const displayAmenities = amenities.slice(0, 7);
+
     return (
-      <TouchableOpacity key={'flatlist' + index} onPress={() => gotoBooking()}>
+      <TouchableOpacity 
+        key={'flatlist' + index} 
+        onPress={() => gotoBooking(item)}
+        activeOpacity={0.7}>
         <View style={[HomeStyle.bedListContainer]}>
-          <Image source={IMAGES.bed} style={[HomeStyle.bedimg]} />
-          <View>
-            <Text style={[HomeStyle.hostelTitle]}>
-              {'Figma Deluxe  Hostel'}
+          {propertyImage ? (
+            <FastImage
+              source={{uri: propertyImage}}
+              style={[HomeStyle.bedimg]}
+              resizeMode={FastImage.resizeMode.cover}
+            />
+          ) : (
+            <Image source={IMAGES.bed} style={[HomeStyle.bedimg]} />
+          )}
+          <View style={{flex: 1, marginLeft: 10}}>
+            <Text style={[HomeStyle.hostelTitle]} numberOfLines={1}>
+              {propertyName}
             </Text>
             <View style={[HomeStyle.genderView]}>
-              <Text style={[HomeStyle.servicesName]}>{'Male'}</Text>
+              <Text style={[HomeStyle.servicesName]}>{gender}</Text>
             </View>
-            <Text style={[HomeStyle.areaName]}>{'Uppal, Hyderabad'}</Text>
-            <View style={{...CommonStyles.directionRowCenter}}>
-              <Text style={[HomeStyle.reviewText]}>{'Starting from '}</Text>
-              <Text style={[HomeStyle.price]}>{'₹ 8000/-'}</Text>
-            </View>
-            <View style={{...CommonStyles.directionRowCenter}}>
+            <Text style={[HomeStyle.areaName]} numberOfLines={1}>
+              {location || 'Location not available'}
+            </Text>
+            {minPrice > 0 && (
+              <View style={{...CommonStyles.directionRowCenter, marginTop: 5}}>
+                <Text style={[HomeStyle.reviewText]}>{'Starting from '}</Text>
+                <Text style={[HomeStyle.price]}>{`₹ ${minPrice.toLocaleString()}/-`}</Text>
+              </View>
+            )}
+            <View style={{...CommonStyles.directionRowCenter, marginTop: 5}}>
               <View style={[HomeStyle.rateImg]}>
-                {Array.from({length: 5}, (_, index) => (
-                  <TouchableOpacity
-                    key={'rate' + index}
-                    onPress={() => handleRating(index + 1)}>
-                    <Icons
-                      iconSetName={'Ionicons'}
-                      iconName={index < rating ? 'star' : 'star-outline'}
-                      iconColor={Colors.rating}
-                      iconSize={18}
-                    />
-                  </TouchableOpacity>
+                {Array.from({length: 5}, (_, idx) => (
+                  <Icons
+                    key={'rate' + idx}
+                    iconSetName={'Ionicons'}
+                    iconName={idx < rating ? 'star' : 'star-outline'}
+                    iconColor={Colors.rating}
+                    iconSize={18}
+                  />
                 ))}
               </View>
               <Text style={[HomeStyle.reviewText]}>{'  49 reviews'}</Text>
             </View>
-            <View style={{...CommonStyles.directionRowCenter}}>
-              <Icons
-                iconSetName={'Ionicons'}
-                iconName={'wifi'}
-                iconColor={Colors.gray}
-                iconSize={18}
-              />
-              <Icons
-                iconSetName={'Ionicons'}
-                iconName={'car-sport'}
-                iconColor={Colors.gray}
-                iconSize={18}
-              />
-              <Icons
-                iconSetName={'MaterialCommunityIcons'}
-                iconName={'alpha-p-circle'}
-                iconColor={Colors.gray}
-                iconSize={18}
-              />
-              <Icons
-                iconSetName={'Ionicons'}
-                iconName={'bonfire-outline'}
-                iconColor={Colors.gray}
-                iconSize={18}
-              />
-              <Icons
-                iconSetName={'MaterialCommunityIcons'}
-                iconName={'iron'}
-                iconColor={Colors.gray}
-                iconSize={18}
-              />
-              <Icons
-                iconSetName={'MaterialCommunityIcons'}
-                iconName={'pot-steam-outline'}
-                iconColor={Colors.gray}
-                iconSize={18}
-              />
-              <Icons
-                iconSetName={'FontAwesome6'}
-                iconName={'user-secret'}
-                iconColor={Colors.gray}
-                iconSize={18}
-              />
-              <TouchableOpacity>
-                <Text style={[HomeStyle.reviewText]}>{' View all '}</Text>
-              </TouchableOpacity>
+            <View style={{...CommonStyles.directionRowCenter, marginTop: 5, flexWrap: 'wrap'}}>
+              {displayAmenities.map((amenity, idx) => {
+                let iconName = 'star-outline';
+                let iconSet = 'Ionicons';
+                
+                // Map amenities to icons
+                if (amenity.toLowerCase().includes('wifi') || amenity.toLowerCase().includes('internet')) {
+                  iconName = 'wifi';
+                } else if (amenity.toLowerCase().includes('parking') || amenity.toLowerCase().includes('car')) {
+                  iconName = 'car-sport';
+                } else if (amenity.toLowerCase().includes('gym')) {
+                  iconName = 'barbell';
+                } else if (amenity.toLowerCase().includes('ac') || amenity.toLowerCase().includes('air')) {
+                  iconName = 'snow-outline';
+                } else {
+                  iconName = 'checkmark-circle-outline';
+                }
+                
+                return (
+                  <Icons
+                    key={'amenity' + idx}
+                    iconSetName={iconSet}
+                    iconName={iconName}
+                    iconColor={Colors.gray}
+                    iconSize={18}
+                    style={{marginRight: 5}}
+                  />
+                );
+              })}
+              {amenities.length > 7 && (
+                <TouchableOpacity>
+                  <Text style={[HomeStyle.reviewText]}>{' View all '}</Text>
+                </TouchableOpacity>
+              )}
             </View>
           </View>
         </View>
@@ -212,35 +236,41 @@ const TrendingScreen = props => {
             source={IMAGES.primaryBG}
             style={HomeStyle.formContainer}
             resizeMode="cover">
-            <ScrollView
-              keyboardShouldPersistTaps="handled"
-              contentContainerStyle={{
-                flexGrow: 1,
-                padding: 20,
-                ...LayoutStyle.paddingBottom30,
-              }}
-              showsVerticalScrollIndicator={false}>
-              <View style={[HomeStyle.PgListContainer]}>
-                <Input
-                  placeholder={'Search for locality or landmark'}
-                  inputStyle={HomeStyle.searchInput}
-                  leftIcon={true}
-                  leftIconSet={'Ionicons'}
-                  leftIconName={'search-outline'}
-                  leftIconColor={Colors.gray}
-                  leftIconSize={18}
-                  rightIcon={false}
-                />
-                <FlatList
-                  data={pgList}
-                  renderItem={({item: destinationItem, index}) =>
-                    renderPGList(destinationItem, index)
-                  }
-                  scrollEnabled={false}
-                  keyExtractor={item => item.id}
-                />
+            <View style={{paddingHorizontal: 20, paddingTop: 20, backgroundColor: 'transparent'}}>
+              <Input
+                placeholder={'Search for locality or landmark'}
+                inputStyle={HomeStyle.searchInput}
+                leftIcon={true}
+                leftIconSet={'Ionicons'}
+                leftIconName={'search-outline'}
+                leftIconColor={Colors.gray}
+                leftIconSize={18}
+                rightIcon={false}
+              />
+            </View>
+            {loading ? (
+              <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', paddingTop: 50}}>
+                <ActivityIndicator size="large" color={Colors.secondary} />
+                <Text style={[HomeStyle.reviewText, {marginTop: 10}]}>Loading PG properties...</Text>
               </View>
-            </ScrollView>
+            ) : pgList.length === 0 ? (
+              <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', paddingTop: 50}}>
+                <Text style={[HomeStyle.reviewText]}>No PG properties found</Text>
+              </View>
+            ) : (
+              <FlatList
+                data={pgList}
+                renderItem={renderPGList}
+                scrollEnabled={true}
+                keyExtractor={(item, index) => item?.property?._id?.toString() || index.toString()}
+                contentContainerStyle={{
+                  paddingHorizontal: 20,
+                  paddingBottom: 150,
+                }}
+                style={{flex: 1}}
+                showsVerticalScrollIndicator={false}
+              />
+            )}
             <View style={[HomeStyle.trendingFilter]}>
               <TouchableOpacity
                 onPress={() => {
@@ -264,7 +294,7 @@ const TrendingScreen = props => {
                 </View>
               </TouchableOpacity>
             </View>
-            <BottomSheet
+            {sortByModal && <BottomSheet
               maxHeight={deviceHight / 2}
               isOpen={sortByModal}
               onClose={() => gotoBottomSheetClose()}
@@ -295,7 +325,7 @@ const TrendingScreen = props => {
                   </View>
                 );
               }}
-            />
+            />}
           </ImageBackground>
         </SafeAreaView>
       ) : (

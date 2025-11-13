@@ -8,6 +8,8 @@ import {
   ScrollView,
   StyleSheet,
   FlatList,
+  SafeAreaView,
+  Modal,
 } from "react-native";
 import HomeStyle from "../../styles/HomeStyle";
 import { Button, Icons } from "../../components";
@@ -19,7 +21,7 @@ const FilterComponent = ({ onApply, onClear, isFilterlShow }) => {
   const [selectedGender, setSelectedGender] = useState("Male");
   const [selectedRoom, setSelectedRoom] = useState("Single Sharing");
   const [budget, setBudget] = useState(20000);
-  const [ratings, setRatings] = useState(null);
+  const [ratings, setRatings] = useState([]);
   const [amenities, setAmenities] = useState([
     {
       id: 1,
@@ -88,8 +90,8 @@ const FilterComponent = ({ onApply, onClear, isFilterlShow }) => {
       id: 10,
       name: "Refrigerator",
       selected: false,
-      iconSetName: "AntDesign",
-      iconName: "database",
+      iconSetName: "MaterialCommunityIcons",
+      iconName: "fridge",
     },
     {
       id: 11,
@@ -124,7 +126,7 @@ const FilterComponent = ({ onApply, onClear, isFilterlShow }) => {
       name: "Drinking",
       selected: true,
       iconSetName: "MaterialCommunityIcons",
-      iconName: "food-fork-drink",
+      iconName: "glass-wine",
     },
     {
       id: 16,
@@ -152,7 +154,7 @@ const FilterComponent = ({ onApply, onClear, isFilterlShow }) => {
       name: "Others",
       selected: true,
       iconSetName: "MaterialCommunityIcons",
-      iconName: "food-fork-drink",
+      iconName: "account-group",
     },
   ]);
 
@@ -164,7 +166,15 @@ const FilterComponent = ({ onApply, onClear, isFilterlShow }) => {
   };
 
   const toggleRating = (index) => {
-    setRatings(index === setRatings ? null : index);
+    setRatings(prevRatings => {
+      if (prevRatings.includes(index)) {
+        // Remove the index if it's already selected
+        return prevRatings.filter(rating => rating !== index);
+      } else {
+        // Add the index if it's not selected
+        return [...prevRatings, index];
+      }
+    });
   };
 
   const handleApply = () => {
@@ -172,9 +182,9 @@ const FilterComponent = ({ onApply, onClear, isFilterlShow }) => {
       gender: selectedGender,
       roomType: selectedRoom,
       budget,
-      ratings: ratings
-        .map((selected, index) => (selected ? 5 - index : null))
-        .filter((val) => val !== null),
+      ratings: ratings.length > 0 
+        ? ratings.map(index => 5 - index).sort((a, b) => b - a) // Convert indices to star ratings (5, 4, 3, 2, 1) and sort descending
+        : null,
       amenities: amenities
         .filter((item) => item.selected)
         .map((item) => item.name),
@@ -187,233 +197,253 @@ const FilterComponent = ({ onApply, onClear, isFilterlShow }) => {
   };
 
   return (
-    <ScrollView
-      contentContainerStyle={{ paddingBottom: "20%" }}
-      style={HomeStyle.filterContainer}
-    >
-      <View style={{ ...CommonStyles.directionRowSB }}>
-        <Text style={HomeStyle.filterTitle}>{"I'm Looking to"}</Text>
-        <TouchableOpacity onPress={() => gotoClosesFilter()}>
-          <Icons
-            iconSetName={"FontAwesome6"}
-            iconName={"xmark"}
-            iconColor={Colors.black}
-            iconSize={24}
-          />
-        </TouchableOpacity>
-      </View>
-      <View style={[HomeStyle.gendercontainer]}>
-        <View style={{ ...CommonStyles.directionRowCenter }}>
-          <Icons
-            iconSetName={"MaterialCommunityIcons"}
-            iconName={"human-male-female"}
-            iconColor={Colors.gray}
-            iconSize={20}
-          />
-          <Text style={[HomeStyle.sectionTitle]}>{"Type"}</Text>
-        </View>
-        <View style={HomeStyle.genderSection}>
-          {["Male", "Female", "Co-Living"].map((item, index) => (
-            <TouchableOpacity
-              key={`gender-${index}`}
-              style={[
-                HomeStyle.genderBox,
-                selectedGender === item && HomeStyle.selectedGenderBox,
-              ]}
-              onPress={() => setSelectedGender(item)}
-            >
-              <Text
-                style={[
-                  HomeStyle.genderText,
-                  selectedGender === item && HomeStyle.selectedGenderText,
-                ]}
-              >
-                {item}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </View>
-      <View style={[HomeStyle.gendercontainer, { ...LayoutStyle.marginTop20 }]}>
-        <View style={{ ...CommonStyles.directionRowCenter }}>
-          <Icons
-            iconSetName={"Ionicons"}
-            iconName={"bed-outline"}
-            iconColor={Colors.gray}
-            iconSize={20}
-          />
-          <Text style={[HomeStyle.sectionTitle]}>{"Room Type"}</Text>
-        </View>
-        <ScrollView horizontal>
-          <View style={HomeStyle.roomTypeContainer}>
-            {[
-              "Single Sharing",
-              "Double Sharing",
-              "Triple Sharing",
-              "Four Sharing",
-              "Five Sharing",
-              "Five + Sharing",
-            ].map((item, index) => (
-              <TouchableOpacity
-                key={`room-${index}`}
-                style={[
-                  HomeStyle.roomTypeBox,
-                  selectedRoom === item && HomeStyle.selectedRoomTypeBox,
-                ]}
-                onPress={() => setSelectedRoom(item)}
-              >
-                <Text
-                  style={[
-                    HomeStyle.genderText,
-                    selectedRoom === item && HomeStyle.selectedGenderText,
-                  ]}
-                >
-                  {item}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </ScrollView>
-      </View>
-      <View style={[HomeStyle.gendercontainer, { ...LayoutStyle.marginTop20 }]}>
-        <View style={{ ...CommonStyles.directionRowCenter }}>
-          <Icons
-            iconSetName={"Ionicons"}
-            iconName={"pricetag"}
-            iconColor={Colors.gray}
-            iconSize={20}
-          />
-          <Text style={[HomeStyle.sectionTitle]}>{"Budget"}</Text>
-        </View>
-        <View style={HomeStyle.sliderContainer}>
-          <View style={{ ...CommonStyles.directionRowSB }}>
-            <Text style={[HomeStyle.textBudge]}>{"₹ 500"}</Text>
-            <Text style={[HomeStyle.textBudge]}>{"₹ 90,000"}</Text>
-          </View>
-
-          <View>
-            <Slider
-              minimumValue={500}
-              maximumValue={90000}
-              step={500}
-              value={budget}
-              onValueChange={setBudget}
-              minimumTrackTintColor={Colors.secondary}
-              maximumTrackTintColor="#000090"
-            />
-          </View>
-          {/* <Text>₹ {budget}</Text> */}
-          <View style={{ ...CommonStyles.directionRowSB }}>
-            <Text style={[HomeStyle.textMini]}>{"Minimun"}</Text>
-            <Text style={[HomeStyle.textMini]}>{"Miximun"}</Text>
-          </View>
-        </View>
-      </View>
-      <View style={[HomeStyle.gendercontainer, { ...LayoutStyle.marginTop20 }]}>
-        <View
-          style={{
-            ...LayoutStyle.marginBottom10,
-          }}
-        >
-          <Icons
-            iconSetName={"MaterialCommunityIcons"}
-            iconName={"star-circle"}
-            iconColor={Colors.gray}
-            iconSize={20}
-          />
-          <Text style={[HomeStyle.sectionTitle]}>{"Rating"}</Text>
-        </View>
-        {[1, 2, 3, 4, 5].map((starCount, index) => (
-          <View
-            key={index}
-            style={{
-              ...LayoutStyle.marginTop5,
-            }}
-          >
-            <TouchableOpacity onPress={() => toggleRating(index)}>
+    <Modal
+      visible={true}
+      animationType="slide"
+      transparent={false}
+      onRequestClose={() => gotoClosesFilter()}>
+      <SafeAreaView style={[HomeStyle.filterContainer, { flex: 1 }]}>
+        <ScrollView
+          contentContainerStyle={{ paddingBottom: 100, paddingHorizontal: 20 }}
+          showsVerticalScrollIndicator={false}>
+          <View style={{ ...CommonStyles.directionRowSB, ...LayoutStyle.marginTop20, ...LayoutStyle.marginBottom20 }}>
+            <Text style={HomeStyle.filterTitle}>{"I'm Looking to"}</Text>
+            <TouchableOpacity onPress={() => gotoClosesFilter()}>
               <Icons
                 iconSetName={"Ionicons"}
-                iconName={
-                  ratings === index ? "checkbox-outline" : "square-outline"
-                }
-                iconColor={Colors.gray}
-                iconSize={26}
+                iconName={"close"}
+                iconColor={Colors.black}
+                iconSize={24}
               />
             </TouchableOpacity>
-            {[...Array(5)].map((_, i) => (
-              <View style={{ ...LayoutStyle.paddingLeft5 }}>
-                <Icons
-                  iconSetName={"Ionicons"}
-                  iconName={i < starCount ? "star" : "star-outline"}
-                  iconColor={Colors.primary}
-                  iconSize={26}
+          </View>
+          <View style={[HomeStyle.gendercontainer]}>
+            <View style={{ ...CommonStyles.directionRowCenter }}>
+              <Icons
+                iconSetName={"MaterialCommunityIcons"}
+                iconName={"human-male-female"}
+                iconColor={Colors.gray}
+                iconSize={20}
+              />
+              <Text style={[HomeStyle.sectionTitle]}>{"Type"}</Text>
+            </View>
+            <View style={[HomeStyle.genderSection, { width: '100%' }]}>
+              {["Male", "Female", "Co-Living"].map((item, index) => (
+                <TouchableOpacity
+                  key={`gender-${index}`}
+                  style={[
+                    HomeStyle.genderBox,
+                    selectedGender === item && HomeStyle.selectedGenderBox,
+                    {
+                      borderRadius: 20,
+                      paddingVertical: 10,
+                      paddingHorizontal: 20,
+                    }
+                  ]}
+                  onPress={() => setSelectedGender(item)}
+                >
+                  <Text
+                    style={[
+                      HomeStyle.genderText,
+                      selectedGender === item && HomeStyle.selectedGenderText,
+                    ]}
+                  >
+                    {item}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+          <View style={[HomeStyle.gendercontainer, { ...LayoutStyle.marginTop20 }]}>
+            <View style={{ ...CommonStyles.directionRowCenter }}>
+              <Icons
+                iconSetName={"Ionicons"}
+                iconName={"bed-outline"}
+                iconColor={Colors.gray}
+                iconSize={20}
+              />
+              <Text style={[HomeStyle.sectionTitle]}>{"Room Type"}</Text>
+            </View>
+            <View style={[HomeStyle.roomTypeContainer, { flexWrap: 'wrap', justifyContent: 'center', marginTop: 10 }]}>
+              {[
+                "Single Sharing",
+                "Double Sharing",
+                "Triple Sharing",
+                "Four Sharing",
+                "Five Sharing",
+                "Five + Sharing",
+              ].map((item, index) => (
+                <TouchableOpacity
+                  key={`room-${index}`}
+                  style={[
+                    HomeStyle.roomTypeBox,
+                    selectedRoom === item && HomeStyle.selectedRoomTypeBox,
+                    {
+                      borderRadius: 20,
+                      paddingVertical: 10,
+                      paddingHorizontal: 15,
+                      marginHorizontal: 5,
+                      marginTop: 10,
+                      minWidth: 100,
+                      alignSelf: "center"
+                    }
+                  ]}
+                  onPress={() => setSelectedRoom(item)}
+                >
+                  <Text
+                    style={[
+                      HomeStyle.genderText,
+                      selectedRoom === item && HomeStyle.selectedGenderText,
+                    ]}
+                  >
+                    {item}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+          <View style={[HomeStyle.gendercontainer, { ...LayoutStyle.marginTop20 }]}>
+            <View style={{ ...CommonStyles.directionRowCenter }}>
+              <Icons
+                iconSetName={"Ionicons"}
+                iconName={"pricetag"}
+                iconColor={Colors.gray}
+                iconSize={20}
+              />
+              <Text style={[HomeStyle.sectionTitle]}>{"Budget"}</Text>
+            </View>
+            <View style={HomeStyle.sliderContainer}>
+              <View style={{ ...CommonStyles.directionRowSB }}>
+                <Text style={[HomeStyle.textBudge]}>{"₹ 500"}</Text>
+                <Text style={[HomeStyle.textBudge]}>{"₹ 90,000"}</Text>
+              </View>
+
+              <View>
+                <Slider
+                  minimumValue={500}
+                  maximumValue={90000}
+                  step={500}
+                  value={budget}
+                  onValueChange={setBudget}
+                  minimumTrackTintColor={Colors.secondary}
+                  maximumTrackTintColor="#000090"
                 />
+              </View>
+              {/* <Text>₹ {budget}</Text> */}
+              <View style={{ ...CommonStyles.directionRowSB }}>
+                <Text style={[HomeStyle.textMini]}>{"Minimun"}</Text>
+                <Text style={[HomeStyle.textMini]}>{"Miximun"}</Text>
+              </View>
+            </View>
+          </View>
+          <View style={[HomeStyle.gendercontainer, { ...LayoutStyle.marginTop20 }]}>
+            <View style={{ ...CommonStyles.directionRowCenter, ...LayoutStyle.marginBottom10 }}>
+              <Icons
+                iconSetName={"Ionicons"}
+                iconName={"star"}
+                iconColor={Colors.gray}
+                iconSize={20}
+              />
+              <Text style={[HomeStyle.sectionTitle]}>{"Rating"}</Text>
+            </View>
+            {[1, 2, 3, 4, 5].map((starCount, index) => (
+              <View
+                key={index}
+                style={{
+                  ...CommonStyles.directionRowCenter,
+                  ...LayoutStyle.marginTop10,
+                  alignItems: 'center',
+                }}
+              >
+                <TouchableOpacity onPress={() => toggleRating(index)} style={{ marginRight: 10 }}>
+                  <Icons
+                    iconSetName={"Ionicons"}
+                    iconName={
+                      ratings.includes(index) ? "checkbox" : "square-outline"
+                    }
+                    iconColor={ratings.includes(index) ? Colors.secondary : Colors.gray}
+                    iconSize={24}
+                  />
+                </TouchableOpacity>
+                <View style={{ ...CommonStyles.directionRowCenter, flex: 1 }}>
+                  {[...Array(5)].map((_, i) => (
+                    <Icons
+                      key={`star-${i}`}
+                      iconSetName={"Ionicons"}
+                      iconName={i < starCount ? "star" : "star-outline"}
+                      iconColor={Colors.rating}
+                      iconSize={20}
+                    />
+                  ))}
+                </View>
               </View>
             ))}
           </View>
-        ))}
-      </View>
-      <View style={[HomeStyle.gendercontainer, { ...LayoutStyle.marginTop20 }]}>
-        <View style={{ ...CommonStyles.directionRowCenter }}>
-          <Icons
-            iconSetName={"MaterialCommunityIcons"}
-            iconName={"star-circle"}
-            iconColor={Colors.gray}
-            iconSize={20}
-          />
-          <Text style={[HomeStyle.sectionTitle]}>{"Amenities"}</Text>
-        </View>
+          <View style={[HomeStyle.gendercontainer, { ...LayoutStyle.marginTop20 }]}>
+            <View style={{ ...CommonStyles.directionRowCenter }}>
+              <Icons
+                iconSetName={"MaterialCommunityIcons"}
+                iconName={"view-grid"}
+                iconColor={Colors.gray}
+                iconSize={20}
+              />
+              <Text style={[HomeStyle.sectionTitle]}>{"Amenities"}</Text>
+            </View>
 
-        <FlatList
-          data={amenities}
-          keyExtractor={(item) => `amenity-${item.id}`}
-          numColumns={4} // or adjust based on your layout needs
-          contentContainerStyle={HomeStyle.genderSection}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={[
-                HomeStyle.amenityButton,
-                item.selected && HomeStyle.selectedAmenity,
-              ]}
-              onPress={() => toggleAmenity(item.id)}
-            >
-              <View style={[HomeStyle.textIconContainer]}>
-                <View style={{ ...LayoutStyle.marginTop10 }}>
-                  <Icons
-                    iconSetName={item.iconSetName}
-                    iconName={item.iconName}
-                    iconColor={item.selected ? Colors.paleBlue : Colors.gray}
-                    iconSize={20}
-                  />
-                </View>
-                <Text
+            <FlatList
+              data={amenities}
+              keyExtractor={(item) => `amenity-${item.id}`}
+              numColumns={4} // or adjust based on your layout needs
+              contentContainerStyle={HomeStyle.genderSection}
+              renderItem={({ item }) => (
+                <TouchableOpacity
                   style={[
-                    HomeStyle.amenityText,
-                    item.selected && HomeStyle.selectedAmenityText,
+                    HomeStyle.amenityButton,
+                    item.selected && HomeStyle.selectedAmenity,
                   ]}
+                  onPress={() => toggleAmenity(item.id)}
                 >
-                  {item.name}
-                </Text>
-              </View>
-            </TouchableOpacity>
-          )}
-        />
-      </View>
-      <View style={[HomeStyle.btnFilterContainer]}>
-        <Button
-          flexContainer={{ flexGrow: 0.456 }}
-          btnName={"Apply"}
-          onPress={handleApply}
-        />
-        <Button
-          flexContainer={{ flexGrow: 0.456 }}
-          btnStyle={[HomeStyle.btnStyle]}
-          btnName={"Clear filter"}
-          onPress={onClear}
-          btnTextColor={Colors.secondary}
-        />
-      </View>
-    </ScrollView>
+                  <View style={[HomeStyle.textIconContainer]}>
+                    <View style={{ ...LayoutStyle.marginTop10 }}>
+                      <Icons
+                        iconSetName={item.iconSetName}
+                        iconName={item.iconName}
+                        iconColor={item.selected ? Colors.paleBlue : Colors.gray}
+                        iconSize={20}
+                      />
+                    </View>
+                    <Text
+                      style={[
+                        HomeStyle.amenityText,
+                        item.selected && HomeStyle.selectedAmenityText,
+                      ]}
+                    >
+                      {item.name}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              )}
+            />
+          </View>
+        </ScrollView>
+        <View style={[HomeStyle.btnFilterContainer, { paddingHorizontal: 20, paddingBottom: 20, paddingTop: 10, backgroundColor: Colors.goastWhite }]}>
+          <Button
+            flexContainer={{ flex: 1, marginRight: 10 }}
+            btnName={"Apply"}
+            onPress={handleApply}
+            bgColor={Colors.secondary}
+          />
+          <Button
+            flexContainer={{ flex: 1, marginLeft: 10 }}
+            btnStyle={[HomeStyle.btnStyle]}
+            btnName={"Clear filter"}
+            onPress={onClear}
+            btnTextColor={Colors.secondary}
+            bgColor={Colors.white}
+          />
+        </View>
+      </SafeAreaView>
+    </Modal>
   );
 };
 

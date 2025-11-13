@@ -598,7 +598,7 @@ const HomeStyle = StyleSheet.create({
     ...LayoutStyle.padding5,
     borderWidth: 0.5,
     backgroundColor: Colors.whiteText,
-    width: 90,
+    // width: 90,
     borderRadius: 20,
     borderColor: Colors.grayText,
   },
@@ -632,9 +632,8 @@ const HomeStyle = StyleSheet.create({
     ...LayoutStyle.marginTop20,
     ...LayoutStyle.paddingVertical30,
     backgroundColor: Colors.whiteText,
-    width: 70,
+    width: "30%",
     borderRadius: 10,
-    borderColor: Colors.grayText,
   },
   selectedRoomTypeBox: {
     ...LayoutStyle.paddingHorizontal5,
@@ -643,7 +642,6 @@ const HomeStyle = StyleSheet.create({
     backgroundColor: Colors.selectedGreen,
     width: 70,
     borderRadius: 10,
-    borderColor: Colors.grayText,
   },
   stars: {
     ...LayoutStyle.fontSize24,
