@@ -8,89 +8,193 @@ import {
   TouchableOpacity,
   ScrollView,
   FlatList,
+  ActivityIndicator,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import HomeStyle from '../../styles/HomeStyle';
+import Colors from '../../styles/Colors';
 import {Button, Icons} from '../../components';
 import LayoutStyle from '../../styles/LayoutStyle';
 import {CommonActions} from '@react-navigation/native';
+import {getAvailableRoomsAndBeds} from '../../services/bookingService';
+import moment from 'moment';
 
 const BookingOptionScreen = props => {
-  const [moveDate, setMoveDate] = useState('DD/MM/YYYY');
-  const [open, setOpen] = useState(false);
-  const [selectedSharing, setSelectedSharing] = useState(0);
+  // Get data from route params
+  const propertyData = props.route?.params?.propertyData;
+  const selectedSharing = props.route?.params?.selectedSharing;
+  const moveInDate = props.route?.params?.moveInDate;
+  const property = propertyData?.property || {};
+  const propertyId = property?._id || property?.id;
+  const rooms = propertyData?.rooms || {roomTypes: []};
+  const roomTypes = rooms?.roomTypes || [];
+
+  const [selectedSharingIndex, setSelectedSharingIndex] = useState(null);
   const [selectedRoom, setSelectedRoom] = useState(null);
+  const [floors, setFloors] = useState([]);
+  const [unavailableRooms, setUnavailableRooms] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const optionList = [
-    {
-      id: 1,
-      optionName: 'Single Sharing',
-    },
-    {
-      id: 2,
-      optionName: 'Double Sharing',
-    },
-    {
-      id: 3,
-      optionName: 'Triple Sharing',
-    },
-    {
-      id: 4,
-      optionName: 'Four \nSharing',
-    },
-    {
-      id: 5,
-      optionName: 'Five  \nSharing',
-    },
-    {
-      id: 6,
-      optionName: 'Six  \nSharing',
-    },
-  ];
+  // Convert room types to option list format
+  const getSharingLabel = (type) => {
+    const typeLower = type?.toLowerCase() || '';
+    if (typeLower.includes('single') || typeLower === '1') return 'Single Sharing';
+    if (typeLower.includes('double') || typeLower === '2') return 'Double Sharing';
+    if (typeLower.includes('triple') || typeLower === '3') return 'Triple Sharing';
+    if (typeLower.includes('four') || typeLower === '4') return 'Four Sharing';
+    if (typeLower.includes('five') || typeLower === '5') return 'Five Sharing';
+    if (typeLower.includes('six') || typeLower === '6') return 'Six Sharing';
+    return type || 'Sharing';
+  };
 
-  const floors = [
-    {
-      id: 'floor1',
-      name: 'First Floor',
-      rooms: ['101', '102', '103', '104', '105', '106', '111', '111'],
-    },
-    {
-      id: 'floor2',
-      name: '2nd Floor',
-      rooms: ['101', '102', '103', '104', '105', '106', '111', '111'],
-    },
-    {
-      id: 'floor3',
-      name: '3rd Floor',
-      rooms: ['101', '102', '103', '104', '105', '106', '111', '111'],
-    },
-  ];
+  const optionList = roomTypes.length > 0
+    ? roomTypes.map((rt, index) => ({
+        id: rt._id || index + 1,
+        optionName: getSharingLabel(rt.type || rt.label),
+        roomType: rt,
+      }))
+    : [
+        {id: 1, optionName: 'Single Sharing'},
+        {id: 2, optionName: 'Double Sharing'},
+        {id: 3, optionName: 'Triple Sharing'},
+        {id: 4, optionName: 'Four Sharing'},
+        {id: 5, optionName: 'Five Sharing'},
+        {id: 6, optionName: 'Six Sharing'},
+      ];
 
-  const availableRooms = ['101', '102', '111'];
+  // Set selected sharing index based on passed data
+  useEffect(() => {
+    if (selectedSharing) {
+      const index = optionList.findIndex(
+        opt => opt.optionName === selectedSharing.optionName || opt.id === selectedSharing.id
+      );
+      if (index !== -1) {
+        setSelectedSharingIndex(index);
+      }
+    }
+  }, [selectedSharing]);
+
+  // Fetch room availability
+  useEffect(() => {
+    if (propertyId && moveInDate) {
+      fetchRoomAvailability();
+    } else {
+      setLoading(false);
+    }
+  }, [propertyId, moveInDate]);
+
+  const fetchRoomAvailability = async () => {
+    try {
+      setLoading(true);
+      // Convert DD/MM/YYYY to YYYY-MM-DD
+      const dateParts = moveInDate.split('/');
+      const formattedDate = dateParts.length === 3 
+        ? `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`
+        : moment(moveInDate, 'DD/MM/YYYY').format('YYYY-MM-DD');
+
+      const response = await getAvailableRoomsAndBeds(propertyId, formattedDate);
+      
+      if (response.success && response.data) {
+        // Process the availability data
+        const availabilityData = response.data;
+        const unavailable = [];
+        
+        // Extract unavailable room identifiers
+        if (availabilityData.unavailableBeds) {
+          unavailable.push(...availabilityData.unavailableBeds);
+        }
+        
+        // Process floor configuration
+        if (availabilityData.availabilityByFloor) {
+          const floorList = Object.keys(availabilityData.availabilityByFloor).map((floorName, index) => {
+            const floorData = availabilityData.availabilityByFloor[floorName];
+            const roomNumbers = [];
+            
+            // Extract room numbers from the floor data
+            if (floorData.rooms) {
+              Object.keys(floorData.rooms).forEach(roomNum => {
+                const roomData = floorData.rooms[roomNum];
+                if (roomData.beds) {
+                  Object.keys(roomData.beds).forEach(bed => {
+                    roomNumbers.push(roomNum);
+                  });
+                }
+              });
+            }
+            
+            return {
+              id: `floor${index + 1}`,
+              name: floorName,
+              rooms: roomNumbers.length > 0 ? [...new Set(roomNumbers)] : [],
+            };
+          });
+          
+          setFloors(floorList);
+        } else {
+          // Fallback: use default floors structure
+          setFloors([
+            {id: 'floor1', name: 'First Floor', rooms: ['101', '102', '103', '104', '105', '106', '111']},
+            {id: 'floor2', name: '2nd Floor', rooms: ['101', '102', '103', '104', '105', '106', '111']},
+            {id: 'floor3', name: '3rd Floor', rooms: ['101', '102', '103', '104', '105', '106', '111']},
+          ]);
+        }
+        
+        setUnavailableRooms(unavailable);
+      } else {
+        // Fallback to default structure
+        setFloors([
+          {id: 'floor1', name: 'First Floor', rooms: ['101', '102', '103', '104', '105', '106', '111']},
+          {id: 'floor2', name: '2nd Floor', rooms: ['101', '102', '103', '104', '105', '106', '111']},
+          {id: 'floor3', name: '3rd Floor', rooms: ['101', '102', '103', '104', '105', '106', '111']},
+        ]);
+      }
+    } catch (error) {
+      console.error('Error fetching room availability:', error);
+      // Fallback to default structure
+      setFloors([
+        {id: 'floor1', name: 'First Floor', rooms: ['101', '102', '103', '104', '105', '106', '111']},
+        {id: 'floor2', name: '2nd Floor', rooms: ['101', '102', '103', '104', '105', '106', '111']},
+        {id: 'floor3', name: '3rd Floor', rooms: ['101', '102', '103', '104', '105', '106', '111']},
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSharingSelect = index => {
-    setSelectedSharing(index);
+    setSelectedSharingIndex(index);
   };
+
   const gotoPolicy = () => {
-    props.navigation.navigate('BookingPolicy');
+    props.navigation.navigate('BookingPolicy', {propertyData});
   };
+
   const gotoBack = () => {
     props.navigation.dispatch(CommonActions.goBack());
   };
 
+  const handleContinue = () => {
+    if (!selectedRoom) {
+      // Show error or alert
+      return;
+    }
+    // Navigate to payment or next screen
+    props.navigation.navigate('Tab', {screen: 'PayTab'});
+  };
+
   const renderOptionList = (item, index) => {
+    const isSelected = selectedSharingIndex === index;
     return (
       <TouchableOpacity onPress={() => handleSharingSelect(index)}>
         <View
           style={[
             HomeStyle.optionListContainer,
-
-            selectedSharing === index && HomeStyle.selectOptionListContainer,
+            isSelected && HomeStyle.selectOptionListContainer,
           ]}>
           <Text
             style={[
               HomeStyle.optionListText,
-              selectedSharing === index && HomeStyle.selectOptionListText,
+              isSelected && HomeStyle.selectOptionListText,
             ]}>
             {item.optionName}
           </Text>
@@ -98,49 +202,68 @@ const BookingOptionScreen = props => {
       </TouchableOpacity>
     );
   };
-  const handleSelectRoom = room => {
-    setSelectedRoom(room === selectedRoom ? null : room);
+
+  const handleSelectRoom = (room, floorName) => {
+    const roomKey = `${floorName}-${room}`;
+    setSelectedRoom(selectedRoom === roomKey ? null : roomKey);
   };
-  const renderRoom =
-    floorName =>
-    ({item}) => {
-      const isAvailable = availableRooms.includes(item);
-      const isSelected = selectedRoom === `${floorName}-${item}`;
-      return (
-        <TouchableOpacity
-          style={[
-            HomeStyle.roomBox,
-            isAvailable && isSelected
-              ? HomeStyle.selectedStyle
-              : isAvailable
-              ? HomeStyle.available
-              : HomeStyle.unavailable,
-          ]}
-          onPress={() => isAvailable && handleSelectRoom(item)}>
-          <Text style={HomeStyle.roomText}>{item}</Text>
-          <View style={[HomeStyle.greenStripContainer]}>
-            <View
-              style={[
-                !isAvailable ? HomeStyle.greenStrip : HomeStyle.grayStrip,
-              ]}
-            />
-          </View>
-        </TouchableOpacity>
-      );
-    };
+
+  const isRoomAvailable = (roomNumber) => {
+    // Check if room is in unavailable list
+    // The unavailable list contains room identifiers like "single-101-bed1"
+    // We need to check if any unavailable room starts with this room number
+    return !unavailableRooms.some(unavailable => 
+      unavailable.includes(roomNumber) || unavailable.startsWith(roomNumber)
+    );
+  };
+
+  const renderRoom = (floorName) => ({item}) => {
+    const isAvailable = isRoomAvailable(item);
+    const roomKey = `${floorName}-${item}`;
+    const isSelected = selectedRoom === roomKey;
+    return (
+      <TouchableOpacity
+        style={[
+          HomeStyle.roomBox,
+          isAvailable && isSelected
+            ? HomeStyle.selectedStyle
+            : isAvailable
+            ? HomeStyle.available
+            : HomeStyle.unavailable,
+            {justifyContent: "center"}
+        ]}
+        onPress={() => isAvailable && handleSelectRoom(item, floorName)}
+        disabled={!isAvailable}>
+        <Text style={HomeStyle.roomText}>{item}</Text>
+        <View style={[HomeStyle.greenStripContainer]}>
+          <View
+            style={[
+              isAvailable ? HomeStyle.grayStrip : HomeStyle.grayStrip,
+            ]}
+          />
+        </View>
+      </TouchableOpacity>
+    );
+  };
   const renderFloor = ({item}) => (
     <View style={HomeStyle.floorContainer}>
       <Text style={HomeStyle.floorTitle}>{item.name}</Text>
-      <FlatList
-        data={item.rooms}
-        keyExtractor={(room, index) => `${item.id}-${room}-${index}`}
-        horizontal={false}
-        numColumns={4}
-        columnWrapperStyle={{gap: 8}}
-        contentContainerStyle={{gap: 8}}
-        renderItem={renderRoom(item.name)}
-        scrollEnabled={false}
-      />
+      {item.rooms && item.rooms.length > 0 ? (
+        <FlatList
+          data={item.rooms}
+          keyExtractor={(room, index) => `${item.id}-${room}-${index}`}
+          horizontal={false}
+          numColumns={4}
+          columnWrapperStyle={{gap: 8}}
+          contentContainerStyle={{gap: 8}}
+          renderItem={renderRoom(item.name)}
+          scrollEnabled={false}
+        />
+      ) : (
+        <Text style={[HomeStyle.pgDesc, {textAlign: 'center', paddingVertical: 10}]}>
+          No rooms available
+        </Text>
+      )}
     </View>
   );
 
@@ -167,65 +290,77 @@ const BookingOptionScreen = props => {
           </View>
         </View>
       </SafeAreaView>
-      <ScrollView
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
-        style={{flexGrow: 1}}
-        scrollEnabled>
-        <View style={{...LayoutStyle.paddingHorizontal20}}>
-          <View style={[HomeStyle.optionContainer]}>
-            <Text style={[HomeStyle.optionBoldText]}>
-              {'Select your preferred Sharing'}
-            </Text>
-          </View>
-          <FlatList
-            numColumns={3}
-            data={optionList}
-            columnWrapperStyle={{
-              justifyContent: 'space-between',
-              ...LayoutStyle.marginTop20,
-            }}
-            renderItem={({item: optionItem, index}) =>
-              renderOptionList(optionItem, index)
-            }
-            scrollEnabled={false}
-            keyExtractor={item => item.id}
-          />
-          <View style={HomeStyle.legendRow}>
-            <View style={{alignItems: 'center'}}>
-              <View style={[HomeStyle.legendBox, {backgroundColor: 'green'}]} />
-              <Text style={HomeStyle.legendLabel}>Available</Text>
-            </View>
-            <View
-              style={{
-                alignItems: 'center',
-                ...LayoutStyle.paddingLeft15,
-              }}>
-              <View style={[HomeStyle.legendBox, {backgroundColor: 'gray'}]} />
-              <Text style={HomeStyle.legendLabel}>Not Available</Text>
-            </View>
-          </View>
-          <FlatList
-            data={floors}
-            keyExtractor={item => item.id}
-            renderItem={renderFloor}
-            scrollEnabled={false}
-          />
+      {loading ? (
+        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+          <ActivityIndicator size="large" color={Colors.secondary} />
+          <Text style={[HomeStyle.pgDesc, {marginTop: 10}]}>Loading room availability...</Text>
         </View>
-
-        <View style={[HomeStyle.bottomTextContainer]}>
-          <TouchableOpacity onPress={() => gotoPolicy()}>
-            <Text style={[HomeStyle.bottomText]}>
-              {'Click here'}
-              <Text style={[HomeStyle.bottomTextMid]}>
-                {'for Booking & Refund '}
+      ) : (
+        <ScrollView
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+          style={{flexGrow: 1}}
+          contentContainerStyle={{paddingBottom: 100}}
+          scrollEnabled>
+          <View style={{...LayoutStyle.paddingHorizontal20}}>
+            <View style={[HomeStyle.optionContainer]}>
+              <Text style={[HomeStyle.optionBoldText]}>
+                {'Select your preferred Sharing'}
               </Text>
-              <Text>{'Continue'}</Text>
-            </Text>
-          </TouchableOpacity>
-          <Button onPress={() => gotoPayrent()} btnName={'Continue'} />
-        </View>
-      </ScrollView>
+            </View>
+            <FlatList
+              numColumns={3}
+              data={optionList}
+              columnWrapperStyle={{
+                justifyContent: 'space-between',
+                ...LayoutStyle.marginTop20,
+              }}
+              renderItem={({item: optionItem, index}) =>
+                renderOptionList(optionItem, index)
+              }
+              scrollEnabled={false}
+              keyExtractor={item => item.id?.toString() || Math.random().toString()}
+            />
+            <View style={HomeStyle.legendRow}>
+              <View style={{alignItems: 'center'}}>
+                <View style={[HomeStyle.legendBox, {backgroundColor: Colors.selectedGreen}]} />
+                <Text style={HomeStyle.legendLabel}>Available</Text>
+              </View>
+              <View
+                style={{
+                  alignItems: 'center',
+                  ...LayoutStyle.paddingLeft15,
+                }}>
+                <View style={[HomeStyle.legendBox, {backgroundColor: Colors.lightGray}]} />
+                <Text style={HomeStyle.legendLabel}>Not Available</Text>
+              </View>
+            </View>
+            {floors.length > 0 ? (
+              <FlatList
+                data={floors}
+                keyExtractor={item => item.id}
+                renderItem={renderFloor}
+                scrollEnabled={false}
+              />
+            ) : (
+              <Text style={[HomeStyle.pgDesc, {textAlign: 'center', paddingVertical: 20}]}>
+                No floor data available
+              </Text>
+            )}
+          </View>
+
+          <View style={[HomeStyle.bottomTextContainer, {paddingHorizontal: 20}]}>
+            <TouchableOpacity onPress={() => gotoPolicy()}>
+              <Text style={[HomeStyle.bottomText]}>
+                {'Click here for Booking & Refund Policies'}
+              </Text>
+            </TouchableOpacity>
+            <View style={{marginTop: 15}}>
+              <Button onPress={handleContinue} btnName={'Continue'} />
+            </View>
+          </View>
+        </ScrollView>
+      )}
     </KeyboardAvoidingView>
   );
 };

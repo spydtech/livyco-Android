@@ -18,12 +18,14 @@ if (Text.defaultProps) {
 const App = () => {
   LogBox.ignoreAllLogs(); //Ignore all log console
   return (
-    <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-      <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
-        <FlashMessage position="top" />
-        <AppNavigation />
-      </SafeAreaView>
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
+          <FlashMessage position="top" />
+          <AppNavigation />
+        </SafeAreaView>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 };
 

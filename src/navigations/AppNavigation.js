@@ -40,6 +40,7 @@ import ChangeRequestScreen from '../screens/mystays/ChangeRequestScreen';
 import SuccessRequestScreen from '../screens/mystays/SuccessRequestScreen';
 import ViewStatusScreen from '../screens/mystays/ViewStatusScreen';
 import VacateRoomScreen from '../screens/Dashboard/VacateRoomScreen';
+import WishlistScreen from '../screens/Dashboard/WishlistScreen';
 import Registerotp from '../screens/auth/Registerotp';
 
 const Stack = createNativeStackNavigator();
@@ -272,6 +273,7 @@ function AppNavigation(props) {
         <Stack.Screen name="SuccessRequest" component={SuccessRequestScreen} />
         <Stack.Screen name="ViewStatus" component={ViewStatusScreen} />
         <Stack.Screen name="VacateRoom" component={VacateRoomScreen} />
+        <Stack.Screen name="Wishlist" component={WishlistScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

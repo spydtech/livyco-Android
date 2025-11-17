@@ -31,21 +31,33 @@ const TrendingScreen = props => {
   const [isFilterl, setIsFilterl] = useState(false);
   const [statusColor, setStatusColor] = useState(Colors.secondary);
   const [pgList, setPgList] = useState([]);
+  const [originalList, setOriginalList] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [filterData, setFilterData] = useState(null);
 
   useEffect(() => {
     fetchPGList();
   }, []);
 
+  useEffect(() => {
+    if (originalList.length > 0) {
+      applyFiltersAndSort();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selected, filterData, originalList.length]);
+
   const fetchPGList = async () => {
     try {
       setLoading(true);
       const response = await getAllProperties();
+      console.log("response",response);
+      
       if (response.success && response.data) {
         // Filter only approved properties with PG data
         const approvedPGProperties = response.data.filter(
           item => item.property?.status === 'approved' && item.pgProperty
         );
+        setOriginalList(approvedPGProperties);
         setPgList(approvedPGProperties);
       }
     } catch (error) {
@@ -53,6 +65,131 @@ const TrendingScreen = props => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Get minimum price from property
+  const getMinPrice = (item) => {
+    if (!item?.rooms?.roomTypes || item.rooms.roomTypes.length === 0) return 0;
+    const prices = item.rooms.roomTypes.map(room => room.price || 0).filter(p => p > 0);
+    return prices.length > 0 ? Math.min(...prices) : 0;
+  };
+
+  // Apply filters based on filterData
+  const applyFilters = (list) => {
+    if (!filterData) return list;
+
+    let filtered = [...list];
+
+    // Filter by gender
+    if (filterData.gender) {
+      const genderMap = {
+        'Male': 'Male',
+        'Female': 'Female',
+        'Co-Living': 'Co Living'
+      };
+      const targetGender = genderMap[filterData.gender] || filterData.gender;
+      filtered = filtered.filter(item => {
+        const pgGender = item.pgProperty?.gender || '';
+        return pgGender.toLowerCase() === targetGender.toLowerCase();
+      });
+    }
+
+    // Filter by room type
+    if (filterData.roomType) {
+      const roomTypeMap = {
+        'Single Sharing': 'Single',
+        'Double Sharing': 'Double',
+        'Triple Sharing': 'Triple',
+        'Four Sharing': 'Four',
+        'Five Sharing': 'Five',
+        'Five + Sharing': 'Five+'
+      };
+      const targetRoomType = roomTypeMap[filterData.roomType] || filterData.roomType;
+      filtered = filtered.filter(item => {
+        const roomTypes = item.rooms?.roomTypes || [];
+        return roomTypes.some(room => {
+          const roomLabel = (room.label || room.type || '').toLowerCase();
+          return roomLabel.includes(targetRoomType.toLowerCase());
+        });
+      });
+    }
+
+    // Filter by budget (max price)
+    if (filterData.budget) {
+      filtered = filtered.filter(item => {
+        const minPrice = getMinPrice(item);
+        return minPrice > 0 && minPrice <= filterData.budget;
+      });
+    }
+
+    // Filter by amenities
+    if (filterData.amenities && filterData.amenities.length > 0) {
+      filtered = filtered.filter(item => {
+        const propertyAmenities = (item.pgProperty?.amenities || []).map(a => a.toLowerCase());
+        return filterData.amenities.some(amenity => 
+          propertyAmenities.some(pa => pa.includes(amenity.toLowerCase()))
+        );
+      });
+    }
+
+    // Filter by ratings (if ratings filter is applied)
+    // Note: Since we don't have actual ratings in the data, we'll skip this for now
+    // if (filterData.ratings && filterData.ratings.length > 0) {
+    //   filtered = filtered.filter(item => {
+    //     const propertyRating = item.rating || 0;
+    //     return filterData.ratings.some(rating => propertyRating >= rating);
+    //   });
+    // }
+
+    return filtered;
+  };
+
+  // Apply sorting based on selected option
+  const applySorting = (list) => {
+    if (!selected) return list;
+
+    const sorted = [...list];
+
+    switch (selected) {
+      case 'Price - Low to High':
+        return sorted.sort((a, b) => {
+          const priceA = getMinPrice(a);
+          const priceB = getMinPrice(b);
+          return priceA - priceB;
+        });
+
+      case 'Price - High to Low':
+        return sorted.sort((a, b) => {
+          const priceA = getMinPrice(a);
+          const priceB = getMinPrice(b);
+          return priceB - priceA;
+        });
+
+      case 'Freshness':
+        return sorted.sort((a, b) => {
+          const dateA = new Date(a.property?.createdAt || 0);
+          const dateB = new Date(b.property?.createdAt || 0);
+          return dateB - dateA; // Newest first
+        });
+
+      case 'Relevance':
+      default:
+        // Keep original order (already sorted by backend or default)
+        return sorted;
+    }
+  };
+
+  // Apply both filters and sorting
+  const applyFiltersAndSort = () => {
+    let result = [...originalList];
+    
+    // Apply filters first
+    result = applyFilters(result);
+    
+    // Then apply sorting
+    result = applySorting(result);
+    
+    setPgList(result);
   };
   const options = [
     'Relevance',
@@ -180,15 +317,30 @@ const TrendingScreen = props => {
   const gotoBottomSheetClose = () => {
     setSortByModal(false);
   };
+
+  const handleSortSelect = (sortOption) => {
+    setSelected(sortOption);
+    // Close modal after a short delay to show selection
+    setTimeout(() => {
+      setSortByModal(false);
+    }, 300);
+  };
+
   const closeModal = () => {
     setIsFilterl(false);
   };
-  const handleApply = data => {
+
+  const handleApply = (data) => {
     console.log('Selected Data:', data);
+    setFilterData(data);
+    // Modal will be closed by FilterComponent's onApply
   };
 
   const handleClear = () => {
     console.log('Filters cleared');
+    setFilterData(null);
+    setSelected(null);
+    // Modal will be closed by FilterComponent's onClear
   };
   const gotoBack = () => {
     props.navigation.dispatch(CommonActions.goBack());
@@ -300,7 +452,7 @@ const TrendingScreen = props => {
               onClose={() => gotoBottomSheetClose()}
               renderContent={() => {
                 return (
-                  <View style={[HomeStyle.bottomSheetHeight]}>
+                  <View style={[]}>
                     <Text style={[HomeStyle.blackTextbigCenter, {marginTop: 20}]}>
                       {'Sort By'}
                     </Text>
@@ -312,7 +464,7 @@ const TrendingScreen = props => {
                           selected === item && HomeStyle.selectedOption,
                           {paddingHorizontal: 20}
                         ]}
-                        onPress={() => setSelected(item)}>
+                        onPress={() => handleSortSelect(item)}>
                         <Text
                           style={[
                             HomeStyle.optionText,
@@ -331,8 +483,8 @@ const TrendingScreen = props => {
       ) : (
         <FilterComponent
           key={'index-filter'}
-          onApply={() => {
-            handleApply();
+          onApply={(data) => {
+            handleApply(data);
             closeModal(); // Close the modal after applying the filter
           }}
           onClear={() => {

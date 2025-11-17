@@ -5,6 +5,7 @@ import {
   Animated,
   StyleSheet,
   Image,
+  Modal,
 } from 'react-native';
 import Icons from './Icons';
 import Colors from '../styles/Colors';
@@ -32,33 +33,42 @@ const BottomSheet = ({isOpen, onClose, renderContent, maxHeight}) => {
   };
 
   return (
-    <>
-      {isOpen && (
+    <Modal
+      visible={isOpen}
+      transparent={true}
+      animationType="none"
+      onRequestClose={onClose}
+      statusBarTranslucent={true}>
+      <View style={styles.modalContainer}>
         <TouchableOpacity
           style={styles.overlay}
           activeOpacity={1}
           onPress={onClose}
         />
-      )}
-      <Animated.View
-        style={[styles.bottomSheet, bottomSheetStyle, {maxHeight}]}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-            <Icons
-              iconName={'close-circle-outline'}
-              iconSetName={'MaterialCommunityIcons'}
-              iconColor={Colors.gray}
-              iconSize={20}
-            />
-          </TouchableOpacity>
-        </View>
-        {renderContent && renderContent()}
-      </Animated.View>
-    </>
+        <Animated.View
+          style={[styles.bottomSheet, bottomSheetStyle, {maxHeight}]}>
+          <View style={styles.header}>
+            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+              <Icons
+                iconName={'close-circle-outline'}
+                iconSetName={'MaterialCommunityIcons'}
+                iconColor={Colors.gray}
+                iconSize={20}
+              />
+            </TouchableOpacity>
+          </View>
+          {renderContent && renderContent()}
+        </Animated.View>
+      </View>
+    </Modal>
   );
 };
 
 const styles = StyleSheet.create({
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
   overlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -78,7 +88,8 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
-    elevation: 2,
+    elevation: 1001,
+    zIndex: 1001,
     borderTopWidth: 0.5,
     borderLeftWidth: 0.5,
     borderRightWidth: 0.5,
@@ -92,7 +103,7 @@ const styles = StyleSheet.create({
   closeButton: {
     position: 'absolute',
     top: -45,
-    right: 0,
+    right: 10,
     backgroundColor: 'white',
     borderRadius: 15,
     width: 30,
@@ -106,7 +117,8 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.2,
     shadowRadius: 1.41,
-    elevation: 2,
+    elevation: 1002,
+    zIndex: 1002,
   },
   closeIcon: {
     height: 40,

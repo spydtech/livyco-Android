@@ -133,8 +133,16 @@ const HomeScreen = props => {
     }
   };
 
-  const gotoPGDetails = (propertyId) => {
-    props.navigation.navigate('PGBooking', { propertyId });
+  const gotoPGDetails = (item) => {
+    // Pass the complete property data object
+    const propertyData = {
+      property: item.property || {},
+      pgProperty: item.pgProperty || {},
+      media: item.media || {images: [], videos: []},
+      rooms: item.rooms || {roomTypes: []},
+      owner: item.owner || {}
+    };
+    props.navigation.navigate('PGBooking', { propertyData });
   };
 
   const renderPGList = ({ item, index }) => {
@@ -162,7 +170,7 @@ const HomeScreen = props => {
 
     return (
       <TouchableOpacity
-        onPress={() => gotoPGDetails(property._id)}
+        onPress={() => gotoPGDetails(item)}
         style={{ marginRight: 15, width: screenWidth * 0.85 }}>
         <View style={[HomeStyle.bedListContainer]}>
           {propertyImage && propertyImage.startsWith('http') ? (
@@ -613,7 +621,7 @@ const HomeScreen = props => {
             {/* Recently Viewed Section */}
             <View style={[HomeStyle.trendingPGCard, { ...LayoutStyle.paddingHorizontal20 }]}>
               <Text style={HomeStyle.blackTextMid}>{'Recently Viewed'}</Text>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={()=> gotoTrendingPG()}>
                 <Icons
                   iconSetName={'MaterialCommunityIcons'}
                   iconName={'arrow-right'}
