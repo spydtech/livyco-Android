@@ -1112,7 +1112,7 @@ const HomeStyle = StyleSheet.create({
     height: 55,
     borderTopRightRadius: 10,
     borderBottomRightRadius: 10,
-    width: "45%",
+    width: "35%",
     backgroundColor: Colors.secondary,
 
     alignItems: "center",

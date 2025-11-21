@@ -18,12 +18,14 @@ import LayoutStyle from '../../styles/LayoutStyle';
 import {CommonActions} from '@react-navigation/native';
 import {getAvailableRoomsAndBeds} from '../../services/bookingService';
 import moment from 'moment';
+import {showMessage} from 'react-native-flash-message';
 
 const BookingOptionScreen = props => {
   // Get data from route params
   const propertyData = props.route?.params?.propertyData;
   const selectedSharing = props.route?.params?.selectedSharing;
   const moveInDate = props.route?.params?.moveInDate;
+  const bookingType = props.route?.params?.bookingType; // 'group' or undefined (self booking)
   const property = propertyData?.property || {};
   const propertyId = property?._id || property?.id;
   const rooms = propertyData?.rooms || {roomTypes: []};
@@ -50,7 +52,7 @@ const BookingOptionScreen = props => {
   const optionList = roomTypes.length > 0
     ? roomTypes.map((rt, index) => ({
         id: rt._id || index + 1,
-        optionName: getSharingLabel(rt.type || rt.label),
+        optionName: getSharingLabel(rt.label || rt.type),
         roomType: rt,
       }))
     : [
@@ -74,6 +76,20 @@ const BookingOptionScreen = props => {
     }
   }, [selectedSharing]);
 
+  // Check if we're coming back from GroupBookingScreen (user clicked back from guest details)
+  // and restore the selected room if it was previously selected
+  useEffect(() => {
+    const previouslySelectedRoom = props.route?.params?.previouslySelectedRoom;
+    if (previouslySelectedRoom) {
+      setSelectedRoom(previouslySelectedRoom);
+      // Clear the param to avoid re-triggering
+      props.navigation.setParams({ previouslySelectedRoom: undefined });
+    }
+  }, [props.route?.params?.previouslySelectedRoom]);
+
+  
+  console.log("Property Id", propertyId, propertyData);
+  
   // Fetch room availability
   useEffect(() => {
     if (propertyId && moveInDate) {
@@ -176,10 +192,40 @@ const BookingOptionScreen = props => {
   const handleContinue = () => {
     if (!selectedRoom) {
       // Show error or alert
+      showMessage({
+        message: 'Please select a room',
+        type: 'danger',
+        floating: true,
+      });
       return;
     }
-    // Navigate to payment or next screen
-    props.navigation.navigate('Tab', {screen: 'PayTab'});
+    
+    // Check if this is a group booking flow
+    if (bookingType === 'group') {
+      // Navigate to GuestDetailsScreen with selected room data
+      const numberOfGuests = props.route?.params?.numberOfGuests;
+      const isShortVisit = props.route?.params?.isShortVisit;
+      const selectedSharing = props.route?.params?.selectedSharing;
+      
+      props.navigation.navigate('GuestDetails', {
+        propertyData,
+        selectedRoom,
+        selectedSharingIndex,
+        moveInDate,
+        numberOfGuests,
+        isShortVisit,
+        selectedSharing,
+      });
+    } else {
+      // Navigate to payment screen with booking data (self booking flow)
+      const bookingData = {
+        propertyData,
+        selectedRoom,
+        selectedSharingIndex,
+        moveInDate,
+      };
+      props.navigation.navigate('PayRentBooking', {bookingData});
+    }
   };
 
   const renderOptionList = (item, index) => {

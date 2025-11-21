@@ -316,6 +316,7 @@ const PGBookingScreen = props => {
     setIsBottomSheet(true);
     setIsContact(false);
   };
+console.log("propertyData", propertyData);
 
   const gotoMySelf = () => {
     setIsBottomSheet(false);
@@ -485,7 +486,8 @@ const PGBookingScreen = props => {
     props.navigation.dispatch(CommonActions.goBack());
   };
   const gotoGroupCheckIn = () => {
-    props.navigation.navigate('GroupBooking');
+    setIsBottomSheet(false);
+    props.navigation.navigate('GroupBooking', { propertyData });
   };
   return (
     <KeyboardAvoidingView

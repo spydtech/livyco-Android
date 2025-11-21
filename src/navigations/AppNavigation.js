@@ -15,6 +15,7 @@ import RegisterScreen from '../screens/auth/RegisterScreen';
 import HomeScreen from '../screens/Dashboard/HomeScreen';
 import Colors from '../styles/Colors';
 import PayRentScreen from '../screens/payment/PayRentScreen';
+import PayRentBookingScreen from '../screens/payment/PayRentBookingScreen';
 import ChatsScreen from '../screens/chats/ChatsScreen';
 import MystaysScreen from '../screens/mystays/MystaysScreen';
 import ProfileScreen from '../screens/profile/ProfileScreen';
@@ -34,6 +35,7 @@ import ChatListScreen from '../screens/chats/ChatListScreen';
 import CallScreen from '../screens/chats/CallScreen';
 import SuccessIDScreen from '../screens/auth/SuccessIDScreen';
 import BookingOptionScreen from '../screens/Dashboard/BookingOptionScreen';
+import GuestDetailsScreen from '../screens/Dashboard/GuestDetailsScreen';
 import MystayDetailScreen from '../screens/mystays/MystayDetailScreen';
 import FoodManuScreen from '../screens/mystays/FoodManuScreen';
 import ChangeRequestScreen from '../screens/mystays/ChangeRequestScreen';
@@ -264,7 +266,9 @@ function AppNavigation(props) {
         <Stack.Screen name="MySelfBooking" component={MySelfBookingScreen} />
         <Stack.Screen name="BookingOption" component={BookingOptionScreen} />
         <Stack.Screen name="BookingPolicy" component={BookingPolicyScreen} />
+        <Stack.Screen name="PayRentBooking" component={PayRentBookingScreen} />
         <Stack.Screen name="GroupBooking" component={GroupBookingScreen} />
+        <Stack.Screen name="GuestDetails" component={GuestDetailsScreen} />
         <Stack.Screen name="ChatList" component={ChatListScreen} />
         <Stack.Screen name="MessageList" component={MessageListScreen} />
         <Stack.Screen name="Call" component={CallScreen} />

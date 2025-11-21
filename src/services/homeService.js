@@ -148,6 +148,8 @@ export const getLocationByProperty = async (propertyId) => {
 export const getMapByProperty = async (propertyId) => {
   try {
     const response = await Api.get(`map/${propertyId}`);
+    console.log("");
+    
     return {
       success: response.data?.success || false,
       data: response.data?.location || null,

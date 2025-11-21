@@ -9,335 +9,343 @@ import {
   ScrollView,
   FlatList,
   TextInput,
+  Alert,
+  ActivityIndicator,
+  Image,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, { useState, useEffect } from 'react';
 import HomeStyle from '../../styles/HomeStyle';
 import Colors from '../../styles/Colors';
-import {Button, Icons, DropDown, Input} from '../../components';
+import { Button, Icons, DropDown, Input } from '../../components';
 import LayoutStyle from '../../styles/LayoutStyle';
 import DatePicker from 'react-native-date-picker';
 import CommonStyles from '../../styles/CommonStyles';
-import {CommonActions} from '@react-navigation/native';
+import { CommonActions } from '@react-navigation/native';
 import moment from 'moment';
+import { showMessage } from 'react-native-flash-message';
+import { Dropdown } from 'react-native-element-dropdown';
+import { deviceHight } from '../../utils/DeviceInfo';
 
 const GroupBookingScreen = props => {
-  const [moveDate, setMoveDate] = useState('DD/MM/YYYY');
-  const [open, setOpen] = useState(false);
-  const [screen1, setScreen1] = useState(true);
+  const propertyData = props.route?.params?.propertyData;
+  const property = propertyData?.property || {};
+  const rooms = propertyData?.rooms || {};
+  const roomTypes = rooms?.roomTypes || [];
+  const propertyId = property?._id || property?.id;
 
-  const optionList = [
-    {
-      id: 1,
-      optionName: 'Single Sharing',
-    },
-    {
-      id: 2,
-      optionName: 'Double Sharing',
-    },
-    {
-      id: 3,
-      optionName: 'Triple Sharing',
-    },
-    {
-      id: 4,
-      optionName: 'Four \nSharing',
-    },
-    {
-      id: 5,
-      optionName: 'Five  \nSharing',
-    },
-    {
-      id: 6,
-      optionName: 'Six  \nSharing',
-    },
-  ];
+  // Room Booking State
+  const [moveInDate, setMoveInDate] = useState(null);
+  const [moveInDateText, setMoveInDateText] = useState('DD/MM/YYYY');
+  const [datePickerOpen, setDatePickerOpen] = useState(false);
+  const [selectedSharing, setSelectedSharing] = useState(null);
+  const [numberOfGuests, setNumberOfGuests] = useState(null);
+  const [isShortVisit, setIsShortVisit] = useState(true);
 
-  const dropdownData = [
-    {label: 'Item 1', value: '1'},
-    {label: 'Item 2', value: '2'},
-    {label: 'Item 3', value: '3'},
-    {label: 'Item 4', value: '4'},
-    {label: 'Item 5', value: '5'},
-    {label: 'Item 6', value: '6'},
-    {label: 'Item 7', value: '7'},
-    {label: 'Item 8', value: '8'},
-  ];
+  // Number of Guests Options
+  const numberOfGuestsOptions = Array.from({ length: 10 }, (_, i) => ({
+    label: `${i + 1}`,
+    value: `${i + 1}`,
+  }));
 
-  const renderOptionList = (item, index) => {
-    return (
-      <TouchableOpacity>
-        <View style={[HomeStyle.optionListContainer]}>
-          <Text style={[HomeStyle.optionListText]}>{item.optionName}</Text>
-        </View>
-      </TouchableOpacity>
-    );
+  // Get sharing options from room types or use default
+  const getSharingOptions = () => {
+    if (roomTypes && roomTypes.length > 0) {
+      return roomTypes.map(rt => ({
+        id: rt.type || rt._id,
+        optionName: rt.label || getSharingLabel(rt.type),
+        type: rt.type,
+      }));
+    }
+    return [
+      { id: 1, optionName: 'Single Sharing', type: 'single' },
+      { id: 2, optionName: 'Double Sharing', type: 'double' },
+      { id: 3, optionName: 'Triple Sharing', type: 'triple' },
+      { id: 4, optionName: 'Four Sharing', type: 'four' },
+      { id: 5, optionName: 'Five Sharing', type: 'five' },
+      { id: 6, optionName: 'Six Sharing', type: 'six' },
+    ];
   };
 
-  const gotoNextScreen = () => {
-    setScreen1(false);
+  const getSharingLabel = type => {
+    const typeLower = type?.toLowerCase() || '';
+    if (typeLower.includes('single') || typeLower === '1')
+      return 'Single Sharing';
+    if (typeLower.includes('double') || typeLower === '2')
+      return 'Double Sharing';
+    if (typeLower.includes('triple') || typeLower === '3')
+      return 'Triple Sharing';
+    if (typeLower.includes('four') || typeLower === '4') return 'Four Sharing';
+    if (typeLower.includes('five') || typeLower === '5') return 'Five Sharing';
+    if (typeLower.includes('six') || typeLower === '6') return 'Six Sharing';
+    return type || 'Sharing';
   };
 
-  const gotoPayNow = () => {
-    props.navigation.navigate('Tab', {screen: 'PayTab'});
+
+  const handleDateSelect = date => {
+    setDatePickerOpen(false);
+    const formattedDate = moment(date).format('DD/MM/YYYY');
+    setMoveInDateText(formattedDate);
+    setMoveInDate(date);
   };
 
-  const handleMovingDate = date => {
-    setOpen(false);
-    const formattedDate = moment(date).format('DD-MM-YYYY');
-    console.log('in press date=>date', formattedDate);
+  const handleSharingSelect = item => {
+    setSelectedSharing(item);
+  };
 
-    setMoveDate(formattedDate);
+  const validateRoomBooking = () => {
+    if (!moveInDate) {
+      showMessage({
+        message: 'Please select move-in date',
+        type: 'danger',
+        floating: true,
+      });
+      return false;
+    }
+    if (!selectedSharing) {
+      showMessage({
+        message: 'Please select sharing type',
+        type: 'danger',
+        floating: true,
+      });
+      return false;
+    }
+    if (!numberOfGuests) {
+      showMessage({
+        message: 'Please select number of guests',
+        type: 'danger',
+        floating: true,
+      });
+      return false;
+    }
+    return true;
+  };
+
+
+  const handleContinue = () => {
+    if (validateRoomBooking()) {
+      // Navigate to BookingOptionScreen for bed selection
+      props.navigation.navigate('BookingOption', {
+        propertyData,
+        selectedSharing: selectedSharing,
+        moveInDate: moveInDateText,
+        numberOfGuests: numberOfGuests,
+        isShortVisit: isShortVisit,
+        bookingType: 'group', // Flag to indicate this is group booking
+      });
+    }
   };
 
   const gotoBack = () => {
     props.navigation.dispatch(CommonActions.goBack());
   };
 
-  return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={HomeStyle.homeContainer}>
-      <StatusBar barStyle="light-content" backgroundColor={Colors.secondary} />
-      <SafeAreaView
-        style={{
-          paddingTop: 10,
-          backgroundColor: Colors.secondary,
-        }}>
-        <View style={HomeStyle.headerContainerBlue}>
-          <View style={HomeStyle.profileImgContainer}>
-            <TouchableOpacity onPress={() => gotoBack()}>
-              <Icons
-                iconSetName={'MaterialCommunityIcons'}
-                iconName={'arrow-left'}
-                iconColor={Colors.white}
-                iconSize={26}
-              />
-            </TouchableOpacity>
-            <Text style={HomeStyle.screenNameWhite}>{'Group Bookings'}</Text>
-          </View>
-        </View>
-      </SafeAreaView>
-      <ScrollView
-        contentContainerStyle={{backgroundColor: Colors.goastWhite}}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}>
-        {screen1 ? (
-          <View style={[HomeStyle.homePadding20]}>
-            <Text
-              style={[
-                HomeStyle.blackTextSmall,
-                {...LayoutStyle.marginBottom15},
-              ]}>
-              {'Please fill the below details for a smooth transaction'}
-            </Text>
-            <View style={[HomeStyle.radioBtn]}>
-              <Icons
-                iconSetName={'Ionicons'}
-                iconName={'radio-button-off-outline'}
-                iconColor={Colors.gray}
-                iconSize={24}
-              />
-              <Text style={[HomeStyle.visitText]}>{'Short Visit'}</Text>
-            </View>
-            <View style={[HomeStyle.dateContainer]}>
-              <Text style={[HomeStyle.dateText]}>{'Move In Date *'}</Text>
-              <Icons
-                iconSetName={'Ionicons'}
-                iconName={'calendar-clear-outline'}
-                iconColor={Colors.gray}
-                iconSize={24}
-              />
-            </View>
-            <TouchableOpacity
-              onPress={() => setOpen(true)}
-              style={[HomeStyle.dateView]}>
-              <Text style={[HomeStyle.textDate]}>{moveDate}</Text>
-              <DatePicker
-                mode={'date'}
-                modal
-                open={open}
-                date={new Date()}
-                onConfirm={selectedDate => {
-                  handleMovingDate(selectedDate);
-                }}
-                onCancel={() => {
-                  setOpen(false);
-                }}
-              />
-            </TouchableOpacity>
-            <Text style={[HomeStyle.optionSelectText]}>
-              {'Select your preferred Sharing'}
-            </Text>
-            <FlatList
-              numColumns={3}
-              data={optionList}
-              columnWrapperStyle={{
-                justifyContent: 'space-between',
-                ...LayoutStyle.marginTop20,
-              }}
-              renderItem={({item: optionItem, index}) =>
-                renderOptionList(optionItem, index)
+  const renderSharingOption = (item, index) => {
+    const isSelected = selectedSharing?.id === item.id;
+    return (
+      <TouchableOpacity
+        key={index}
+        onPress={() => handleSharingSelect(item)}
+        style={[
+          HomeStyle.optionListContainer,
+          isSelected && {
+            backgroundColor: Colors.secondary,
+            borderColor: Colors.secondary,
+          },
+        ]}
+      >
+        <Text
+          style={[
+            HomeStyle.optionListText,
+            isSelected && { color: Colors.white },
+          ]}
+        >
+          {item.optionName}
+        </Text>
+      </TouchableOpacity>
+    );
+  };
+
+  const renderRoomBookingScreen = () => {
+    const sharingOptions = getSharingOptions();
+    // const currentGuest = guests[guestType === 'Self' ? 0 : currentGuestIndex];
+
+    return (
+      <View style={[HomeStyle.homePadding20]}>
+        <Text
+          style={[HomeStyle.blackTextSmall, { ...LayoutStyle.marginBottom15 }]}
+        >
+          {'Please fill the below details for a smooth transaction'}
+        </Text>
+
+        {/* Short Visit Radio Button */}
+        <View style={[HomeStyle.radioBtn]}>
+          <TouchableOpacity
+            onPress={() => setIsShortVisit(true)}
+            style={{ flexDirection: 'row', alignItems: 'center' }}
+          >
+            <Icons
+              iconSetName={'Ionicons'}
+              iconName={
+                isShortVisit ? 'radio-button-on' : 'radio-button-off-outline'
               }
-              scrollEnabled={false}
-              keyExtractor={item => item.id}
+              iconColor={isShortVisit ? Colors.secondary : Colors.gray}
+              iconSize={24}
             />
-            <Text style={[HomeStyle.numbOf]}>{'Number Of Guest'}</Text>
-            <DropDown
-              placeholderStyle={[HomeStyle.dropdownMonth]}
-              selectedTextStyle={[HomeStyle.dropdownMonth]}
-              searchPlaceholder={'Search..'}
-              itemContainerStyle={{
-                paddingHorizontal: 10,
-              }}
-              containerStyle={{
-                // borderRadius: 10,
-                width: 90,
-                paddingBottom: 10,
-              }}
-              itemTextStyle={{
-                padding: 5,
-                fontSize: 12,
-              }}
-              activeColor={Colors.secondary}
-              dropdownData={dropdownData}
-              maxHeight={200}
-              labelField="label"
-              valueField="value"
-              placeholder={'Select from below options'}
-              value={'selectedMonth'}
-              onChange={item => {
-                // gotoChangeMonth(item.name);
-              }}
-            />
-
-            <View style={[HomeStyle.bottomTextGroup]}>
-              <Button onPress={() => gotoNextScreen()} btnName={'Continue'} />
-              <Text style={[HomeStyle.bottomLabel]}>
-                {'Id is mandatory during the check-in'}
-              </Text>
-            </View>
-          </View>
-        ) : (
-          <View style={[HomeStyle.homePadding20]}>
-            <View style={[HomeStyle.btnTapFlexStyle]}>
-              <Button
-                btnStyle={[HomeStyle.btnTapSelf]}
-                flexContainer={{flexGrow: 0.456}}
-                btnName={'Self'}
-              />
-              <Button
-                flexContainer={{flexGrow: 0.456}}
-                btnStyle={[HomeStyle.btnTapStyle]}
-                btnName={'Others'}
-                btnTextColor={Colors.grayText}
-              />
-            </View>
-
-            <View style={{...LayoutStyle.marginTop20}}>
-              <Text style={[HomeStyle.inputLabel]}>{'Name *'}</Text>
-              <View style={{...CommonStyles.directionRowSB}}>
-                <TextInput
-                  style={[HomeStyle.inputName]}
-                  placeholderTextColor={Colors.grayText}
-                />
-                <TextInput
-                  style={[HomeStyle.inputAge]}
-                  placeholderTextColor={Colors.grayText}
-                  placeholder="Age"
-                />
-                <View>
-                  <Text style={[HomeStyle.inputLabelGender]}>{'Gender'}</Text>
-                  <View style={[HomeStyle.genderRadioView]}>
-                    <View
-                      style={[
-                        HomeStyle.genderIconContainer,
-                        {marginRight: 10},
-                      ]}>
-                      <Icons
-                        iconSetName={'Ionicons'}
-                        iconName={'man'}
-                        iconColor={Colors.gray}
-                        iconSize={20}
-                      />
-                    </View>
-                    <View style={[HomeStyle.genderIconContainer]}>
-                      <Icons
-                        iconSetName={'Ionicons'}
-                        iconName={'woman'}
-                        iconColor={Colors.gray}
-                        iconSize={20}
-                      />
-                    </View>
-                  </View>
-                </View>
-              </View>
-
-              <Text style={[HomeStyle.inputMobileLabel]}>
-                {'Mobile Number *'}
-              </Text>
-              <View style={{...CommonStyles.directionRowCenter}}>
-                <TextInput
-                  style={[HomeStyle.inputMobile]}
-                  placeholderTextColor={Colors.grayText}
-                />
-                <TouchableOpacity style={[HomeStyle.verifyOTPContainer]}>
-                  <Text style={[HomeStyle.verifyOtpText]}>{'Verify OTP'}</Text>
-                </TouchableOpacity>
-              </View>
-              <Input InputLabel={'Alternate Mobile Number'} />
-              <Input InputLabel={'Email'} />
-              <Text style={[HomeStyle.idproof]}>{'Id Proof *'}</Text>
-              <DropDown
-                placeholderStyle={[HomeStyle.dropdownMonth]}
-                selectedTextStyle={[HomeStyle.dropdownMonth]}
-                searchPlaceholder={'Search..'}
-                itemContainerStyle={{
-                  paddingHorizontal: 10,
-                }}
-                containerStyle={{
-                  // borderRadius: 10,
-                  width: 90,
-                  paddingBottom: 10,
-                }}
-                itemTextStyle={{
-                  padding: 5,
-                  fontSize: 12,
-                }}
-                activeColor={Colors.secondary}
-                dropdownData={dropdownData}
-                maxHeight={200}
-                labelField="label"
-                valueField="value"
-                placeholder={'Select from below options'}
-                value={'selectedMonth'}
-                onChange={item => {
-                  // gotoChangeMonth(item.name);
-                }}
-              />
-              <Text style={[HomeStyle.inputMobileImg]}>{'Upload *'}</Text>
-              <View style={[HomeStyle.uploadContainer]}>
-                <TextInput
-                  style={[HomeStyle.inputMobile]}
-                  placeholderTextColor={Colors.grayText}
-                />
-                <TouchableOpacity style={[HomeStyle.verifyOTPContainer]}>
-                  <Text style={[HomeStyle.verifyOtpText]}>{'Upload'}</Text>
-                </TouchableOpacity>
-              </View>
-              <Input InputLabel={'Purpose of visit'} />
-            </View>
-            <Button
-              btnStyle={HomeStyle.paynowBtn}
-              btnName={'Pay Now'}
-              onPress={() => gotoPayNow()}
-            />
-            <Text style={[HomeStyle.bottomLabel]}>
-              {'Id is mandatory during the check-in'}
+            <Text style={[HomeStyle.visitText, { marginLeft: 10 }]}>
+              {'Short Visit'}
             </Text>
-          </View>
-        )}
-      </ScrollView>
-    </KeyboardAvoidingView>
+          </TouchableOpacity>
+        </View>
+
+        {/* Move In Date */}
+        <View
+          style={[
+            HomeStyle.dateContainer,
+            { flexDirection: 'row', alignItems: 'center' },
+          ]}
+        >
+          <Text style={[HomeStyle.dateText]}>{'Move In Date *'}</Text>
+          <TouchableOpacity onPress={() => setDatePickerOpen(true)}>
+            <Icons
+              iconSetName={'Ionicons'}
+              iconName={'calendar-clear-outline'}
+              iconColor={Colors.gray}
+              iconSize={24}
+            />
+          </TouchableOpacity>
+        </View>
+        <TouchableOpacity
+          onPress={() => setDatePickerOpen(true)}
+          style={[HomeStyle.dateView]}
+        >
+          <Text style={[HomeStyle.textDate]}>{moveInDateText}</Text>
+        </TouchableOpacity>
+        <DatePicker
+          mode={'date'}
+          modal
+          open={datePickerOpen}
+          date={moveInDate || new Date()}
+          minimumDate={new Date()}
+          onConfirm={handleDateSelect}
+          onCancel={() => setDatePickerOpen(false)}
+        />
+
+        {/* Sharing Selection */}
+        <Text
+          style={[HomeStyle.optionSelectText, { ...LayoutStyle.marginTop20 }]}
+        >
+          {'Select your preferred Sharing'}
+        </Text>
+        <FlatList
+          numColumns={3}
+          data={sharingOptions}
+          columnWrapperStyle={{
+            justifyContent: 'space-between',
+            // ...LayoutStyle.marginTop20,
+          }}
+          renderItem={({ item, index }) => renderSharingOption(item, index)}
+          scrollEnabled={false}
+          keyExtractor={item => item.id?.toString() || item.type}
+        />
+
+        {/* Number Of Guest */}
+        <Text style={[HomeStyle.numbOf, { ...LayoutStyle.marginTop20 }]}>
+          {'Number Of Guest'}
+        </Text>
+        <Dropdown
+          data={numberOfGuestsOptions}
+          value={numberOfGuests}
+          placeholder="Select from below options"
+          onChange={item => {
+            setNumberOfGuests(item.value);
+          }}
+          labelField="label"
+          valueField="value"
+          style={{
+            height: 45,
+            borderColor: Colors.grayBorder,
+            borderWidth: 0.5,
+            borderRadius: 8,
+            paddingHorizontal: 15,
+          }}
+          placeholderStyle={{
+            color: Colors.grayBorder,
+          }}
+          renderRightIcon={() => (
+            <Icons
+              iconSetName={'Ionicons'}
+              iconName={'chevron-down'}
+              iconColor={Colors.grayBorder}
+              iconSize={18}
+            />
+          )}
+        />
+
+        {/* Continue Button */}
+        <View
+          style={[HomeStyle.bottomTextGroup, { ...LayoutStyle.marginTop30 }]}
+        >
+          <Button onPress={handleContinue} btnName={'Continue'} />
+          <Text
+            style={[
+              HomeStyle.bottomLabel,
+              { textAlign: 'center', marginTop: 10 },
+            ]}
+          >
+            {'Id is mandatory during the check-in'}
+          </Text>
+        </View>
+      </View>
+    );
+  };
+
+
+  return (
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: Colors.goastWhite,
+      }}
+    >
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor={Colors.secondary}
+      />
+      <View style={HomeStyle.headerContainerBlue}>
+        <View style={HomeStyle.profileImgContainer}>
+          <TouchableOpacity onPress={() => gotoBack()}>
+            <Icons
+              iconSetName={'MaterialCommunityIcons'}
+              iconName={'arrow-left'}
+              iconColor={Colors.white}
+              iconSize={26}
+            />
+          </TouchableOpacity>
+          <Text style={HomeStyle.screenNameWhite}>
+            {'Room Bookings'}
+          </Text>
+        </View>
+      </View>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+      >
+        <ScrollView
+          contentContainerStyle={{
+            flexGrow: 1,
+            backgroundColor: Colors.goastWhite,
+            padding: 20,
+            paddingBottom: 40,
+          }}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+          bounces={false}
+        >
+          {renderRoomBookingScreen()}
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 

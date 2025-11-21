@@ -77,8 +77,62 @@ export const checkRoomAvailability = async (params) => {
   }
 };
 
+/**
+ * Create a new booking
+ * @param {Object} bookingData - Booking data
+ * @param {string} bookingData.propertyId - Property ID
+ * @param {string} bookingData.roomType - Room type (e.g., 'single', 'double')
+ * @param {Array} bookingData.selectedRooms - Array of room identifiers
+ * @param {string} bookingData.moveInDate - Move-in date (YYYY-MM-DD)
+ * @param {string} [bookingData.endDate] - End date (YYYY-MM-DD)
+ * @param {string} [bookingData.durationType] - Duration type ('monthly', 'daily', 'custom')
+ * @param {number} [bookingData.durationDays] - Duration in days
+ * @param {number} [bookingData.durationMonths] - Duration in months
+ * @param {number} bookingData.personCount - Number of persons
+ * @param {Object} bookingData.customerDetails - Customer details
+ * @param {Object} [bookingData.pricing] - Pricing information
+ * @returns {Promise<Object>} Booking creation response
+ */
+export const createBooking = async (bookingData) => {
+  try {
+    const token = await getUserToken();
+    const headers = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    };
+    
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(`${API_BASE_URL}bookings`, {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify(bookingData),
+    });
+
+    const data = await response.json();
+    
+    return {
+      success: data?.success || false,
+      data: data?.booking || data?.data || null,
+      message: data?.message || '',
+      error: data?.error || null,
+    };
+  } catch (error) {
+    console.error('Create booking error:', error);
+    return {
+      success: false,
+      data: null,
+      message: error.message || 'Failed to create booking',
+      error: error.message,
+    };
+  }
+};
+
 export default {
   getAvailableRoomsAndBeds,
   checkRoomAvailability,
+  createBooking,
 };
 
