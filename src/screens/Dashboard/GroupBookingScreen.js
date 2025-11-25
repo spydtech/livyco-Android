@@ -40,6 +40,8 @@ const GroupBookingScreen = props => {
   const [selectedSharing, setSelectedSharing] = useState(null);
   const [numberOfGuests, setNumberOfGuests] = useState(null);
   const [isShortVisit, setIsShortVisit] = useState(true);
+  const [durationType, setDurationType] = useState('monthly');
+  const [durationValue, setDurationValue] = useState('1');
 
   // Number of Guests Options
   const numberOfGuestsOptions = Array.from({ length: 10 }, (_, i) => ({
@@ -117,12 +119,25 @@ const GroupBookingScreen = props => {
       });
       return false;
     }
+    if (!durationValue || parseInt(durationValue) < 1) {
+      showMessage({
+        message: 'Please enter a valid duration',
+        type: 'danger',
+        floating: true,
+      });
+      return false;
+    }
     return true;
   };
 
 
   const handleContinue = () => {
     if (validateRoomBooking()) {
+      // Prepare duration data
+      const durationMonths = durationType === 'monthly' ? parseInt(durationValue) : null;
+      const durationDays = durationType === 'daily' ? parseInt(durationValue) : null;
+      const durationWeeks = durationType === 'weekly' ? parseInt(durationValue) : null;
+      
       // Navigate to BookingOptionScreen for bed selection
       props.navigation.navigate('BookingOption', {
         propertyData,
@@ -130,6 +145,10 @@ const GroupBookingScreen = props => {
         moveInDate: moveInDateText,
         numberOfGuests: numberOfGuests,
         isShortVisit: isShortVisit,
+        durationType,
+        durationMonths,
+        durationDays,
+        durationWeeks,
         bookingType: 'group', // Flag to indicate this is group booking
       });
     }
@@ -280,6 +299,74 @@ const GroupBookingScreen = props => {
             />
           )}
         />
+
+        {/* Duration Type and Value */}
+        <View style={[HomeStyle.dateContainer, { flexDirection: 'row', alignItems: 'center', marginTop: 20 }]}>
+          <Text style={[HomeStyle.dateText]}>{'Duration *'}</Text>
+        </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10, gap: 10 }}>
+          {/* Duration Type Dropdown */}
+          <View style={{ flex: 1 }}>
+            <Dropdown
+              style={{
+                height: 45,
+                borderColor: Colors.grayBorder,
+                borderWidth: 0.5,
+                borderRadius: 8,
+                paddingHorizontal: 15,
+              }}
+              placeholderStyle={{ color: Colors.grayBorder, fontSize: 16 }}
+              selectedTextStyle={{ color: Colors.blackText, fontSize: 16 }}
+              data={[
+                { label: 'Daily', value: 'daily' },
+                { label: 'Weekly', value: 'weekly' },
+                { label: 'Monthly', value: 'monthly' },
+              ]}
+              maxHeight={300}
+              labelField="label"
+              valueField="value"
+              placeholder="Select type"
+              value={durationType}
+              onChange={item => {
+                setDurationType(item.value);
+              }}
+              renderLeftIcon={() => (
+                <Icons
+                  iconSetName={'MaterialIcons'}
+                  iconName={'calendar-today'}
+                  iconColor={Colors.gray}
+                  iconSize={20}
+                />
+              )}
+            />
+          </View>
+
+          {/* Duration Value Input */}
+          <View style={{ flex: 0.5 }}>
+            <TextInput
+              style={{
+                height: 45,
+                borderColor: Colors.grayBorder,
+                borderWidth: 0.5,
+                borderRadius: 8,
+                paddingHorizontal: 15,
+                textAlign: 'center',
+              }}
+              placeholder="1"
+              placeholderTextColor={Colors.grayText}
+              keyboardType="numeric"
+              value={durationValue}
+              onChangeText={setDurationValue}
+            />
+          </View>
+
+          {/* Duration Unit Label */}
+          <View style={{ flex: 0.5, alignItems: 'flex-start', justifyContent: 'center' }}>
+            <Text style={[HomeStyle.dateText, { marginTop: 0 }]}>
+              {durationType === 'monthly' ? 'Months' : durationType === 'weekly' ? 'Weeks' : 'Days'}
+            </Text>
+          </View>
+        </View>
 
         {/* Continue Button */}
         <View

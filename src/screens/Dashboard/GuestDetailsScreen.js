@@ -33,6 +33,15 @@ const GuestDetailsScreen = props => {
   const selectedSharing = props.route?.params?.selectedSharing;
   const moveInDate = props.route?.params?.moveInDate;
   const isShortVisit = props.route?.params?.isShortVisit || true;
+  const bookingType = props.route?.params?.bookingType; // 'myself' or 'group'
+  const durationType = props.route?.params?.durationType || 'monthly';
+  const durationMonths = props.route?.params?.durationMonths || null;
+  const durationDays = props.route?.params?.durationDays || null;
+  const durationWeeks = props.route?.params?.durationWeeks || null;
+  
+  // Determine if this is MySelf booking (always 1 guest, no Others tab)
+  const isMySelfFlow = bookingType === 'myself';
+  const isGroupFlow = bookingType === 'group';
 
   // Guest Details State
   const [guestType, setGuestType] = useState('Self'); // 'Self' or 'Others'
@@ -75,7 +84,12 @@ const GuestDetailsScreen = props => {
 
   // Initialize Others guests array based on numberOfGuests
   useEffect(() => {
-    if (guestType === 'Others' && numberOfGuests) {
+    // For MySelf flow, always use Self tab and disable Others
+    if (isMySelfFlow) {
+      setGuestType('Self');
+    }
+    
+    if (guestType === 'Others' && numberOfGuests && !isMySelfFlow) {
       const guestCount = parseInt(numberOfGuests) || 1;
       setOthersGuests(prevGuests => {
         // Preserve existing data, only add new empty guests if needed
@@ -104,7 +118,7 @@ const GuestDetailsScreen = props => {
       });
       setCurrentGuestIndex(0);
     }
-  }, [guestType, numberOfGuests]);
+  }, [guestType, numberOfGuests, isMySelfFlow]);
 
   const handleGuestFieldChange = (field, value, index = null) => {
     if (guestType === 'Self') {
@@ -335,85 +349,219 @@ const GuestDetailsScreen = props => {
     return true;
   };
 
-  const validateGuestDetails = () => {
-    const guestsToValidate = guestType === 'Self' ? [selfGuest] : othersGuests;
+  const focusGuestTab = (tab, index) => {
+    if (tab && guestType !== tab) {
+      setGuestType(tab);
+    }
+    if (tab === 'Others' && typeof index === 'number') {
+      setCurrentGuestIndex(index);
+    }
+  };
 
-    for (let i = 0; i < guestsToValidate.length; i++) {
-      const guest = guestsToValidate[i];
-      if (!guest.name?.trim()) {
-        showMessage({
-          message: `Please enter name for ${guestType === 'Self' ? 'guest' : `guest ${i + 1}`
-            }`,
-          type: 'danger',
-          floating: true,
-        });
+  const validateSingleGuest = (
+    guest,
+    { label = 'guest', isSelf = false, tab = null, index = null } = {},
+  ) => {
+    const targetLabel = isSelf ? 'your' : label;
+
+    if (!guest) {
+      showMessage({
+        message: `Please fill details for ${label}`,
+        type: 'danger',
+        floating: true,
+      });
+      focusGuestTab(tab, index);
+      return false;
+    }
+
+    if (!guest.name?.trim()) {
+      showMessage({
+        message: isSelf
+          ? 'Please enter your name'
+          : `Please enter name for ${label}`,
+        type: 'danger',
+        floating: true,
+      });
+      focusGuestTab(tab, index);
+      return false;
+    }
+
+    if (!guest.age?.trim()) {
+      showMessage({
+        message: isSelf
+          ? 'Please enter your age'
+          : `Please enter age for ${label}`,
+        type: 'danger',
+        floating: true,
+      });
+      focusGuestTab(tab, index);
+      return false;
+    }
+
+    if (!guest.gender) {
+      showMessage({
+        message: isSelf
+          ? 'Please select your gender'
+          : `Please select gender for ${label}`,
+        type: 'danger',
+        floating: true,
+      });
+      focusGuestTab(tab, index);
+      return false;
+    }
+
+    if (!guest.mobile?.trim() || guest.mobile.length !== 10) {
+      showMessage({
+        message: isSelf
+          ? 'Please enter a valid mobile number'
+          : `Please enter a valid mobile number for ${label}`,
+        type: 'danger',
+        floating: true,
+      });
+      focusGuestTab(tab, index);
+      return false;
+    }
+
+    if (!guest.idProofType) {
+      showMessage({
+        message: isSelf
+          ? 'Please select ID proof type'
+          : `Please select ID proof type for ${label}`,
+        type: 'danger',
+        floating: true,
+      });
+      focusGuestTab(tab, index);
+      return false;
+    }
+
+    if (!guest.idProofNumber?.trim()) {
+      showMessage({
+        message: isSelf
+          ? 'Please enter ID proof number'
+          : `Please enter ID proof number for ${label}`,
+        type: 'danger',
+        floating: true,
+      });
+      focusGuestTab(tab, index);
+      return false;
+    }
+
+    if (!guest.idProofImage) {
+      showMessage({
+        message: isSelf
+          ? 'Please upload your ID proof'
+          : `Please upload ID proof for ${label}`,
+        type: 'danger',
+        floating: true,
+      });
+      focusGuestTab(tab, index);
+      return false;
+    }
+
+    if (!guest.saveForFuture) {
+      showMessage({
+        message: isSelf
+          ? 'Please check "Save details for future use"'
+          : `Please check "Save details for future use" for ${label}`,
+        type: 'danger',
+        floating: true,
+      });
+      focusGuestTab(tab, index);
+      return false;
+    }
+
+    return true;
+  };
+
+  const validateGuestDetails = () => {
+    // For MySelf flow, only validate self guest
+    if (isMySelfFlow) {
+      return validateSingleGuest(selfGuest, {
+        label: 'self guest',
+        isSelf: true,
+        tab: 'Self',
+      });
+    }
+    
+    if (isGroupFlow) {
+      // Always validate self guest first
+      if (
+        !validateSingleGuest(selfGuest, {
+          label: 'self guest',
+          isSelf: true,
+          tab: 'Self',
+        })
+      ) {
         return false;
       }
-      if (!guest.age?.trim()) {
+      
+      const expectedGuests = parseInt(numberOfGuests) || 0;
+      if (expectedGuests <= 0) {
         showMessage({
-          message: `Please enter age for ${guestType === 'Self' ? 'guest' : `guest ${i + 1}`
-            }`,
+          message: 'Please specify number of guests in the previous step',
           type: 'danger',
           floating: true,
         });
+        focusGuestTab('Others', 0);
         return false;
       }
-      if (!guest.gender) {
+
+      if (!othersGuests || othersGuests.length < expectedGuests) {
         showMessage({
-          message: `Please select gender for ${guestType === 'Self' ? 'guest' : `guest ${i + 1}`
-            }`,
+          message: `Please fill details for all ${expectedGuests} guest(s)`,
           type: 'danger',
           floating: true,
         });
+        focusGuestTab('Others', othersGuests?.length || 0);
         return false;
       }
-      if (!guest.mobile?.trim() || guest.mobile.length !== 10) {
-        showMessage({
-          message: `Please enter valid mobile number for ${guestType === 'Self' ? 'guest' : `guest ${i + 1}`
-            }`,
-          type: 'danger',
-          floating: true,
-        });
-        return false;
+
+      for (let i = 0; i < expectedGuests; i++) {
+        if (
+          !validateSingleGuest(othersGuests[i], {
+            label: `guest ${i + 1}`,
+            tab: 'Others',
+            index: i,
+          })
+        ) {
+          return false;
+        }
       }
-      if (!guest.idProofType) {
-        showMessage({
-          message: `Please select ID proof type for ${guestType === 'Self' ? 'guest' : `guest ${i + 1}`
-            }`,
-          type: 'danger',
-          floating: true,
-        });
-        return false;
-      }
-      if (!guest.idProofNumber?.trim()) {
-        showMessage({
-          message: `Please enter ID proof number for ${guestType === 'Self' ? 'guest' : `guest ${i + 1}`
-            }`,
-          type: 'danger',
-          floating: true,
-        });
-        return false;
-      }
-      if (!guest.idProofImage) {
-        showMessage({
-          message: `Please upload ID proof for ${guestType === 'Self' ? 'guest' : `guest ${i + 1}`
-            }`,
-          type: 'danger',
-          floating: true,
-        });
-        return false;
-      }
-      // Check if saveForFuture is checked (mandatory)
-      if (!guest.saveForFuture) {
-        showMessage({
-          message: `Please check "Save details for future use" for ${guestType === 'Self' ? 'guest' : `guest ${i + 1}`
-            }`,
-          type: 'danger',
-          floating: true,
-        });
+
+      return true;
+    }
+
+    // Legacy flow: validate based on current tab selection
+    if (guestType === 'Self') {
+      return validateSingleGuest(selfGuest, {
+        label: 'self guest',
+        isSelf: true,
+        tab: 'Self',
+      });
+    }
+
+    if (!othersGuests || othersGuests.length === 0) {
+      showMessage({
+        message: 'Please add guest details',
+        type: 'danger',
+        floating: true,
+      });
+      focusGuestTab('Others', 0);
+      return false;
+    }
+
+    for (let i = 0; i < othersGuests.length; i++) {
+      if (
+        !validateSingleGuest(othersGuests[i], {
+          label: `guest ${i + 1}`,
+          tab: 'Others',
+          index: i,
+        })
+      ) {
         return false;
       }
     }
+    
     return true;
   };
 
@@ -432,13 +580,41 @@ const GuestDetailsScreen = props => {
     }
 
     // Prepare customer details
-    const primaryGuest = guestType === 'Self' ? selfGuest : othersGuests[0];
-    const additionalGuests = guestType === 'Others' ? othersGuests.slice(1) : [];
+    const primaryGuest = isGroupFlow
+      ? selfGuest
+      : guestType === 'Self'
+      ? selfGuest
+      : othersGuests[0];
+
+    const additionalGuestSource = isGroupFlow
+      ? othersGuests
+      : guestType === 'Others'
+      ? othersGuests.slice(1)
+      : [];
+
+    const filteredAdditionalGuests = (additionalGuestSource || [])
+      .filter(guest => guest && guest.name)
+      .map(guest => ({
+        name: guest.name,
+        age: parseInt(guest.age),
+        gender: guest.gender,
+        idProofType: guest.idProofType,
+        idProofNumber: guest.idProofNumber,
+      }));
 
     // Check if saveForFuture is set
-    const saveForFuture = guestType === 'Self' 
-      ? selfGuest.saveForFuture || false
-      : (othersGuests.length > 0 ? othersGuests[othersGuests.length - 1].saveForFuture || false : false);
+    const saveForFuture = isGroupFlow
+      ? Boolean(
+          selfGuest.saveForFuture &&
+            (othersGuests || []).every(guest => guest?.saveForFuture),
+        )
+      : guestType === 'Self'
+      ? Boolean(selfGuest.saveForFuture)
+      : Boolean(
+          othersGuests.length > 0
+            ? othersGuests[othersGuests.length - 1]?.saveForFuture
+            : false,
+        );
 
     const customerDetails = {
       primary: {
@@ -451,27 +627,118 @@ const GuestDetailsScreen = props => {
         idProofNumber: primaryGuest.idProofNumber,
         purpose: primaryGuest.purpose || '',
       },
-      additional: additionalGuests.map(guest => ({
-        name: guest.name,
-        age: parseInt(guest.age),
-        gender: guest.gender,
-        idProofType: guest.idProofType,
-        idProofNumber: guest.idProofNumber,
-      })),
+      additional: filteredAdditionalGuests,
       saveForFuture: saveForFuture,
     };
 
     // Prepare booking data (without creating booking yet)
-    const roomTypeValue =
-      selectedSharing?.type || selectedSharing?.id || 'single';
+    // Extract room type from selectedSharing - check multiple sources
+    let roomTypeValue = 'single'; // Default fallback
     
-    // Parse selectedRoom format: "floorName-roomNumber" or use it directly
+    // Priority 1: Check selectedSharing.roomType.type (from BookingOptionScreen)
+    if (selectedSharing?.roomType?.type) {
+      roomTypeValue = selectedSharing.roomType.type;
+    }
+    // Priority 2: Check selectedSharing.type (direct type property)
+    else if (selectedSharing?.type) {
+      roomTypeValue = selectedSharing.type;
+    }
+    // Priority 3: Extract from optionName (e.g., "Single Sharing" -> "single")
+    else if (selectedSharing?.optionName) {
+      const optionNameLower = selectedSharing.optionName.toLowerCase();
+      if (optionNameLower.includes('single')) {
+        roomTypeValue = 'single';
+      } else if (optionNameLower.includes('double')) {
+        roomTypeValue = 'double';
+      } else if (optionNameLower.includes('triple')) {
+        roomTypeValue = 'triple';
+      } else if (optionNameLower.includes('four')) {
+        roomTypeValue = 'four';
+      } else if (optionNameLower.includes('five')) {
+        roomTypeValue = 'five';
+      } else if (optionNameLower.includes('six')) {
+        roomTypeValue = 'six';
+      }
+    }
+    // Priority 4: Try to find in roomTypes array using selectedSharing.id
+    else if (selectedSharing?.id && roomTypes.length > 0) {
+      const foundRoomType = roomTypes.find(rt => 
+        rt._id === selectedSharing.id || 
+        rt.id === selectedSharing.id
+      );
+      if (foundRoomType?.type) {
+        roomTypeValue = foundRoomType.type;
+      } else if (foundRoomType?.label) {
+        const labelLower = foundRoomType.label.toLowerCase();
+        if (labelLower.includes('single')) roomTypeValue = 'single';
+        else if (labelLower.includes('double')) roomTypeValue = 'double';
+        else if (labelLower.includes('triple')) roomTypeValue = 'triple';
+        else if (labelLower.includes('four')) roomTypeValue = 'four';
+        else if (labelLower.includes('five')) roomTypeValue = 'five';
+        else if (labelLower.includes('six')) roomTypeValue = 'six';
+      }
+    }
+    
+    // Normalize roomTypeValue to match backend format (single, double, triple, etc.)
+    let normalizedSharingType = roomTypeValue;
+    if (typeof roomTypeValue === 'string') {
+      const roomTypeLower = roomTypeValue.toLowerCase();
+      if (roomTypeLower.includes('single') || roomTypeLower === '1') {
+        normalizedSharingType = 'single';
+      } else if (roomTypeLower.includes('double') || roomTypeLower === '2') {
+        normalizedSharingType = 'double';
+      } else if (roomTypeLower.includes('triple') || roomTypeLower === '3') {
+        normalizedSharingType = 'triple';
+      } else if (roomTypeLower.includes('four') || roomTypeLower === '4') {
+        normalizedSharingType = 'four';
+      } else if (roomTypeLower.includes('five') || roomTypeLower === '5') {
+        normalizedSharingType = 'five';
+      } else if (roomTypeLower.includes('six') || roomTypeLower === '6') {
+        normalizedSharingType = 'six';
+      } else {
+        normalizedSharingType = roomTypeLower.replace(' sharing', '').trim();
+      }
+    }
+    
+    // Use normalized type for roomTypeValue
+    roomTypeValue = normalizedSharingType;
+    
+    // Debug logging
+    console.log('GuestDetailsScreen - Room Type Extraction:', {
+      selectedSharing,
+      roomTypeValue,
+      normalizedSharingType,
+      hasRoomType: !!selectedSharing?.roomType,
+      roomTypeFromSharing: selectedSharing?.roomType?.type,
+    });
+    
+    // Parse selectedRoom format: "floorName-roomNumber" -> convert to "sharingType-roomNumber-bedName"
     let selectedRoomsArray = [];
     if (selectedRoom) {
-      selectedRoomsArray = [selectedRoom];
+      // Extract room number from "floorName-roomNumber" format (e.g., "First Floor-101" -> "101")
+      const parts = selectedRoom.split('-');
+      let roomNumber = null;
+      
+      if (parts.length >= 2) {
+        // Get the last part as room number (e.g., "First Floor-101" -> "101")
+        roomNumber = parts[parts.length - 1];
+      } else if (parts.length === 1) {
+        // If no dash, assume the whole string is the room number
+        roomNumber = parts[0];
+      }
+      
+      if (roomNumber) {
+        // Construct proper roomIdentifier format: "sharingType-roomNumber-bedName"
+        // Use default bed name "bed1" if not specified
+        const roomIdentifier = `${normalizedSharingType}-${roomNumber}-bed1`;
+        selectedRoomsArray = [roomIdentifier];
+      } else {
+        // Fallback if room number extraction fails
+        selectedRoomsArray = [`${normalizedSharingType}-room-1-bed1`];
+      }
     } else {
       // Fallback to placeholder if no room selected
-      selectedRoomsArray = [`${roomTypeValue}-room-1-bed-1`];
+      selectedRoomsArray = [`${normalizedSharingType}-room-1-bed1`];
     }
     
     // Convert moveInDate from DD/MM/YYYY to Date object if needed
@@ -483,22 +750,104 @@ const GuestDetailsScreen = props => {
       }
     }
     
+    // Use duration from route params if available, otherwise fallback to isShortVisit logic
+    const finalDurationType = durationType || (isShortVisit ? 'daily' : 'monthly');
+    const finalDurationDays = durationDays || (isShortVisit ? 1 : null);
+    const finalDurationMonths = durationMonths || (isShortVisit ? null : 1);
+    const finalDurationWeeks = durationWeeks || null;
+    
+    // Get room type details from propertyData
+    const rooms = propertyData?.rooms || { roomTypes: [] };
+    const roomTypes = rooms?.roomTypes || [];
+    
+    // Find the selected room type to get price and deposit
+    let selectedRoomTypeData = null;
+    if (selectedSharing) {
+      // Try multiple ways to find the room type
+      // 1. Check if selectedSharing has roomType property
+      if (selectedSharing.roomType) {
+        selectedRoomTypeData = selectedSharing.roomType;
+      }
+      // 2. Try to find by type or id in roomTypes array
+      else if (roomTypes.length > 0) {
+        selectedRoomTypeData = roomTypes.find(rt => 
+          rt.type === roomTypeValue || 
+          rt._id === selectedSharing.id ||
+          rt.label?.toLowerCase().includes(roomTypeValue.toLowerCase()) ||
+          (selectedSharing.type && rt.type === selectedSharing.type)
+        );
+      }
+    }
+    
+    // Get price and deposit from room type
+    const roomPrice = selectedRoomTypeData?.price || selectedSharing?.roomType?.price || selectedSharing?.price || 1.0;
+    const roomDeposit = selectedRoomTypeData?.deposit || selectedSharing?.roomType?.deposit || selectedSharing?.deposit || 0;
+    const monthlyRent = roomPrice; // Base monthly rent
+    
+    // Calculate advance amount based on duration
+    let advanceAmount = 0;
+    if (finalDurationType === 'daily' && finalDurationDays) {
+      // For daily: advanceAmount = roomType.price * durationDays 
+      advanceAmount = roomPrice * finalDurationDays;
+    } else if (finalDurationType === 'monthly' && finalDurationMonths) {
+      // For monthly: advanceAmount = roomType.price * durationMonths
+      advanceAmount = roomPrice * finalDurationMonths;
+    } else if (finalDurationType === 'weekly' && finalDurationWeeks) {
+      // For weekly: convert to daily calculation
+      advanceAmount = roomPrice * (finalDurationWeeks * 7);
+    } else {
+      // Default: 1 month
+      advanceAmount = roomPrice;
+    }
+    
+    // Calculate deposit amount: roomType.deposit * number of selected rooms
+    const depositAmount = roomDeposit * selectedRoomsArray.length;
+    
+    // Calculate total amount: advanceAmount + depositAmount
+    const totalAmount = advanceAmount + depositAmount;
+    
+    // Create pricing object matching web implementation
+    const pricingData = {
+      monthlyRent: monthlyRent,
+      totalRent: advanceAmount, // Total rent for the duration
+      advanceAmount: advanceAmount,
+      securityDeposit: depositAmount,
+      totalAmount: totalAmount,
+      maintenanceFee: 0, // Can be added if needed
+    };
+    
     const bookingData = {
       propertyData,
       propertyId,
-      roomType: roomTypeValue,
+      roomType: roomTypeValue, // Use normalized room type (single, double, triple, etc.)
       selectedRooms: selectedRoomsArray,
       selectedSharing,
       selectedSharingIndex: null, // Can be passed if needed
       moveInDate: moment(moveInDateObj).format('YYYY-MM-DD'),
       moveInDateText: moveInDate,
-      durationType: isShortVisit ? 'daily' : 'monthly',
-      durationDays: isShortVisit ? 1 : null,
-      durationMonths: isShortVisit ? null : 1,
-      personCount: parseInt(numberOfGuests) || 1,
+      durationType: finalDurationType,
+      durationDays: finalDurationDays,
+      durationMonths: finalDurationMonths,
+      durationWeeks: finalDurationWeeks,
+      personCount: isMySelfFlow ? 1 : (parseInt(numberOfGuests) || 1),
       customerDetails,
       isShortVisit,
+      bookingType, // Pass bookingType to payment screen
+      // Add pricing data matching web implementation
+      pricing: pricingData,
+      advanceAmount: advanceAmount,
+      depositAmount: depositAmount,
+      totalAmount: totalAmount,
+      monthlyRent: monthlyRent,
     };
+
+    // Debug logging before navigation
+    console.log('GuestDetailsScreen - Navigating to PayRentBooking with bookingData:', {
+      roomType: bookingData.roomType,
+      selectedRooms: bookingData.selectedRooms,
+      propertyId: bookingData.propertyId,
+      moveInDate: bookingData.moveInDate,
+    });
 
     // Navigate to payment screen with all booking data
     // Booking will be created after successful payment
@@ -560,63 +909,65 @@ const GuestDetailsScreen = props => {
           showsVerticalScrollIndicator={false}
           bounces={false}
         >
-          {/* Self/Others Toggle */}
-          <View style={[HomeStyle.btnTapFlexStyle]}>
-            <TouchableOpacity
-              onPress={() => {
-                setGuestType('Self');
-                setCurrentGuestIndex(0);
-              }}
-              style={[
-                HomeStyle.btnTapSelf,
-                guestType === 'Self' && { backgroundColor: Colors.secondary },
-                {
-                  flex: 0.48,
-                  paddingVertical: 12,
-                  borderRadius: 8,
-                  alignItems: 'center',
-                },
-              ]}
-            >
-              <Text
+          {/* Self/Others Toggle - Hide Others tab for MySelf flow */}
+          {!isMySelfFlow && (
+            <View style={[HomeStyle.btnTapFlexStyle]}>
+              <TouchableOpacity
+                onPress={() => {
+                  setGuestType('Self');
+                  setCurrentGuestIndex(0);
+                }}
                 style={[
-                  { fontSize: 14, fontWeight: '600' },
-                  guestType === 'Self'
-                    ? { color: Colors.white }
-                    : { color: Colors.grayText },
+                  HomeStyle.btnTapSelf,
+                  guestType === 'Self' && { backgroundColor: Colors.secondary },
+                  {
+                    flex: 0.48,
+                    paddingVertical: 12,
+                    borderRadius: 8,
+                    alignItems: 'center',
+                  },
                 ]}
               >
-                {'Self'}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                setGuestType('Others');
-                setCurrentGuestIndex(0);
-              }}
-              style={[
-                HomeStyle.btnTapStyle,
-                guestType === 'Others' && { backgroundColor: Colors.secondary },
-                {
-                  flex: 0.48,
-                  paddingVertical: 12,
-                  borderRadius: 8,
-                  alignItems: 'center',
-                },
-              ]}
-            >
-              <Text
+                <Text
+                  style={[
+                    { fontSize: 14, fontWeight: '600' },
+                    guestType === 'Self'
+                      ? { color: Colors.white }
+                      : { color: Colors.grayText },
+                  ]}
+                >
+                  {'Self'}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  setGuestType('Others');
+                  setCurrentGuestIndex(0);
+                }}
                 style={[
-                  { fontSize: 14, fontWeight: '600' },
-                  guestType === 'Others'
-                    ? { color: Colors.white }
-                    : { color: Colors.grayText },
+                  HomeStyle.btnTapStyle,
+                  guestType === 'Others' && { backgroundColor: Colors.secondary },
+                  {
+                    flex: 0.48,
+                    paddingVertical: 12,
+                    borderRadius: 8,
+                    alignItems: 'center',
+                  },
                 ]}
               >
-                {'Others'}
-              </Text>
-            </TouchableOpacity>
-          </View>
+                <Text
+                  style={[
+                    { fontSize: 14, fontWeight: '600' },
+                    guestType === 'Others'
+                      ? { color: Colors.white }
+                      : { color: Colors.grayText },
+                  ]}
+                >
+                  {'Others'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
 
           {/* Guest Navigation (for Others mode) */}
           {isOthersMode && (

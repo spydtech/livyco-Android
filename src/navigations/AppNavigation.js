@@ -267,6 +267,7 @@ function AppNavigation(props) {
         <Stack.Screen name="BookingOption" component={BookingOptionScreen} />
         <Stack.Screen name="BookingPolicy" component={BookingPolicyScreen} />
         <Stack.Screen name="PayRentBooking" component={PayRentBookingScreen} />
+        <Stack.Screen name="CancelScreen" component={CancelScreen} />
         <Stack.Screen name="GroupBooking" component={GroupBookingScreen} />
         <Stack.Screen name="GuestDetails" component={GuestDetailsScreen} />
         <Stack.Screen name="ChatList" component={ChatListScreen} />

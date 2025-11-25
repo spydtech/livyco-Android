@@ -9,6 +9,7 @@ import {
   ImageBackground,
   ScrollView,
   FlatList,
+  TextInput,
 } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import HomeStyle from '../../styles/HomeStyle';
@@ -19,6 +20,8 @@ import { Button, Icons } from '../../components';
 import DatePicker from 'react-native-date-picker';
 import moment from 'moment';
 import { CommonActions } from '@react-navigation/native';
+import { Dropdown } from 'react-native-element-dropdown';
+import { showMessage } from 'react-native-flash-message';
 
 const MySelfBookingScreen = props => {
   // Get property data from route params (similar to PGBookingScreen)
@@ -32,6 +35,9 @@ const MySelfBookingScreen = props => {
   const [selectedSharing, setSelectedSharing] = useState(null);
   const [selectedSharingIndex, setSelectedSharingIndex] = useState(null);
   const [isShortVisit, setIsShortVisit] = useState(false);
+  const [personCount] = useState('1'); // Always 1 for MySelf booking, disabled
+  const [durationType, setDurationType] = useState('monthly');
+  const [durationValue, setDurationValue] = useState('1');
 
   // Convert room types to option list format
   const getSharingLabel = (type) => {
@@ -103,18 +109,46 @@ const MySelfBookingScreen = props => {
 
   const handleContinue = () => {
     if (!selectedSharing) {
-      // Show error or alert
+      showMessage({
+        message: 'Please select a sharing type',
+        type: 'danger',
+        floating: true,
+      });
       return;
     }
     if (moveDate === 'DD/MM/YYYY') {
-      // Show error or alert
+      showMessage({
+        message: 'Please select a move-in date',
+        type: 'danger',
+        floating: true,
+      });
       return;
     }
+    if (!durationValue || parseInt(durationValue) < 1) {
+      showMessage({
+        message: 'Please enter a valid duration',
+        type: 'danger',
+        floating: true,
+      });
+      return;
+    }
+
+    // Prepare duration data
+    const durationMonths = durationType === 'monthly' ? parseInt(durationValue) : null;
+    const durationDays = durationType === 'daily' ? parseInt(durationValue) : null;
+    const durationWeeks = durationType === 'weekly' ? parseInt(durationValue) : null;
+
     // Navigate to BookingOption screen with selected data
     props.navigation.navigate('BookingOption', {
       propertyData,
       selectedSharing,
       moveInDate: moveDate,
+      personCount: 1, // Always 1 for MySelf booking
+      durationType,
+      durationMonths,
+      durationDays,
+      durationWeeks,
+      bookingType: 'myself', // Flag to indicate this is MySelf booking
     });
   };
 
@@ -150,7 +184,7 @@ const MySelfBookingScreen = props => {
               keyboardShouldPersistTaps="handled"
               contentContainerStyle={{ padding: 20 }}
               showsVerticalScrollIndicator={false}>
-              <View style={[HomeStyle.myselfContainer ]}>
+              <View style={[HomeStyle.myselfContainer]}>
                 <View style={[HomeStyle.selfBookingContainer, { flexDirection: 'row', alignItems: 'center' }]}>
                   <Icons
                     iconSetName={'MaterialCommunityIcons'}
@@ -201,6 +235,77 @@ const MySelfBookingScreen = props => {
                     }}
                   />
                 </TouchableOpacity>
+
+                {/* Number of Persons - Disabled, always 1 for MySelf booking */}
+                <View style={[HomeStyle.dateContainer, { flexDirection: 'row', alignItems: 'center', marginTop: 20 }]}>
+                  <Text style={[HomeStyle.dateText]}>{'Number of Persons *'}</Text>
+                </View>
+                <View style={[HomeStyle.dateView, { marginTop: 10, opacity: 0.6 }]}>
+                  <TextInput
+                    style={[HomeStyle.textDate, { flex: 1, padding: 0 }]}
+                    placeholder="Enter number"
+                    placeholderTextColor={Colors.grayText}
+                    keyboardType="numeric"
+                    value="1"
+                    editable={false}
+                  />
+                </View>
+
+                {/* Duration Type and Value */}
+                <View style={[HomeStyle.dateContainer, { flexDirection: 'row', alignItems: 'center', marginTop: 20 }]}>
+                  <Text style={[HomeStyle.dateText]}>{'Duration *'}</Text>
+                </View>
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10, gap: 10 }}>
+                  {/* Duration Type Dropdown */}
+                  <View style={{ flex: 1 }}>
+                    <Dropdown
+                      style={[HomeStyle.dateView, { paddingHorizontal: 15, paddingVertical: 12 }]}
+                      placeholderStyle={{ color: Colors.grayText, fontSize: 16 }}
+                      selectedTextStyle={{ color: Colors.blackText, fontSize: 16 }}
+                      data={[
+                        { label: 'Daily', value: 'daily' },
+                        { label: 'Weekly', value: 'weekly' },
+                        { label: 'Monthly', value: 'monthly' },
+                      ]}
+                      maxHeight={300}
+                      labelField="label"
+                      valueField="value"
+                      placeholder="Select type"
+                      value={durationType}
+                      onChange={item => {
+                        setDurationType(item.value);
+                      }}
+                      renderLeftIcon={() => (
+                        <Icons
+                          iconSetName={'MaterialIcons'}
+                          iconName={'calendar-today'}
+                          iconColor={Colors.gray}
+                          iconSize={20}
+                        />
+                      )}
+                    />
+                  </View>
+
+                  {/* Duration Value Input */}
+                  <View style={{ flex: 0.5 }}>
+                    <TextInput
+                      style={[HomeStyle.dateView, { paddingHorizontal: 15, paddingVertical: 12, textAlign: 'center' }]}
+                      placeholder="1"
+                      placeholderTextColor={Colors.grayText}
+                      keyboardType="numeric"
+                      value={durationValue}
+                      onChangeText={setDurationValue}
+                    />
+                  </View>
+
+                  {/* Duration Unit Label */}
+                  <View style={{ flex: 0.5, alignItems: 'flex-start', justifyContent: 'center' }}>
+                    <Text style={[HomeStyle.dateText, { marginTop: 0 }]}>
+                      {durationType === 'monthly' ? 'Months' : durationType === 'weekly' ? 'Weeks' : 'Days'}
+                    </Text>
+                  </View>
+                </View>
+
                 <View style={[HomeStyle.optionContainer, { marginTop: 20 }]}>
                   <Text style={[HomeStyle.optionBoldText]}>
                     {'Select your preferred Sharing'}
@@ -221,20 +326,25 @@ const MySelfBookingScreen = props => {
                     keyExtractor={item => item.id?.toString() || Math.random().toString()}
                   />
                 </View>
-              </View>
-              <View style={{ justifyContent: "flex-end", height: "100%", paddingVertical: 10}}>
-                <View style={{ alignItems: 'center' }}>
-                  <TouchableOpacity onPress={() => gotoPolicy()}>
-                    <Text style={[HomeStyle.bottomText]}>
-                      {'Click here for Booking & Refund Policies'}
-                    </Text>
-                  </TouchableOpacity>
+                <View style={{
+                  backgroundColor: 'transparent',
+                  paddingTop: 10,
+                  zIndex: 1000,
+                  elevation: 10,
+                }}>
+                  <View style={{ alignItems: 'center', marginBottom: 15 }}>
+                    <TouchableOpacity onPress={() => gotoPolicy()}>
+                      <Text style={[HomeStyle.bottomText]}>
+                        {'Click here for Booking & Refund Policies'}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                  <Button
+                    onPress={handleContinue}
+                    btnStyle={[HomeStyle.btnRadius]}
+                    btnName={'Continue'}
+                  />
                 </View>
-                <Button
-                  onPress={handleContinue}
-                  btnStyle={[HomeStyle.btnRadius]}
-                  btnName={'Continue'}
-                />
               </View>
             </ScrollView>
           </View>

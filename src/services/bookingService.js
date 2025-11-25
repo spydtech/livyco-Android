@@ -48,6 +48,77 @@ export const getAvailableRoomsAndBeds = async (propertyId, date = null) => {
 };
 
 /**
+ * Get all available beds with status for a property (matching website API)
+ * @param {string} propertyId - Property ID
+ * @param {string} startDate - Start date in YYYY-MM-DD format
+ * @param {string} endDate - End date in YYYY-MM-DD format (optional, defaults to startDate)
+ * @returns {Promise<Object>} Availability response with bedsByFloor and statistics
+ */
+export const getAllAvailableBeds = async (propertyId, startDate, endDate = null) => {
+  try {
+    const token = await getUserToken();
+    
+    if (!token) {
+      console.error("No authentication token found");
+      return {
+        success: false,
+        data: null,
+        message: "Please log in to check room availability",
+      };
+    }
+
+    const finalEndDate = endDate || startDate;
+    const url = `${API_BASE_URL}bookings/availability/property/${propertyId}/all-beds?startDate=${startDate}&endDate=${finalEndDate}`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      return {
+        success: result?.success || false,
+        bedsByFloor: result?.bedsByFloor || {},
+        statistics: result?.statistics || null,
+        message: result?.message || '',
+      };
+    } else if (response.status === 401) {
+      console.error("Authentication failed - token may be invalid or expired");
+      return {
+        success: false,
+        data: null,
+        message: "Your session has expired. Please log in again.",
+      };
+    } else if (response.status === 400) {
+      console.error("Bad request - missing parameters");
+      return {
+        success: false,
+        data: null,
+        message: "Bad request - missing parameters",
+      };
+    } else {
+      const errorData = await response.json().catch(() => ({}));
+      return {
+        success: false,
+        data: null,
+        message: errorData?.message || 'Failed to fetch bed availability',
+      };
+    }
+  } catch (error) {
+    console.error('Get all available beds error:', error);
+    return {
+      success: false,
+      data: null,
+      message: error.message || 'Failed to fetch bed availability',
+    };
+  }
+};
+
+/**
  * Check room availability for a date range
  * @param {Object} params - { propertyId, startDate, endDate }
  * @returns {Promise<Object>} Availability response
@@ -56,23 +127,51 @@ export const checkRoomAvailability = async (params) => {
   try {
     const { propertyId, startDate, endDate } = params;
     
-    const response = await Api.post('bookings/check-availability', {
-      propertyId,
-      startDate,
-      endDate,
+    const token = await getUserToken();
+    
+    if (!token) {
+      console.error("No authentication token found");
+      return {
+        success: false,
+        data: null,
+        message: "Please log in to check room availability",
+      };
+    }
+
+    const response = await fetch(`${API_BASE_URL}bookings/check-availability`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        startDate,
+        endDate: endDate || startDate,
+        propertyId,
+      }),
     });
 
-    return {
-      success: response.data?.success || false,
-      data: response.data || null,
-      message: response.data?.message || '',
-    };
+    if (response.ok) {
+      const result = await response.json();
+      return {
+        success: result?.success || false,
+        unavailableRooms: result?.unavailableRooms || [],
+        message: result?.message || '',
+      };
+    } else {
+      const errorData = await response.json().catch(() => ({}));
+      return {
+        success: false,
+        unavailableRooms: [],
+        message: errorData?.message || 'Failed to check room availability',
+      };
+    }
   } catch (error) {
     console.error('Check room availability error:', error);
     return {
       success: false,
-      data: null,
-      message: error.response?.data?.message || error.message || 'Failed to check room availability',
+      unavailableRooms: [],
+      message: error.message || 'Failed to check room availability',
     };
   }
 };
@@ -130,9 +229,53 @@ export const createBooking = async (bookingData) => {
   }
 };
 
+/**
+ * Cancel a booking
+ * @param {string} bookingId - Booking ID
+ * @returns {Promise<Object>} Cancellation response
+ */
+export const cancelBooking = async (bookingId) => {
+  try {
+    const token = await getUserToken();
+    
+    if (!token) {
+      return {
+        success: false,
+        data: null,
+        message: 'Please log in to cancel booking',
+      };
+    }
+
+    const response = await fetch(`${API_BASE_URL}bookings/${bookingId}/cancel`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    const data = await response.json();
+    
+    return {
+      success: data?.success || false,
+      data: data?.booking || data?.data || null,
+      message: data?.message || '',
+    };
+  } catch (error) {
+    console.error('Cancel booking error:', error);
+    return {
+      success: false,
+      data: null,
+      message: error.message || 'Failed to cancel booking',
+    };
+  }
+};
+
 export default {
   getAvailableRoomsAndBeds,
+  getAllAvailableBeds,
   checkRoomAvailability,
   createBooking,
+  cancelBooking,
 };
 

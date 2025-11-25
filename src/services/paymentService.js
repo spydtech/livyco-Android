@@ -129,7 +129,8 @@ export const validatePayment = async (paymentData) => {
     
     return {
       success: data?.success || false,
-      data: data?.payment || data?.data || null,
+      data: data?.payment || data?.data || data || null,
+      booking: data?.booking || null,
       message: data?.message || '',
     };
   } catch (error) {
