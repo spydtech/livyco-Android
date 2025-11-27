@@ -20,6 +20,7 @@ import LayoutStyle from '../../styles/LayoutStyle';
 import MystaysStyle from '../../styles/MystaysStyle';
 import IMAGES from '../../assets/Images';
 import CommonStyles from '../../styles/CommonStyles';
+import moment from 'moment';
 
 const FoodManuScreen = props => {
   const mealData = [
@@ -69,36 +70,27 @@ const FoodManuScreen = props => {
           paddingTop: 10,
           backgroundColor: Colors.secondary,
         }}>
-        <View style={HomeStyle.headerContainerBlue}>
-          <View style={HomeStyle.profileImgContainer}>
-            <TouchableOpacity
-              onPress={() => {
-                gotoBack();
-              }}>
-              <Icons
-                iconSetName={'MaterialCommunityIcons'}
-                iconName={'arrow-left'}
-                iconColor={Colors.white}
-                iconSize={26}
-              />
-            </TouchableOpacity>
-          </View>
-          <View style={HomeStyle.iconContainer}>
-            <TouchableOpacity>
-              <Icons
-                iconSetName={'Ionicons'}
-                iconName={'notifications-outline'}
-                iconColor={Colors.white}
-                iconSize={26}
-              />
-              <View style={HomeStyle.smallRound}></View>
-            </TouchableOpacity>
+        <View style={MystaysStyle.headerContainerBlue}>
+          <TouchableOpacity
+            onPress={() => {
+              gotoBack();
+            }}
+            style={MystaysStyle.profileImgContainer}>
+            <Icons
+              iconSetName={'MaterialCommunityIcons'}
+              iconName={'arrow-left'}
+              iconColor={Colors.white}
+              iconSize={26}
+            />
+          </TouchableOpacity>
+          <Text style={MystaysStyle.headerTitle}>Food Menu</Text>
+          <View style={MystaysStyle.iconContainer}>
             <TouchableOpacity style={{...LayoutStyle.marginLeft5}}>
               <Icons
                 iconSetName={'Ionicons'}
                 iconName={'share-social-outline'}
                 iconColor={Colors.white}
-                iconSize={26}
+                iconSize={24}
               />
             </TouchableOpacity>
             <TouchableOpacity style={{...LayoutStyle.marginLeft5}}>
@@ -106,7 +98,15 @@ const FoodManuScreen = props => {
                 iconSetName={'Ionicons'}
                 iconName={'heart-outline'}
                 iconColor={Colors.white}
-                iconSize={26}
+                iconSize={24}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity style={{...LayoutStyle.marginLeft5}}>
+              <Icons
+                iconSetName={'FontAwesome6'}
+                iconName={'circle-question'}
+                iconColor={Colors.white}
+                iconSize={24}
               />
             </TouchableOpacity>
           </View>
@@ -122,7 +122,7 @@ const FoodManuScreen = props => {
           showsVerticalScrollIndicator={false}>
           <Image source={IMAGES.food} style={[MystaysStyle.imgFood]} />
           <View style={MystaysStyle.foodListContainer}>
-            <Text style={MystaysStyle.header}>Date (DD/MM/YYYY)</Text>
+            <Text style={MystaysStyle.header}>Date ({moment().format('DD/MM/YYYY')})</Text>
             <FlatList
               data={mealData}
               keyExtractor={(item, index) => index.toString()}

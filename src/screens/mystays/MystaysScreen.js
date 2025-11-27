@@ -32,12 +32,13 @@ const MystaysScreen = () => {
     }
   };
   const gotoBack = () => {
-    props.navigation.dispatch(CommonActions.goBack());
+    // Since this is in a tab navigator, we don't need to go back
+    // The back button can be removed or kept for consistency
   };
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={MystaysStyle.homeContainer}>
+      style={[MystaysStyle.homeContainer, {flex: 1}]}>
       <StatusBar barStyle="light-content" backgroundColor={Colors.secondary} />
       <SafeAreaView
         style={{
@@ -45,23 +46,22 @@ const MystaysScreen = () => {
           backgroundColor: Colors.secondary,
         }}>
         <View style={MystaysStyle.headerContainerBlue}>
-          <View style={MystaysStyle.profileImgContainer}>
-            <TouchableOpacity onPress={() => gotoBack()}>
-              <Icons
-                iconSetName={'MaterialCommunityIcons'}
-                iconName={'arrow-left'}
-                iconColor={Colors.white}
-                iconSize={26}
-              />
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity onPress={() => gotoBack()} style={MystaysStyle.profileImgContainer}>
+            <Icons
+              iconSetName={'MaterialCommunityIcons'}
+              iconName={'arrow-left'}
+              iconColor={Colors.white}
+              iconSize={26}
+            />
+          </TouchableOpacity>
+          <Text style={MystaysStyle.headerTitle}>My Stays</Text>
           <View style={MystaysStyle.iconContainer}>
             <TouchableOpacity>
               <Icons
                 iconSetName={'Ionicons'}
                 iconName={'search'}
                 iconColor={Colors.white}
-                iconSize={26}
+                iconSize={24}
               />
             </TouchableOpacity>
             <TouchableOpacity style={{...LayoutStyle.marginLeft5}}>
@@ -69,17 +69,16 @@ const MystaysScreen = () => {
                 iconSetName={'Ionicons'}
                 iconName={'notifications-outline'}
                 iconColor={Colors.white}
-                iconSize={26}
+                iconSize={24}
               />
               <View style={MystaysStyle.smallRound}></View>
             </TouchableOpacity>
-
             <TouchableOpacity style={{...LayoutStyle.marginLeft5}}>
               <Icons
                 iconSetName={'FontAwesome6'}
                 iconName={'circle-question'}
                 iconColor={Colors.white}
-                iconSize={26}
+                iconSize={24}
               />
             </TouchableOpacity>
           </View>
@@ -88,7 +87,7 @@ const MystaysScreen = () => {
 
       <ImageBackground
         source={IMAGES.primaryBG}
-        style={[MystaysStyle.formContainer, {flex: 1}]}
+        style={[MystaysStyle.formContainer, {flex: 1, backgroundColor:"red"}]}
         resizeMode="cover">
         <View style={MystaysStyle.tabContainer}>
           <TouchableOpacity
@@ -102,7 +101,7 @@ const MystaysScreen = () => {
                 MystaysStyle.tabText,
                 selectedTab === 'Mystay' && MystaysStyle.tabActiveText,
               ]}>
-              {'My Stay'}
+              My Stay
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -116,7 +115,7 @@ const MystaysScreen = () => {
                 MystaysStyle.tabText,
                 selectedTab === 'TimeSheet' && MystaysStyle.tabActiveText,
               ]}>
-              {'Timesheet'}
+              Timesheet
             </Text>
           </TouchableOpacity>
         </View>
