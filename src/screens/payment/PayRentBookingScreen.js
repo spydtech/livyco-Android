@@ -659,7 +659,7 @@ console.log("Validation Booking Payload",{
 
         // Navigate to cancel booking screen with booking details
         setTimeout(() => {
-          props.navigation.navigate('CancelScreen', { 
+          props.navigation.navigate('Cancel', { 
             bookingData: bookingDataForCancel 
           });
         }, 1500);

@@ -34,11 +34,11 @@ const VacateRoomScreen = props => {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={HomeStyle.homeContainer}>
+      style={[HomeStyle.homeContainer, {flex: 1, padding: 20}]}>
       <StatusBar barStyle="light-content" backgroundColor={Colors.secondary} />
       <SafeAreaView
         style={{
-          paddingTop: 10,
+          // paddingTop: 10,
           backgroundColor: Colors.secondary,
         }}>
         <View style={HomeStyle.headerContainerBlue}>

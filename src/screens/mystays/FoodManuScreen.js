@@ -10,8 +10,9 @@ import {
   Text,
   TouchableOpacity,
   View,
+  ActivityIndicator,
 } from 'react-native';
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {CommonActions} from '@react-navigation/native';
 import HomeStyle from '../../styles/HomeStyle';
 import Colors from '../../styles/Colors';
@@ -21,38 +22,118 @@ import MystaysStyle from '../../styles/MystaysStyle';
 import IMAGES from '../../assets/Images';
 import CommonStyles from '../../styles/CommonStyles';
 import moment from 'moment';
+import {getFoodItemsByBookingAndDay} from '../../services/menuService';
 
 const FoodManuScreen = props => {
-  const mealData = [
-    {
-      title: 'Breakfast (8:00 A.M - 9:00 A.M)',
-      items: ['Aaloo Paratha', 'Aam ka achar', 'Chai and Dahi'],
-    },
-    {
-      title: 'Lunch (12:30 P.M - 2:00 P.M)',
-      items: ['Rajama curry', 'Roti', 'Raiyta', 'Rice and salad'],
-    },
-    {
-      title: 'Snacks (4:30 P.M - 5:00 P.M)',
-      items: ['Tea / Milk and Biscuits'],
-    },
-    {
-      title: 'Dinner (07:30 P.M - 9:00 P.M)',
-      items: ['Dal', 'Mix veg.', 'Halwa', 'Rice and salad'],
-    },
-  ];
+  const stayData = props.route?.params?.stayData;
+  const bookingId = stayData?._id || stayData?.id;
+  
+  const [loading, setLoading] = useState(true);
+  const [mealData, setMealData] = useState([]);
+  const [error, setError] = useState(null);
+
+  // Category time mappings
+  const categoryTimes = {
+    Breakfast: '(8:00 A.M - 9:00 A.M)',
+    Lunch: '(12:30 P.M - 2:00 P.M)',
+    Snacks: '(4:30 P.M - 5:00 P.M)',
+    Dinner: '(07:30 P.M - 9:00 P.M)',
+  };
+
+  // Get current day name
+  const getCurrentDay = () => {
+    return moment().format('dddd'); // Returns Monday, Tuesday, etc.
+  };
+
+  // Group food items by category
+  const groupFoodItemsByCategory = (foodItems) => {
+    const grouped = {
+      Breakfast: [],
+      Lunch: [],
+      Snacks: [],
+      Dinner: [],
+    };
+
+    foodItems.forEach(item => {
+      const category = item.category || 'Breakfast';
+      if (grouped[category]) {
+        grouped[category].push(item.name || item.description || '');
+      }
+    });
+
+    // Convert to array format matching the original structure
+    return [
+      {
+        title: `Breakfast ${categoryTimes.Breakfast}`,
+        items: grouped.Breakfast,
+      },
+      {
+        title: `Lunch ${categoryTimes.Lunch}`,
+        items: grouped.Lunch,
+      },
+      {
+        title: `Snacks ${categoryTimes.Snacks}`,
+        items: grouped.Snacks,
+      },
+      {
+        title: `Dinner ${categoryTimes.Dinner}`,
+        items: grouped.Dinner,
+      },
+    ].filter(meal => meal.items.length > 0); // Only show categories with items
+  };
+
+  useEffect(() => {
+    fetchFoodMenu();
+  }, [bookingId]);
+
+  const fetchFoodMenu = async () => {
+    if (!bookingId) {
+      setError('Booking ID not found');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const currentDay = getCurrentDay();
+      const response = await getFoodItemsByBookingAndDay(bookingId, currentDay);
+
+      if (response.success && response.data) {
+        const groupedData = groupFoodItemsByCategory(response.data);
+        setMealData(groupedData);
+      } else {
+        // If no data, show empty state
+        setMealData([]);
+        setError(response.message || 'No food items found for today');
+      }
+    } catch (err) {
+      console.error('Error fetching food menu:', err);
+      setError('Failed to load food menu. Please try again.');
+      setMealData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const gotoBack = () => {
     props.navigation.dispatch(CommonActions.goBack());
   };
 
   const MealItem = ({item}) => {
+    if (!item.items || item.items.length === 0) {
+      return null;
+    }
+
     return (
       <View style={MystaysStyle.itemContainerFood}>
         <Text style={MystaysStyle.mealTitle}>{item.title}</Text>
-        <View style={{...CommonStyles.directionRowCenter}}>
+        <View style={{...CommonStyles.directionRowCenter, flexWrap: 'wrap'}}>
           {item.items.map((line, index) => (
             <Text key={index} style={MystaysStyle.mealText}>
-              {line + ', '}
+              {line}
+              {index < item.items.length - 1 ? ', ' : ''}
             </Text>
           ))}
         </View>
@@ -63,7 +144,7 @@ const FoodManuScreen = props => {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={HomeStyle.homeContainer}>
+      style={[HomeStyle.homeContainer, {flex: 1}]}>
       <StatusBar barStyle="light-content" backgroundColor={Colors.secondary} />
       <SafeAreaView
         style={{
@@ -93,18 +174,10 @@ const FoodManuScreen = props => {
                 iconSize={24}
               />
             </TouchableOpacity>
-            <TouchableOpacity style={{...LayoutStyle.marginLeft5}}>
+            <TouchableOpacity style={{...LayoutStyle.marginLeft15}}>
               <Icons
                 iconSetName={'Ionicons'}
                 iconName={'heart-outline'}
-                iconColor={Colors.white}
-                iconSize={24}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity style={{...LayoutStyle.marginLeft5}}>
-              <Icons
-                iconSetName={'FontAwesome6'}
-                iconName={'circle-question'}
                 iconColor={Colors.white}
                 iconSize={24}
               />
@@ -118,17 +191,49 @@ const FoodManuScreen = props => {
         resizeMode="cover">
         <ScrollView
           keyboardShouldPersistTaps="handled"
-          contentContainerStyle={{flex: 1}}
+          contentContainerStyle={{flexGrow: 1, alignItems: 'center', width: "100%"}}
           showsVerticalScrollIndicator={false}>
-          <Image source={IMAGES.food} style={[MystaysStyle.imgFood]} />
-          <View style={MystaysStyle.foodListContainer}>
-            <Text style={MystaysStyle.header}>Date ({moment().format('DD/MM/YYYY')})</Text>
-            <FlatList
-              data={mealData}
-              keyExtractor={(item, index) => index.toString()}
-              renderItem={MealItem}
-              contentContainerStyle={MystaysStyle.listContent}
-            />
+          <Image source={IMAGES.food} style={[MystaysStyle.imgFood, {marginVertical: 20}]} />
+          <View style={[MystaysStyle.foodListContainer, {width: '100%', padding:20}]}>
+            <Text style={[MystaysStyle.header, {marginBottom: 15}]}>
+              Date ({moment().format('DD/MM/YYYY')}) - {getCurrentDay()}
+            </Text>
+            
+            {loading ? (
+              <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: 40}}>
+                <ActivityIndicator size="large" color={Colors.secondary} />
+                <Text style={{marginTop: 10, color: Colors.grayText}}>Loading menu...</Text>
+              </View>
+            ) : error && mealData.length === 0 ? (
+              <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: 40}}>
+                <Text style={{color: Colors.grayText, textAlign: 'center'}}>{error}</Text>
+                <TouchableOpacity
+                  onPress={fetchFoodMenu}
+                  style={{
+                    marginTop: 15,
+                    paddingHorizontal: 20,
+                    paddingVertical: 10,
+                    backgroundColor: Colors.secondary,
+                    borderRadius: 8,
+                  }}>
+                  <Text style={{color: Colors.white}}>Retry</Text>
+                </TouchableOpacity>
+              </View>
+            ) : mealData.length === 0 ? (
+              <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: 40}}>
+                <Text style={{color: Colors.grayText, textAlign: 'center'}}>
+                  No food items available for today
+                </Text>
+              </View>
+            ) : (
+              <FlatList
+                data={mealData}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={MealItem}
+                contentContainerStyle={[MystaysStyle.listContent]}
+                scrollEnabled={false}
+              />
+            )}
           </View>
         </ScrollView>
       </ImageBackground>

@@ -87,14 +87,14 @@ const ProfileScreen = () => {
               {'Account Info'}
             </Text>
           </View>
-          <View
+          {/* <View
             style={{
               ...CommonStyles.directionRowSB,
               ...LayoutStyle.marginVertical10,
             }}>
             <Text style={[ProfileStyle.listOption]}>{'Theme'}</Text>
             <Switch />
-          </View>
+          </View> */}
           <TouchableOpacity>
             <View
               style={{
@@ -110,7 +110,7 @@ const ProfileScreen = () => {
               />
             </View>
           </TouchableOpacity>
-          <TouchableOpacity>
+          {/* <TouchableOpacity>
             <View
               style={{
                 ...CommonStyles.directionRowSB,
@@ -124,7 +124,7 @@ const ProfileScreen = () => {
                 iconSize={26}
               />
             </View>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <TouchableOpacity>
             <View
               style={{

@@ -170,9 +170,7 @@ const MystaysStyle = StyleSheet.create({
     color: Colors.black,
     fontSize: 11,
     fontFamily: FontFamily.RobotoRegular,
-    flex: 1,
-    marginLeft: 8,
-    textAlign: 'right',
+    marginLeft: 4,
   },
   dateRow: {
     flexDirection: 'row',
@@ -259,7 +257,8 @@ const MystaysStyle = StyleSheet.create({
     backgroundColor: Colors.paleBlue,
     borderRadius: 20,
     marginRight: 10,
-    marginTop: 5,
+    marginTop: 8,
+    marginBottom: 0,
     alignSelf: 'flex-start',
   },
   detailsView: {
@@ -317,7 +316,7 @@ const MystaysStyle = StyleSheet.create({
     resizeMode: 'contain',
   },
   itemContainerFood: {
-    ...LayoutStyle.marginBottom20,
+    ...LayoutStyle.marginBottom30,
   },
   mealTitle: {
     ...LayoutStyle.fontSize12,
@@ -372,8 +371,7 @@ const MystaysStyle = StyleSheet.create({
     color: Colors.blackText,
   },
   roomBox: {
-    width: 70,
-    height: 45,
+    maxWidth: 100,
     borderRadius: 12,
 
     alignItems: 'center',
@@ -523,7 +521,7 @@ const MystaysStyle = StyleSheet.create({
   modalWrapper: {
     flex: 1,
     width: '100%',
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 15,
     paddingTop: 40,
@@ -541,14 +539,7 @@ const MystaysStyle = StyleSheet.create({
     paddingTop: 10,
   },
   modalCardContainer: {
-    backgroundColor: Colors.white,
-    borderRadius: 15,
     overflow: 'hidden',
-    elevation: 8,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 4},
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
     width: '100%',
     marginBottom: 0,
   },
@@ -559,7 +550,8 @@ const MystaysStyle = StyleSheet.create({
     backgroundColor: Colors.lightGray,
   },
   modalContent: {
-    padding: 20,
+    width: '100%',
+    paddingVertical: 10,
   },
   modalHeaderRow: {
     flexDirection: 'row',
@@ -576,30 +568,32 @@ const MystaysStyle = StyleSheet.create({
   },
   modalDateRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     marginVertical: 6,
   },
   modalRoomDetails: {
-    marginTop: 15,
+    marginTop: 6,
     marginBottom: 0,
+    flexDirection: "row"
   },
   modalRoomBadges: {
     marginTop: 8,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: 'center',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
   },
   referButtonContainer: {
     width: '100%',
     marginTop: 25,
     paddingHorizontal: 0,
+    alignItems: 'center',
   },
   referButton: {
     width: '100%',
     backgroundColor: Colors.secondary,
     borderRadius: 10,
     paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   modalCloseButton: {
     position: 'absolute',

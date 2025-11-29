@@ -14,48 +14,65 @@ import React, { useState } from 'react';
 import PaymentStyle from '../../styles/PaymentStyle';
 import Colors from '../../styles/Colors';
 import LayoutStyle from '../../styles/LayoutStyle';
-import {Button, Icons} from '../../components';
+import { Button, Icons } from '../../components';
 import IMAGES from '../../assets/Images';
 import FontFamily from '../../assets/FontFamily';
-import {CommonActions} from '@react-navigation/native';
+import { CommonActions } from '@react-navigation/native';
 import { cancelBooking } from '../../services/bookingService';
 import { showMessage } from 'react-native-flash-message';
 import moment from 'moment';
 
-const CancelScreen = (props) => {
+const CancelScreen = props => {
   const bookingData = props.route?.params?.bookingData || {};
   const booking = bookingData?.booking || bookingData;
-  
+
   // Extract booking details
   const bookingId = booking?.id || booking?._id || bookingData?.bookingId;
-  const propertyName = booking?.propertyName || 
-                       booking?.property?.name || 
-                       bookingData?.propertyName || 
-                       'Property Name';
+  const propertyName =
+    booking?.propertyName ||
+    booking?.property?.name ||
+    bookingData?.propertyName ||
+    'Property Name';
   // Handle image - can be string URL or object with url property
-  const propertyImageRaw = booking?.property?.images?.[0] || 
-                           bookingData?.propertyImage || 
-                           null;
-  const propertyImage = typeof propertyImageRaw === 'string' 
-    ? propertyImageRaw 
-    : propertyImageRaw?.url || null;
-  const moveInDate = booking?.moveInDate || 
-                     bookingData?.moveInDate || 
-                     null;
-  const amountPaid = booking?.totalAmount || 
-                     booking?.pricing?.totalAmount || 
-                     bookingData?.totalAmount || 
-                     bookingData?.amountPaid || 
-                     0;
-  
+  const propertyImageRaw =
+    booking?.property?.images?.[0] || bookingData?.propertyImage || null;
+  const propertyImage =
+    typeof propertyImageRaw === 'string'
+      ? propertyImageRaw
+      : propertyImageRaw?.url || null;
+  const moveInDate = booking?.moveInDate || bookingData?.moveInDate || null;
+  const amountPaid =
+    booking?.totalAmount ||
+    booking?.pricing?.totalAmount ||
+    bookingData?.totalAmount ||
+    bookingData?.amountPaid ||
+    0;
+
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [cancelling, setCancelling] = useState(false);
 
-  const gotoBack = () => {
-    props.navigation.dispatch(CommonActions.goBack());
+  const resetToHome = () => {
+    props.navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [
+          {
+            name: 'Tab',
+            params: {
+              screen: 'HomeTab',
+            },
+          },
+        ],
+      }),
+    );
   };
 
-  const formatDate = (dateString) => {
+  const gotoBack = () => {
+    // From cancel booking screen, always go directly to Home and clear history
+    resetToHome();
+  };
+
+  const formatDate = dateString => {
     if (!dateString) return '00/00/0000';
     try {
       const date = moment(dateString);
@@ -68,7 +85,7 @@ const CancelScreen = (props) => {
     }
   };
 
-  const formatCurrency = (amount) => {
+  const formatCurrency = amount => {
     return parseFloat(amount || 0).toFixed(2);
   };
 
@@ -95,17 +112,29 @@ const CancelScreen = (props) => {
 
     try {
       const response = await cancelBooking(bookingId);
-      
+
       if (response.success) {
         showMessage({
           message: 'Booking cancelled successfully',
           type: 'success',
           floating: true,
         });
-        
-        // Navigate back or to bookings list
+
+        // After successful cancellation, take user to Mystays tab and clear stack
         setTimeout(() => {
-          props.navigation.navigate('Tab', { screen: 'Mystays' });
+          props.navigation.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [
+                {
+                  name: 'Tab',
+                  params: {
+                    screen: 'MystaysTab',
+                  },
+                },
+              ],
+            }),
+          );
         }, 1500);
       } else {
         showMessage({
@@ -129,7 +158,8 @@ const CancelScreen = (props) => {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}>
+      style={styles.container}
+    >
       <StatusBar barStyle="light-content" backgroundColor={Colors.secondary} />
       <SafeAreaView style={styles.safeArea}>
         {/* Header */}
@@ -151,34 +181,40 @@ const CancelScreen = (props) => {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}>
           <View style={styles.contentContainer}>
-            {/* Property Image */}
-            {propertyImage ? (
-              <Image 
-                source={{ uri: propertyImage }} 
-                style={styles.propertyImage}
-                resizeMode="cover"
-              />
-            ) : (
-              <Image 
-                source={IMAGES.bed || IMAGES.defaultProperty} 
-                style={styles.propertyImage}
-                resizeMode="cover"
-              />
-            )}
+            <View style={styles.card}>
+              {/* Property Image */}
+              {propertyImage ? (
+                <Image
+                  source={{uri: propertyImage}}
+                  style={styles.propertyImage}
+                  resizeMode="cover"
+                />
+              ) : (
+                <Image
+                  source={IMAGES.bed || IMAGES.defaultProperty}
+                  style={styles.propertyImage}
+                  resizeMode="cover"
+                />
+              )}
 
-            {/* Property Name */}
-            <Text style={styles.propertyName}>{propertyName}</Text>
+              {/* Property Name */}
+              <Text style={styles.propertyName}>{propertyName}</Text>
 
-            {/* Check in Date */}
-            <View style={styles.rowContainer}>
-              <Text style={styles.checkInLabel}>{'Check in Date - '}</Text>
-              <Text style={styles.checkInValue}>{formatDate(moveInDate)}</Text>
-            </View>
+              {/* Check in Date */}
+              <View style={styles.rowContainer}>
+                <Text style={styles.checkInLabel}>{'Check in Date - '}</Text>
+                <Text style={styles.checkInValue}>
+                  {formatDate(moveInDate)}
+                </Text>
+              </View>
 
-            {/* Amount Paid */}
-            <View style={styles.rowContainer}>
-              <Text style={styles.amountLabel}>{'Amount Paid'}</Text>
-              <Text style={styles.amountValue}>₹{formatCurrency(amountPaid)}</Text>
+              {/* Amount Paid */}
+              <View style={styles.rowContainer}>
+                <Text style={styles.amountLabel}>{'Amount Paid'}</Text>
+                <Text style={styles.amountValue}>
+                  ₹{formatCurrency(amountPaid)}
+                </Text>
+              </View>
             </View>
           </View>
         </ScrollView>
@@ -186,9 +222,10 @@ const CancelScreen = (props) => {
         {/* Bottom Section with Terms and Cancel Button */}
         <View style={styles.bottomContainer}>
           <View style={styles.termsContainer}>
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={() => setTermsAccepted(!termsAccepted)}
-              style={styles.checkboxContainer}>
+              style={styles.checkboxContainer}
+            >
               <Icons
                 iconSetName={'MaterialCommunityIcons'}
                 iconName={termsAccepted ? 'check-circle' : 'circle'}
@@ -197,7 +234,9 @@ const CancelScreen = (props) => {
               />
             </TouchableOpacity>
             <Text style={styles.termsText}>
-              {'Sapiente asperiores ut inventore. Voluptatem molestiae atque minima corrupti adipisci fugit a. T&C'}
+              {
+                'Sapiente asperiores ut inventore. Voluptatem molestiae atque minima corrupti adipisci fugit a. T&C'
+              }
             </Text>
           </View>
           <Button
@@ -216,11 +255,11 @@ const CancelScreen = (props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.goastWhite || Colors.white,
   },
   safeArea: {
     flex: 1,
-    backgroundColor: Colors.secondary,
+    backgroundColor: Colors.white,
   },
   headerContent: {
     flexDirection: 'row',
@@ -233,9 +272,19 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   contentContainer: {
-    backgroundColor: Colors.white,
     ...LayoutStyle.paddingHorizontal20,
     ...LayoutStyle.paddingTop20,
+    paddingBottom: 10,
+  },
+  card: {
+    backgroundColor: Colors.white,
+    borderRadius: 12,
+    ...LayoutStyle.padding15,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   propertyImage: {
     width: '100%',
@@ -280,8 +329,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 15,
     paddingBottom: 20,
-    borderTopWidth: 1,
-    borderTopColor: Colors.grayBorder || '#E0E0E0',
+    // borderTopWidth: 1,
+    // borderTopColor: Colors.grayBorder || '#E0E0E0',
   },
   termsContainer: {
     flexDirection: 'row',

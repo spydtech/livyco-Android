@@ -53,13 +53,15 @@ const HomeStack = createNativeStackNavigator();
 function HomeStackScreen() {
   return (
     <HomeStack.Navigator
-      screenOptions={({route, navigation}) => ({
+      screenOptions={({ route, navigation }) => ({
         headerShown: false,
         gestureEnabled: true,
         animationEnabled: true,
-      })}>
+      })}
+    >
       <HomeStack.Screen name="Home" component={HomeScreen} />
       <HomeStack.Screen name="PGBooking" component={PGBookingScreen} />
+      <HomeStack.Screen name="Cancel" component={CancelScreen} />
     </HomeStack.Navigator>
   );
 }
@@ -267,7 +269,6 @@ function AppNavigation(props) {
         <Stack.Screen name="BookingOption" component={BookingOptionScreen} />
         <Stack.Screen name="BookingPolicy" component={BookingPolicyScreen} />
         <Stack.Screen name="PayRentBooking" component={PayRentBookingScreen} />
-        <Stack.Screen name="CancelScreen" component={CancelScreen} />
         <Stack.Screen name="GroupBooking" component={GroupBookingScreen} />
         <Stack.Screen name="GuestDetails" component={GuestDetailsScreen} />
         <Stack.Screen name="ChatList" component={ChatListScreen} />

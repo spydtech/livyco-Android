@@ -1,6 +1,5 @@
-import {View, Text, TouchableOpacity} from 'react-native';
+import {View, Text, TouchableOpacity, ScrollView} from 'react-native';
 import React, {useState} from 'react';
-import {CalendarList, CalendarUtils} from 'react-native-calendars';
 import MystaysStyle from '../../styles/MystaysStyle';
 import {Button, Icons} from '../../components';
 import CommonStyles from '../../styles/CommonStyles';
@@ -11,14 +10,93 @@ import LayoutStyle from '../../styles/LayoutStyle';
 import {Calendar} from 'react-native-calendars';
 
 const TimeSheetScreen = () => {
-  const [currentDate, setCurrentDate] = useState(moment().format('YYYY-MM-DD'));
-  const [selectedDate, setSelectedDate] = useState(
-    moment().format('YYYY-MM-DD'),
-  );
+  const [currentMonth, setCurrentMonth] = useState(moment('2025-08-01'));
+  const [selectedDate, setSelectedDate] = useState('2025-08-17');
+
+  // Generate marked dates for the range (1-12) and selected date
+  const getMarkedDates = () => {
+    const marked = {};
+    const monthStr = currentMonth.format('YYYY-MM');
+    const selectedDateInMonth = moment(selectedDate).format('YYYY-MM');
+    
+    // Mark dates 1-12 with yellow/orange background for current month
+    for (let i = 1; i <= 12; i++) {
+      const dateStr = `${monthStr}-${String(i).padStart(2, '0')}`;
+      marked[dateStr] = {
+        customStyles: {
+          container: {
+            backgroundColor: '#F4C430',
+            borderRadius: 0,
+          },
+          text: {
+            color: '#000',
+          },
+        },
+      };
+    }
+    
+    // Mark selected date with blue circle (only if in current month)
+    if (selectedDateInMonth === monthStr) {
+      const selectedDay = moment(selectedDate).date();
+      const selectedDateStr = `${monthStr}-${String(selectedDay).padStart(2, '0')}`;
+      // Override the marking for selected date
+      marked[selectedDateStr] = {
+        selected: true,
+        selectedColor: Colors.secondary,
+        selectedTextColor: Colors.white,
+        customStyles: {
+          container: {
+            backgroundColor: Colors.secondary,
+            borderRadius: 20,
+            borderWidth: 0,
+          },
+          text: {
+            color: Colors.white,
+            fontWeight: 'bold',
+          },
+        },
+      };
+    }
+    
+    return marked;
+  };
+
+  const formatSelectedDate = () => {
+    return moment(selectedDate).format('ddd, MMM DD');
+  };
+
+  const handleMonthChange = (month) => {
+    setCurrentMonth(moment(month.dateString));
+  };
+
+  const handleDayPress = (day) => {
+    setSelectedDate(day.dateString);
+    // Update current month if selected date is in a different month
+    const dayMonth = moment(day.dateString);
+    if (!dayMonth.isSame(currentMonth, 'month')) {
+      setCurrentMonth(dayMonth);
+    }
+  };
+
+  const goToPreviousMonth = () => {
+    const newMonth = moment(currentMonth).subtract(1, 'month');
+    setCurrentMonth(newMonth);
+  };
+
+  const goToNextMonth = () => {
+    const newMonth = moment(currentMonth).add(1, 'month');
+    setCurrentMonth(newMonth);
+  };
+
   return (
-    <View style={[MystaysStyle.tabListcontainer]}>
-      <View style={{...CommonStyles.directionRowSB}}>
-        <Text style={[MystaysStyle.timeSheetText]}>{'Abc Boys Hostel'}</Text>
+    <ScrollView 
+      style={[MystaysStyle.tabListcontainer]}
+      contentContainerStyle={{paddingHorizontal: 15, paddingTop: 15, paddingBottom: 20}}
+      showsVerticalScrollIndicator={false}>
+      <View style={{...CommonStyles.directionRowSB, marginBottom: 8}}>
+        <Text style={[MystaysStyle.timeSheetText, {fontSize: 16, fontFamily: FontFamily.RobotoMedium}]}>
+          {'Abc Boys Hostel'}
+        </Text>
         <TouchableOpacity>
           <Icons
             iconSetName={'Ionicons'}
@@ -28,133 +106,102 @@ const TimeSheetScreen = () => {
           />
         </TouchableOpacity>
       </View>
-      <View style={[MystaysStyle.iconAddress]}>
+      <View style={[MystaysStyle.iconAddress, {marginBottom: 15}]}>
         <Icons
-          iconSetName={'FontAwesome6'}
-          iconName={'location-dot'}
-          iconColor={Colors.gray}
-          iconSize={18}
+          iconSetName={'Ionicons'}
+          iconName={'location-sharp'}
+          iconColor={Colors.black}
+          iconSize={16}
         />
-        <Text style={[MystaysStyle.timesheetAddress]}>
-          {'P.No 123,abc, dfg xxxx, Hyd 5xxxxxx '}
+        <Text style={[MystaysStyle.timesheetAddress, {flex: 1}]}>
+          {'P.No 123,abc, dfg xxxx, Hyd 5xxxxxx'}
         </Text>
       </View>
-      <View style={[MystaysStyle.calenderContainer]}>
-        <Text style={[MystaysStyle.calenderTextDate]}>{'Mon, Aug 17'}</Text>
+      <View style={[MystaysStyle.calenderContainer, {padding: 15, marginTop: 0}]}>
+        <Text style={[MystaysStyle.calenderTextDate, {fontSize: 28, marginBottom: 15, paddingBottom: 15, borderBottomWidth: 1, borderBottomColor: Colors.gray}]}>
+          {formatSelectedDate()}
+        </Text>
+        
+        {/* Month/Year Navigation */}
+        <View style={{...CommonStyles.directionRowSB, marginBottom: 15, alignItems: 'center'}}>
+          <View style={{flexDirection: 'row', alignItems: 'center', flex: 1}}>
+            <Text style={{fontSize: 16, fontFamily: FontFamily.RobotoMedium, color: Colors.black}}>
+              {currentMonth.format('MMMM YYYY')}
+            </Text>
+            <TouchableOpacity style={{marginLeft: 8}}>
+              <Icons
+                iconSetName={'Ionicons'}
+                iconName={'chevron-down'}
+                iconColor={Colors.black}
+                iconSize={16}
+              />
+            </TouchableOpacity>
+          </View>
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <TouchableOpacity onPress={goToPreviousMonth} style={{padding: 5}}>
+              <Icons
+                iconSetName={'Ionicons'}
+                iconName={'chevron-back'}
+                iconColor={Colors.black}
+                iconSize={20}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={goToNextMonth} style={{padding: 5, marginLeft: 10}}>
+              <Icons
+                iconSetName={'Ionicons'}
+                iconName={'chevron-forward'}
+                iconColor={Colors.black}
+                iconSize={20}
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+
         <Calendar
-          current={'2025-08-01'}
-          markedDates={{
-            '2025-08-01': {
-              selected: true,
-              selectedColor: '#F4C430',
-              textColor: '#000',
-            },
-            '2025-08-02': {
-              selected: true,
-              selectedColor: '#F4C430',
-              textColor: '#000',
-            },
-            '2025-08-03': {
-              selected: true,
-              selectedColor: '#F4C430',
-              textColor: '#000',
-            },
-            '2025-08-04': {
-              selected: true,
-              selectedColor: '#F4C430',
-              textColor: '#000',
-            },
-            '2025-08-05': {
-              selected: true,
-              selectedColor: '#F4C430',
-              textColor: '#000',
-            },
-            '2025-08-06': {
-              selected: true,
-              selectedColor: '#F4C430',
-              textColor: '#000',
-            },
-            '2025-08-07': {
-              selected: true,
-              selectedColor: '#F4C430',
-              textColor: '#000',
-            },
-            '2025-08-08': {
-              selected: true,
-              selectedColor: '#F4C430',
-              textColor: '#000',
-            },
-            '2025-08-09': {
-              selected: true,
-              selectedColor: '#F4C430',
-              textColor: '#000',
-            },
-            '2025-08-10': {
-              selected: true,
-              selectedColor: '#F4C430',
-              textColor: '#000',
-            },
-            '2025-08-11': {
-              selected: true,
-              selectedColor: '#F4C430',
-              textColor: '#000',
-            },
-            '2025-08-12': {
-              selected: true,
-              selectedColor: '#F4C430',
-              textColor: '#000',
-            },
-            '2025-08-13': {
-              selected: true,
-              selectedColor: '#F4C430',
-              textColor: '#000',
-            },
-            '2025-08-14': {
-              selected: true,
-              selectedColor: '#F4C430',
-              textColor: '#000',
-            },
-            '2025-08-15': {
-              selected: true,
-              selectedColor: '#F4C430',
-              textColor: '#000',
-            },
-            '2025-08-16': {
-              selected: true,
-              selectedColor: '#F4C430',
-              textColor: '#000',
-            },
-            '2025-08-17': {
-              selected: true,
-              selectedColor: '#0033A0',
-              selectedTextColor: 'white',
-            },
-          }}
+          current={currentMonth.format('YYYY-MM-DD')}
+          markedDates={getMarkedDates()}
+          onMonthChange={handleMonthChange}
+          onDayPress={handleDayPress}
+          markingType={'custom'}
           theme={{
             backgroundColor: 'white',
             calendarBackground: 'white',
-            monthTextColor: '#000',
+            textSectionTitleColor: Colors.black,
             textDayFontSize: 14,
             textDayHeaderFontSize: 12,
-            textDayFontFamily: 'Roboto',
-            textMonthFontSize: 14,
-            todayTextColor: '#0033A0',
-            selectedDayBackgroundColor: '#0033A0',
-            selectedDayTextColor: 'white',
-            dayTextColor: '#000',
+            textDayFontFamily: FontFamily.RobotoRegular,
+            textMonthFontSize: 0, // Hide default month text
+            todayTextColor: Colors.secondary,
+            selectedDayBackgroundColor: Colors.secondary,
+            selectedDayTextColor: Colors.white,
+            dayTextColor: Colors.black,
             textDisabledColor: '#d9d9d9',
-            arrowColor: '#000',
+            arrowColor: 'transparent', // Hide default arrows
+            disabledArrowColor: 'transparent',
+            monthTextColor: 'transparent',
+            indicatorColor: 'transparent',
+            'stylesheet.calendar.header': {
+              week: {
+                marginTop: 5,
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                paddingHorizontal: 0,
+              },
+            },
           }}
+          hideExtraDays={true}
+          firstDay={0} // Start week on Sunday
+          enableSwipeMonths={false}
         />
       </View>
-      <View style={[MystaysStyle.calenderButton]}>
+      <View style={{marginTop: 30, marginBottom: 20, paddingHorizontal: 0, width: '100%'}}>
         <Button
-          btnStyle={[MystaysStyle.btnStyle]}
+          btnStyle={[MystaysStyle.btnStyle, {width: '100%', alignSelf: 'center'}]}
           btnName={'Vacate Room'}
           btnTextColor={Colors.secondary}
         />
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
