@@ -8,37 +8,195 @@ import {
   SafeAreaView,
   ScrollView,
   TextInput,
+  Modal,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, { useMemo, useState } from 'react';
 import HomeStyle from '../../styles/HomeStyle';
 import Colors from '../../styles/Colors';
-import {Button, Icons} from '../../components';
+import { Button, Icons } from '../../components';
 import DatePicker from 'react-native-date-picker';
 import moment from 'moment';
 import LayoutStyle from '../../styles/LayoutStyle';
 import CommonStyles from '../../styles/CommonStyles';
-import {CommonActions} from '@react-navigation/native';
+import { CommonActions } from '@react-navigation/native';
+import {
+  getBookingPaymentHistory,
+  requestVacateRoom,
+} from '../../services/vacateService';
 
 const VacateRoomScreen = props => {
+  const stayData = props?.route?.params?.stayData || {};
+  const bookingId = useMemo(
+    () => stayData?._id || stayData?.id || stayData?.bookingId || null,
+    [stayData],
+  );
+
   const [moveDate, setMoveDate] = useState('DD/MM/YYYY');
   const [open, setOpen] = useState(false);
   const [reason, setReason] = useState('');
+  const [feedback, setFeedback] = useState('');
   const [rating, setRating] = useState(4);
+  const [isTermsAccepted, setIsTermsAccepted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [confirmVisible, setConfirmVisible] = useState(false);
+  const [duesVisible, setDuesVisible] = useState(false);
 
   const handleRating = selectedRating => {
     setRating(selectedRating);
   };
+
   const gotoBack = () => {
     props.navigation.dispatch(CommonActions.goBack());
   };
+
+  const handleMovingDate = selectedDate => {
+    if (selectedDate) {
+      const formattedDate = moment(selectedDate).format('DD/MM/YYYY');
+      setMoveDate(formattedDate);
+    }
+    setOpen(false);
+  };
+
+  const toggleTerms = () => {
+    setIsTermsAccepted(prev => !prev);
+  };
+
+  const handleVacatePress = () => {
+    if (!isButtonEnabled) {
+      return;
+    }
+    setConfirmVisible(true);
+  };
+
+  const handleConfirmNo = () => {
+    setConfirmVisible(false);
+  };
+
+  const handleConfirmYes = async () => {
+    setConfirmVisible(false);
+
+    if (!bookingId) {
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+
+      const historyResponse = await getBookingPaymentHistory(bookingId);
+      const outstandingAmount =
+        historyResponse?.data?.outstandingAmount ??
+        historyResponse?.data?.data?.outstandingAmount ??
+        0;
+console.log("history response", historyResponse);
+
+      if (Number(outstandingAmount) > 0) {
+        setDuesVisible(true);
+        return;
+      }
+
+      const vacateDate =
+        moveDate && moveDate !== 'DD/MM/YYYY'
+          ? moment(moveDate, 'DD/MM/YYYY').toISOString()
+          : new Date().toISOString();
+
+      const vacateResponse = await requestVacateRoom(bookingId, {
+        vacateDate,
+        reason,
+        feedback,
+        rating,
+      });
+console.log('vacateResponse', vacateResponse);
+
+      gotoBack();
+    } catch (error) {
+      console.error('Vacate room flow error:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const renderConfirmModal = () => {
+    return (
+      <Modal
+        transparent
+        visible={confirmVisible}
+        animationType="fade"
+        onRequestClose={handleConfirmNo}>
+        <View style={HomeStyle.modalOverlayCenter}>
+          <View style={HomeStyle.confirmCard}>
+            <Text style={HomeStyle.confirmTitle}>
+              {'Are you sure you want to vacate?'}
+            </Text>
+            <View style={HomeStyle.confirmActionsRow}>
+              <TouchableOpacity
+                style={[HomeStyle.confirmBtn, HomeStyle.confirmYesBtn]}
+                onPress={handleConfirmYes}
+                disabled={isSubmitting}>
+                <Icons
+                  iconName={'check'}
+                  iconSetName={'MaterialCommunityIcons'}
+                  iconColor={Colors.white}
+                  iconSize={20}
+                />
+                <Text style={HomeStyle.confirmYesText}>{'Yes'}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[HomeStyle.confirmBtn, HomeStyle.confirmYesBtn]}
+                onPress={handleConfirmNo}
+                disabled={isSubmitting}>
+                  <Icons
+                  iconName={'close'}
+                  iconSetName={'MaterialCommunityIcons'}
+                  iconColor={Colors.white}
+                  iconSize={20}
+                />
+                <Text style={HomeStyle.confirmYesText}>{'No'}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    );
+  };
+
+  const renderDuesModal = () => {
+    return (
+      <Modal
+        transparent
+        visible={duesVisible}
+        animationType="fade"
+        onRequestClose={() => setDuesVisible(false)}>
+        <View style={HomeStyle.modalOverlayCenter}>
+          <View style={HomeStyle.duesCard}>
+            <View style={HomeStyle.duesIconWrapper}>
+              <Icons
+                iconSetName={'Ionicons'}
+                iconName={'warning-outline'}
+                iconColor={Colors.danger || Colors.secondary}
+                iconSize={40}
+              />
+            </View>
+            <Text style={HomeStyle.duesText}>
+              {
+                'Room vacate option is disabled due to outstanding dues. Please clear your dues to proceed.'
+              }
+            </Text>
+          </View>
+        </View>
+      </Modal>
+    );
+  };
+
+  const isDateSelected = moveDate && moveDate !== 'DD/MM/YYYY';
+  const isButtonEnabled = isTermsAccepted && isDateSelected && !isSubmitting;
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={[HomeStyle.homeContainer, {flex: 1, padding: 20}]}>
+      style={[HomeStyle.homeContainer, { flex: 1, backgroundColor: Colors.white }]}>
       <StatusBar barStyle="light-content" backgroundColor={Colors.secondary} />
       <SafeAreaView
         style={{
-          // paddingTop: 10,
           backgroundColor: Colors.secondary,
         }}>
         <View style={HomeStyle.headerContainerBlue}>
@@ -58,10 +216,14 @@ const VacateRoomScreen = props => {
           </View>
         </View>
       </SafeAreaView>
-      <ScrollView>
+      <ScrollView contentContainerStyle={{ backgroundColor: Colors.white }}>
         <View style={[HomeStyle.vacateRoomContainer]}>
-          <View style={[HomeStyle.dateContainer]}>
-            <Text style={[HomeStyle.dateText]}>{'Move In Date *'}</Text>
+          <View
+            style={[
+              HomeStyle.dateContainer,
+              { flexDirection: 'row', alignItems: 'center' },
+            ]}>
+            <Text style={[HomeStyle.dateText]}>{'Vacating Date *'}</Text>
             <Icons
               iconSetName={'Ionicons'}
               iconName={'calendar-clear-outline'}
@@ -86,7 +248,7 @@ const VacateRoomScreen = props => {
               }}
             />
           </TouchableOpacity>
-          <View style={{...LayoutStyle.paddingTop20}}>
+          <View style={{ ...LayoutStyle.paddingTop20 }}>
             <Text style={[HomeStyle.dateText]}>{'Reason for vacating'}</Text>
             <TextInput
               style={HomeStyle.textarea}
@@ -97,12 +259,12 @@ const VacateRoomScreen = props => {
               onChangeText={text => setReason(text)}
             />
           </View>
-          <View style={{...LayoutStyle.paddingTop20}}>
+          <View style={{ ...LayoutStyle.paddingTop20 }}>
             <Text style={[HomeStyle.dateText]}>
               {'Please drop your valuable feedback'}
             </Text>
-            <View style={[HomeStyle.rateImg, {...LayoutStyle.marginTop5}]}>
-              {Array.from({length: 5}, (_, index) => (
+            <View style={[HomeStyle.rateImg, { ...LayoutStyle.marginTop5 }]}>
+              {Array.from({ length: 5 }, (_, index) => (
                 <TouchableOpacity
                   key={'rate' + index}
                   onPress={() => handleRating(index + 1)}>
@@ -120,18 +282,24 @@ const VacateRoomScreen = props => {
               multiline={true}
               numberOfLines={4}
               placeholder="Type something here..."
-              value={reason}
-              onChangeText={text => setReason(text)}
+              value={feedback}
+              onChangeText={text => setFeedback(text)}
             />
           </View>
         </View>
       </ScrollView>
-      <View style={[HomeStyle.vacateBtnBottom]}>
-        <View style={{...CommonStyles.directionRowSB}}>
+      <View style={[HomeStyle.vacateBtnBottom, { paddingHorizontal: 20 }]}>
+        <TouchableOpacity
+          style={{ ...CommonStyles.directionRowSB }}
+          onPress={toggleTerms}>
           <Icons
             iconSetName={'Ionicons'}
-            iconName={'radio-button-off-outline'}
-            iconColor={Colors.gray}
+            iconName={
+              isTermsAccepted
+                ? 'radio-button-on-outline'
+                : 'radio-button-off-outline'
+            }
+            iconColor={isTermsAccepted ? Colors.secondary : Colors.gray}
             iconSize={22}
           />
           <Text style={[HomeStyle.textRadioBtn]}>
@@ -139,11 +307,23 @@ const VacateRoomScreen = props => {
               'Sapiente asperiores ut inventore. Voluptatem molestiae atque minima corrupti adipisci fugit a.'
             }
           </Text>
-        </View>
-        <View style={{...LayoutStyle.marginTop20}}>
-          <Button btnName={'Vacate Room'} />
+        </TouchableOpacity>
+        <View style={{ ...LayoutStyle.marginTop20 }}>
+          <View
+            style={{
+              opacity: isButtonEnabled ? 1 : 0.6,
+            }}>
+            <Button
+              btnName={'Vacate Room'}
+              onPress={handleVacatePress}
+              bgColor={Colors.paleYellow}
+              btnTextColor={Colors.blackText}
+            />
+          </View>
         </View>
       </View>
+      {renderConfirmModal()}
+      {renderDuesModal()}
     </KeyboardAvoidingView>
   );
 };

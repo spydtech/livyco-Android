@@ -9,15 +9,39 @@ const PaymentStyle = StyleSheet.create({
   mainContainer: {},
   homeContainer: {
     backgroundColor: Colors.goastWhite,
+    flex: 1,
+  },
+  scrollContent: {
+    padding: 20,
+    backgroundColor: Colors.goastWhite,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  emptyText: {
+    fontFamily: FontFamily.RobotoRegular,
+    ...LayoutStyle.fontSize14,
+    color: Colors.gray,
   },
   headerContainerBlue: {
     backgroundColor: Colors.secondary,
+    ...LayoutStyle.paddingVertical15,
+    ...LayoutStyle.paddingHorizontal20,
   },
   titleText: {
     ...LayoutStyle.fontSize16,
     color: Colors.white,
-    fontFamily: FontFamily.RobotoRegular,
-    ...LayoutStyle.marginLeft10,
+    fontFamily: FontFamily.RobotoBold,
+    ...LayoutStyle.marginLeft15,
   },
   payContainer: {},
   pgImg: {
@@ -110,13 +134,13 @@ const PaymentStyle = StyleSheet.create({
     borderRadius: 10,
     height: 50,
     width: 50,
-
     alignItems: 'center',
+    justifyContent: 'center',
   },
   alphabateText: {
     fontFamily: FontFamily.RobotoMedium,
-    ...LayoutStyle.fontSize12,
-    color: Colors.goastWhite,
+    ...LayoutStyle.fontSize14,
+    color: Colors.white,
   },
   listContainer: {
     ...CommonStyles.directionRowCenter,
@@ -136,32 +160,51 @@ const PaymentStyle = StyleSheet.create({
     ...LayoutStyle.marginTop5,
   },
   payArrow: {
-    backgroundColor: '#0080001A',
-    ...LayoutStyle.padding15,
-    borderRadius: 30,
+    backgroundColor: Colors.greenLight,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   mainPayContainer: {
     ...CommonStyles.directionRowSB,
   },
   historyList: {
-    borderWidth: 1,
-    borderRadius: 20,
-    ...LayoutStyle.marginBottom20,
-    borderColor: Colors.grayBorder,
+    backgroundColor: Colors.white,
+    borderRadius: 10,
+    ...LayoutStyle.marginBottom15,
+    shadowColor: Colors.black,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  historyCard: {
+    backgroundColor: Colors.white,
+  },
+  cardPadding: {
+    ...LayoutStyle.paddingHorizontal15,
+    ...LayoutStyle.paddingVertical15,
   },
   dateAmount: {
-    ...LayoutStyle.marginTop5,
+    ...LayoutStyle.paddingHorizontal15,
+    ...LayoutStyle.paddingBottom15,
+    paddingTop: 0,
   },
   amountText: {
     fontFamily: FontFamily.RobotoBold,
-    ...LayoutStyle.fontSize12,
+    ...LayoutStyle.fontSize14,
     color: Colors.blackText,
+    ...LayoutStyle.marginBottom5,
   },
   dateText: {
     fontFamily: FontFamily.RobotoRegular,
     ...LayoutStyle.fontSize12,
-    color: Colors.blackText,
-    ...LayoutStyle.marginTop5,
+    color: Colors.gray,
   },
   historyDetailsList: {
     borderRadius: 20,

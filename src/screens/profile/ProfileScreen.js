@@ -9,21 +9,82 @@ import {
   Image,
   ScrollView,
   Switch,
+  ActivityIndicator,
 } from 'react-native';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import MystaysStyle from '../../styles/MystaysStyle';
 import Colors from '../../styles/Colors';
-import {Icons} from '../../components';
+import { Icons } from '../../components';
 import LayoutStyle from '../../styles/LayoutStyle';
 import ProfileStyle from '../../styles/ProfileStyle';
 import IMAGES from '../../assets/Images';
 import CommonStyles from '../../styles/CommonStyles';
+import { CommonActions, useNavigation } from '@react-navigation/native';
+import { getUser } from '../../services/authService';
+import { getUserToken } from '../../utils/Api';
 
 const ProfileScreen = () => {
+  const navigation = useNavigation();
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const gotoBack = () => {
+    navigation.dispatch(CommonActions.goBack());
+  };
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
+  const fetchUserData = async () => {
+    try {
+      setLoading(true);
+      const token = await getUserToken();
+      if (!token) {
+        console.log('No token found');
+        setLoading(false);
+        return;
+      }
+
+      const response = await getUser(token);
+      if (response.success && response.data?.user) {
+        setUserData(response.data.user);
+        console.log("User dataaa", response.data.user);
+
+      } else {
+        console.log('Failed to fetch user data:', response.message);
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Format phone number with +91- prefix
+  const formatPhoneNumber = (phone) => {
+    if (!phone) return '';
+    // Remove any existing formatting
+    const cleaned = phone.replace(/[^0-9]/g, '');
+    // If it starts with 91, remove it
+    const phoneNumber = cleaned.startsWith('91') ? cleaned.substring(2) : cleaned;
+    // Format as +91-XXXXXXXXXX
+    return phoneNumber ? `+91-${phoneNumber}` : '';
+  };
+
+  // Format user ID (LVC + last 7 digits of aadhaar or user ID)
+  const formatUserId = (user) => {
+    if (!user) return 'LVC0000000';
+    // Try to use aadhaarNumber first
+    if (user.clientId) {
+      return user.clientId;
+    }
+    return 'LVC0000000';
+  };
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={MystaysStyle.homeContainer}>
+      style={[MystaysStyle.homeContainer, { flex: 1 }]}>
       <StatusBar barStyle="light-content" backgroundColor={Colors.secondary} />
       <SafeAreaView
         style={{
@@ -43,7 +104,7 @@ const ProfileScreen = () => {
             <Text style={[ProfileStyle.headerTitle]}>{'Profile'}</Text>
           </View>
           <View style={MystaysStyle.iconContainer}>
-            <TouchableOpacity style={{...LayoutStyle.marginLeft5}}>
+            <TouchableOpacity style={{ ...LayoutStyle.marginLeft5 }}>
               <Icons
                 iconSetName={'Ionicons'}
                 iconName={'notifications-outline'}
@@ -56,136 +117,128 @@ const ProfileScreen = () => {
         </View>
       </SafeAreaView>
       <View style={[ProfileStyle.mainContainer]}>
-        <View style={{...CommonStyles.directionRowSB}}>
-          <View style={[ProfileStyle.userNameContainer]}>
-            <View style={[ProfileStyle.imageContaienr]}>
-              <Image
-                source={{
-                  uri: 'https://cdn.pixabay.com/photo/2016/04/01/10/11/avatar-1299805_1280.png',
-                }}
-                style={[ProfileStyle.profileImg]}
-              />
-            </View>
-            <View style={{...LayoutStyle.marginLeft20}}>
-              <Text style={[ProfileStyle.userName]}>{'Satish CH'}</Text>
-              <Text style={[ProfileStyle.fontLite]}>{'+911234567890'}</Text>
-              <Text style={[ProfileStyle.fontLite]}>{'LV08089'}</Text>
-            </View>
+        {loading ? (
+          <View style={ProfileStyle.loadingContainer}>
+            <ActivityIndicator size="large" color={Colors.secondary} />
           </View>
-          <TouchableOpacity>
-            <Icons
-              iconSetName={'FontAwesome'}
-              iconName={'edit'}
-              iconColor={Colors.black}
-              iconSize={26}
-            />
-          </TouchableOpacity>
-        </View>
-        <ScrollView>
-          <View style={{...LayoutStyle.marginVertical20}}>
-            <Text style={[ProfileStyle.accountInfoTitle]}>
+        ) : (
+          <View style={[ProfileStyle.profileSection]}>
+            <View style={[ProfileStyle.userNameContainer]}>
+              <View style={[ProfileStyle.imageContaienr, { padding:5}]}>
+                {userData?.profileImage ? (
+                  <Image
+                    source={{ uri: userData.profileImage }}
+                    style={[ProfileStyle.profileImg]}
+                  />
+                ) : (
+                  <Image
+                    source={{
+                      uri: 'https://cdn.pixabay.com/photo/2016/04/01/10/11/avatar-1299805_1280.png',
+                    }}
+                    style={[ProfileStyle.profileImg]}
+                  />
+                )}
+              </View>
+              <View style={{ ...LayoutStyle.marginLeft20 }}>
+                <Text style={[ProfileStyle.userName]}>
+                  {userData?.name || 'N/A'}
+                </Text>
+                <Text style={[ProfileStyle.fontLite]}>
+                  {formatPhoneNumber(userData?.phone)}
+                </Text>
+                <Text style={[ProfileStyle.fontLite]}>
+                  {formatUserId(userData)}
+                </Text>
+              </View>
+            </View>
+            <TouchableOpacity style={[ProfileStyle.editButton]}>
+              <Icons
+                iconSetName={'FontAwesome'}
+                iconName={'edit'}
+                iconColor={Colors.white}
+                iconSize={20}
+              />
+            </TouchableOpacity>
+          </View>
+        )}
+        <ScrollView style={ProfileStyle.scrollContainer}>
+          <View style={[ProfileStyle.accountInfoHeader, { marginVertical: 20 }]}>
+            <Text style={[ProfileStyle.accountInfoTitle, { fontWeight: "bold" }]}>
               {'Account Info'}
             </Text>
           </View>
+          {/* Theme option - commented out */}
           {/* <View
-            style={{
-              ...CommonStyles.directionRowSB,
-              ...LayoutStyle.marginVertical10,
-            }}>
+            style={ProfileStyle.accountOptionRow}>
             <Text style={[ProfileStyle.listOption]}>{'Theme'}</Text>
             <Switch />
           </View> */}
-          <TouchableOpacity>
-            <View
-              style={{
-                ...CommonStyles.directionRowSB,
-                ...LayoutStyle.marginVertical10,
-              }}>
-              <Text style={[ProfileStyle.listOption]}>{'Payment History'}</Text>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('History')}>
+            <View style={ProfileStyle.accountOptionRow}>
+              <Text style={[ProfileStyle.listOption]}>{'Payment history'}</Text>
               <Icons
                 iconSetName={'MaterialIcons'}
                 iconName={'keyboard-arrow-right'}
                 iconColor={Colors.gray}
-                iconSize={26}
+                iconSize={24}
               />
             </View>
           </TouchableOpacity>
+          {/* My wallet option - commented out */}
           {/* <TouchableOpacity>
-            <View
-              style={{
-                ...CommonStyles.directionRowSB,
-                ...LayoutStyle.marginVertical10,
-              }}>
-              <Text style={[ProfileStyle.listOption]}>{'My Wallet'}</Text>
+            <View style={ProfileStyle.accountOptionRow}>
+              <Text style={[ProfileStyle.listOption]}>{'My wallet'}</Text>
               <Icons
                 iconSetName={'MaterialIcons'}
                 iconName={'keyboard-arrow-right'}
                 iconColor={Colors.gray}
-                iconSize={26}
+                iconSize={24}
               />
             </View>
           </TouchableOpacity> */}
           <TouchableOpacity>
-            <View
-              style={{
-                ...CommonStyles.directionRowSB,
-                ...LayoutStyle.marginVertical10,
-              }}>
-              <Text style={[ProfileStyle.listOption]}>{'Help & Support'}</Text>
+            <View style={ProfileStyle.accountOptionRow}>
+              <Text style={[ProfileStyle.listOption]}>{'Help & support'}</Text>
               <Icons
                 iconSetName={'MaterialIcons'}
                 iconName={'keyboard-arrow-right'}
                 iconColor={Colors.gray}
-                iconSize={26}
+                iconSize={24}
               />
             </View>
           </TouchableOpacity>
           <TouchableOpacity>
-            <View
-              style={{
-                ...CommonStyles.directionRowSB,
-                ...LayoutStyle.marginVertical10,
-              }}>
-              <Text style={[ProfileStyle.listOption]}>{'Term & Policy'}</Text>
+            <View style={ProfileStyle.accountOptionRow}>
+              <Text style={[ProfileStyle.listOption]}>{'Term & policy'}</Text>
               <Icons
                 iconSetName={'MaterialIcons'}
                 iconName={'keyboard-arrow-right'}
                 iconColor={Colors.gray}
-                iconSize={26}
+                iconSize={24}
               />
             </View>
           </TouchableOpacity>
           <TouchableOpacity>
-            <View
-              style={{
-                ...CommonStyles.directionRowSB,
-                ...LayoutStyle.marginVertical10,
-              }}>
+            <View style={ProfileStyle.accountOptionRow}>
               <Text style={[ProfileStyle.listOption]}>{'Delete Account'}</Text>
               <Icons
                 iconSetName={'MaterialIcons'}
                 iconName={'keyboard-arrow-right'}
                 iconColor={Colors.gray}
-                iconSize={26}
+                iconSize={24}
               />
             </View>
           </TouchableOpacity>
         </ScrollView>
-        <TouchableOpacity style={[ProfileStyle.deleteBtn]}>
-          <View
-            style={{
-              ...CommonStyles.directionRowSB,
-              ...LayoutStyle.marginVertical10,
-              ...LayoutStyle.marginHorizontal20,
-            }}>
-            <Text style={[ProfileStyle.logoutText]}>{'Logout'}</Text>
-            <Icons
-              iconSetName={'MaterialIcons'}
-              iconName={'logout'}
-              iconColor={Colors.red}
-              iconSize={26}
-            />
-          </View>
+        <TouchableOpacity style={[ProfileStyle.logoutBtn, { marginBottom: 30 }]}>
+          <Text style={[ProfileStyle.logoutText]}>{'Logout'}</Text>
+          <Icons
+            iconSetName={'MaterialIcons'}
+            iconName={'logout'}
+            iconColor={Colors.red}
+            iconSize={24}
+          />
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>

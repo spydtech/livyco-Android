@@ -143,10 +143,55 @@ export const validatePayment = async (paymentData) => {
   }
 };
 
+/**
+ * Get user payment history
+ * @returns {Promise<Object>} User payments response
+ */
+export const getUserPayments = async () => {
+  try {
+    const token = await getUserToken();
+    if (!token) {
+      return {
+        success: false,
+        data: [],
+        message: 'User not authenticated',
+      };
+    }
+
+    const headers = {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    };
+
+    const response = await fetch(`${API_BASE_URL}payments/user`, {
+      method: 'GET',
+      headers,
+    });
+
+    const data = await response.json();
+    const payments = data?.payments || data?.data || [];
+
+    return {
+      success: response.ok && (data?.success ?? true),
+      data: payments,
+      message: data?.message || '',
+    };
+  } catch (error) {
+    console.error('Get user payments error:', error);
+    return {
+      success: false,
+      data: [],
+      message: error.message || 'Failed to fetch payments',
+    };
+  }
+};
+
 export default {
   getBookingWithPaymentDetails,
   createPaymentOrder,
   verifyPayment,
   validatePayment,
+  getUserPayments,
 };
 

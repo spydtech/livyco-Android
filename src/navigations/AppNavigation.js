@@ -127,6 +127,7 @@ function ProfileStackScreen() {
         animationEnabled: true,
       })}>
       <ProfileStack.Screen name="Profile" component={ProfileScreen} />
+      <PaymentStack.Screen name="History" component={HistoryScreen} />
     </ProfileStack.Navigator>
   );
 }

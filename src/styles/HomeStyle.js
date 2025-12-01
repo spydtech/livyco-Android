@@ -1281,7 +1281,11 @@ const HomeStyle = StyleSheet.create({
     color: Colors.whiteText,
     ...LayoutStyle.marginLeft10,
   },
-  vacateRoomContainer: {},
+  vacateRoomContainer: {
+    backgroundColor: Colors.white,
+    borderRadius: 10,
+    ...LayoutStyle.padding20,
+  },
   textarea: {
     height: 100,
     borderColor: "#ccc",
@@ -1292,7 +1296,9 @@ const HomeStyle = StyleSheet.create({
     ...LayoutStyle.paddingHorizontal10,
   },
   vacateBtnBottom: {
+    ...LayoutStyle.padding20,
     ...LayoutStyle.paddingBottom30,
+    backgroundColor: Colors.white,
   },
   textRadioBtn: {
     ...LayoutStyle.paddingLeft5,
@@ -1300,6 +1306,73 @@ const HomeStyle = StyleSheet.create({
     fontFamily: FontFamily.RobotoMedium,
     color: Colors.blackText,
     width: deviceWidth / 1.2,
+  },
+  modalOverlayCenter: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  confirmCard: {
+    width: '100%',
+    backgroundColor: Colors.white,
+    borderRadius: 12,
+    ...LayoutStyle.padding20,
+    alignItems: 'center',
+  },
+  confirmTitle: {
+    textAlign: 'center',
+    fontFamily: FontFamily.RobotoMedium,
+    ...LayoutStyle.fontSize14,
+    color: Colors.blackText,
+    ...LayoutStyle.marginBottom20,
+  },
+  confirmActionsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  confirmBtn: {
+    flex: 1,
+    borderRadius: 8,
+    ...LayoutStyle.paddingVertical10,
+    alignItems: 'center',
+    marginHorizontal: 5,
+  },
+  confirmYesBtn: {
+    backgroundColor: Colors.secondary,
+  },
+  confirmNoBtn: {
+    backgroundColor: Colors.white,
+    borderWidth: 1,
+    borderColor: Colors.secondary,
+  },
+  confirmYesText: {
+    fontFamily: FontFamily.RobotoMedium,
+    ...LayoutStyle.fontSize12,
+    color: Colors.whiteText,
+  },
+  confirmNoText: {
+    fontFamily: FontFamily.RobotoMedium,
+    ...LayoutStyle.fontSize12,
+    color: Colors.secondary,
+  },
+  duesCard: {
+    width: '100%',
+    backgroundColor: Colors.white,
+    borderRadius: 12,
+    ...LayoutStyle.padding20,
+    alignItems: 'center',
+  },
+  duesIconWrapper: {
+    ...LayoutStyle.marginBottom10,
+  },
+  duesText: {
+    textAlign: 'center',
+    fontFamily: FontFamily.RobotoRegular,
+    ...LayoutStyle.fontSize12,
+    color: Colors.blackText,
   },
   // Wishlist Styles
   wishlistCard: {
