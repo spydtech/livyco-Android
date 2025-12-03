@@ -1,5 +1,4 @@
-import {API_BASE_URL} from '../config/BaseUrl';
-import {getUserToken} from '../utils/Api';
+import {apiGet} from '../utils/apiCall';
 
 /**
  * Get user's stays/bookings using /api/bookings/user endpoint
@@ -7,33 +6,13 @@ import {getUserToken} from '../utils/Api';
  */
 export const getMyStays = async () => {
   try {
-    const token = await getUserToken();
-    if (!token) {
-      return {
-        success: false,
-        data: [],
-        message: 'User not authenticated',
-      };
-    }
-
-    const headers = {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    };
-
-    const response = await fetch(`${API_BASE_URL}bookings/user`, {
-      method: 'GET',
-      headers,
-    });
-
-    const data = await response.json();
-    const bookings = data?.bookings || data?.data || [];
+    const response = await apiGet('bookings/user');
+    const bookings = response.data?.bookings || response.data?.data || (Array.isArray(response.data) ? response.data : []);
 
     return {
-      success: response.ok && (data?.success ?? true),
+      success: response.success || false,
       data: bookings,
-      message: data?.message || '',
+      message: response.message || '',
     };
   } catch (error) {
     console.error('Get my stays error:', error);

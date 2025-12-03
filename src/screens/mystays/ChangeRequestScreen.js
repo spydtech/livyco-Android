@@ -22,6 +22,8 @@ import { CommonActions } from '@react-navigation/native';
 import { deviceWidth } from '../../utils/DeviceInfo';
 import { Dropdown } from 'react-native-element-dropdown';
 import { getAllAvailableBeds } from '../../services/bookingService';
+import { submitConcern } from '../../services/concernService';
+import { showMessage } from 'react-native-flash-message';
 import moment from 'moment';
 
 const ChangeRequestScreen = props => {
@@ -55,6 +57,7 @@ const ChangeRequestScreen = props => {
   const [selectedBed, setSelectedBed] = useState(null);
   const [availableBeds, setAvailableBeds] = useState([]);
   const [loadingBeds, setLoadingBeds] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const optionList = [
     {
@@ -297,8 +300,168 @@ const ChangeRequestScreen = props => {
     );
   };
 
-  const gotoSuccessRequet = () => {
-    props.navigation.navigate('SuccessRequest');
+  // Normalize sharing type to backend format
+  const normalizeSharingType = (sharing) => {
+    if (!sharing) return null;
+    const sharingLower = sharing.toLowerCase().replace(' sharing', '').trim();
+    if (sharingLower.includes('single') || sharingLower === '1') return 'single';
+    if (sharingLower.includes('double') || sharingLower === '2') return 'double';
+    if (sharingLower.includes('triple') || sharingLower === '3') return 'triple';
+    if (sharingLower.includes('four') || sharingLower === '4') return 'four';
+    if (sharingLower.includes('five') || sharingLower === '5') return 'five';
+    if (sharingLower.includes('six') || sharingLower === '6') return 'six';
+    return sharingLower;
+  };
+
+  // Extract floor number from room number (e.g., 101 -> 1, 205 -> 2)
+  const extractFloorFromRoom = (roomNumber) => {
+    if (!roomNumber) return 1;
+    const roomStr = String(roomNumber);
+    // Try to extract first digit(s) that might represent floor
+    const match = roomStr.match(/^(\d+)/);
+    if (match) {
+      const num = parseInt(match[1]);
+      // If room number is like 101, 102, etc., floor is likely 1
+      // If room number is like 201, 202, etc., floor is likely 2
+      if (num >= 100) {
+        return Math.floor(num / 100);
+      }
+      return num;
+    }
+    return 1; // Default to floor 1
+  };
+
+  // Validate form before submission
+  const validateForm = () => {
+    if (!reasonValue) {
+      showMessage({
+        message: 'Please select what you want to change',
+        type: 'danger',
+        floating: true,
+      });
+      return false;
+    }
+
+    if (reasonValue === '1') {
+      // Bed change validation
+      if (!selectedBed) {
+        showMessage({
+          message: 'Please select a preferred bed',
+          type: 'danger',
+          floating: true,
+        });
+        return false;
+      }
+      if (selectedBed === currentBed.toUpperCase()) {
+        showMessage({
+          message: 'Please select a different bed than your current bed',
+          type: 'danger',
+          floating: true,
+        });
+        return false;
+      }
+    } else if (reasonValue === '2') {
+      // Room change validation
+      if (selectedSharing === null) {
+        showMessage({
+          message: 'Please select your preferred sharing type',
+          type: 'danger',
+          floating: true,
+        });
+        return false;
+      }
+      const selectedSharingType = optionList[selectedSharing]?.optionName;
+      if (selectedSharingType === currentSharing) {
+        showMessage({
+          message: 'Please select a different sharing type than your current one',
+          type: 'danger',
+          floating: true,
+        });
+        return false;
+      }
+    } else if (reasonValue === '3') {
+      // Other services validation
+      if (!reasonDesc || !reasonDesc.trim()) {
+        showMessage({
+          message: 'Please provide a reason for your request',
+          type: 'danger',
+          floating: true,
+        });
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+  // Handle form submission
+  const handleSubmitRequest = async () => {
+    if (!validateForm()) {
+      return;
+    }
+
+    setSubmitting(true);
+
+    try {
+      let concernData = {
+        comment: reasonDesc || '',
+        priority: 'medium',
+      };
+
+      if (reasonValue === '1') {
+        // Bed change
+        concernData.type = 'bed-change';
+        concernData.requestedRoom = currentRoom;
+        concernData.requestedBed = selectedBed;
+      } else if (reasonValue === '2') {
+        // Room change
+        concernData.type = 'room-change';
+        // For room change, we use current room/bed since user only selects sharing type
+        // The backend will handle finding available rooms with the requested sharing type
+        concernData.requestedRoom = currentRoom;
+        concernData.requestedBed = currentBed;
+        const selectedSharingType = optionList[selectedSharing]?.optionName;
+        concernData.requestedSharingType = normalizeSharingType(selectedSharingType);
+        concernData.requestedFloor = extractFloorFromRoom(currentRoom);
+      } else if (reasonValue === '3') {
+        // Other services
+        concernData.type = 'other-services';
+      }
+
+      const response = await submitConcern(concernData);
+console.log("changer request data", concernData, response);
+
+      if (response.success) {
+        showMessage({
+          message: response.message || 'Request submitted successfully',
+          type: 'success',
+          floating: true,
+        });
+        // Navigate to success screen after a short delay with concern data
+        setTimeout(() => {
+          props.navigation.navigate('SuccessRequest', {
+            concernId: response.concern?._id || response.concern?.id,
+            concern: response.concern,
+          });
+        }, 500);
+      } else {
+        // Handle different error cases
+        showMessage({
+          message: response.message || 'Failed to submit request. Please try again.',
+          type: 'danger',
+          floating: true,
+        });
+      }
+    } catch (error) {
+      console.error('Submit request error:', error);
+      showMessage({
+        message: error.message || 'An unexpected error occurred. Please try again.',
+        type: 'danger',
+        floating: true,
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -510,10 +673,18 @@ const ChangeRequestScreen = props => {
           ) : null}
           {reasonValue && <View style={{ ...LayoutStyle.paddingTop20 }}>
             <Button
-              onPress={() => gotoSuccessRequet()}
-              btnName={'Raise Request'}
-              btnStyle={[MystaysStyle.btnStylesmall]}
+              onPress={submitting ? () => {} : handleSubmitRequest}
+              btnName={submitting ? 'Submitting...' : 'Raise Request'}
+              btnStyle={[
+                MystaysStyle.btnStylesmall,
+                submitting && { opacity: 0.6 }
+              ]}
             />
+            {submitting && (
+              <View style={{ marginTop: 10, alignItems: 'center' }}>
+                <ActivityIndicator size="small" color={Colors.secondary} />
+              </View>
+            )}
           </View>}
         </View>
       </ScrollView>

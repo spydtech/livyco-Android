@@ -1,6 +1,4 @@
-import {API_BASE_URL} from '../config/BaseUrl';
-import {getUserToken} from '../utils/Api';
-import Api from '../utils/Api';
+import {apiGet, apiPost} from '../utils/apiCall';
 
 /**
  * Get available rooms and beds for a property
@@ -10,32 +8,16 @@ import Api from '../utils/Api';
  */
 export const getAvailableRoomsAndBeds = async (propertyId, date = null) => {
   try {
-    const token = await getUserToken();
-    const headers = {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-    };
-    
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-
-    let url = `${API_BASE_URL}bookings/availability/property/${propertyId}`;
+    let endpoint = `bookings/availability/property/${propertyId}`;
     if (date) {
-      url += `?date=${date}`;
+      endpoint += `?date=${date}`;
     }
 
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: headers,
-    });
-
-    const data = await response.json();
-    
+    const response = await apiGet(endpoint);
     return {
-      success: data?.success || false,
-      data: data?.data || null,
-      message: data?.message || '',
+      success: response.success || false,
+      data: response.data?.data || response.data || null,
+      message: response.message || '',
     };
   } catch (error) {
     console.error('Get available rooms and beds error:', error);
@@ -56,58 +38,25 @@ export const getAvailableRoomsAndBeds = async (propertyId, date = null) => {
  */
 export const getAllAvailableBeds = async (propertyId, startDate, endDate = null) => {
   try {
-    const token = await getUserToken();
-    
-    if (!token) {
-      console.error("No authentication token found");
-      return {
-        success: false,
-        data: null,
-        message: "Please log in to check room availability",
-      };
-    }
-
     const finalEndDate = endDate || startDate;
-    const url = `${API_BASE_URL}bookings/availability/property/${propertyId}/all-beds?startDate=${startDate}&endDate=${finalEndDate}`;
+    const endpoint = `bookings/availability/property/${propertyId}/all-beds?startDate=${startDate}&endDate=${finalEndDate}`;
 
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-    });
-
-    if (response.ok) {
-      const result = await response.json();
+    const response = await apiGet(endpoint);
+    
+    if (response.success) {
       return {
-        success: result?.success || false,
-        bedsByFloor: result?.bedsByFloor || {},
-        statistics: result?.statistics || null,
-        message: result?.message || '',
-      };
-    } else if (response.status === 401) {
-      console.error("Authentication failed - token may be invalid or expired");
-      return {
-        success: false,
-        data: null,
-        message: "Your session has expired. Please log in again.",
-      };
-    } else if (response.status === 400) {
-      console.error("Bad request - missing parameters");
-      return {
-        success: false,
-        data: null,
-        message: "Bad request - missing parameters",
-      };
-    } else {
-      const errorData = await response.json().catch(() => ({}));
-      return {
-        success: false,
-        data: null,
-        message: errorData?.message || 'Failed to fetch bed availability',
+        success: true,
+        bedsByFloor: response.data?.bedsByFloor || {},
+        statistics: response.data?.statistics || null,
+        message: response.message || '',
       };
     }
+    
+    return {
+      success: false,
+      data: null,
+      message: response.message || 'Failed to fetch bed availability',
+    };
   } catch (error) {
     console.error('Get all available beds error:', error);
     return {
@@ -126,46 +75,26 @@ export const getAllAvailableBeds = async (propertyId, startDate, endDate = null)
 export const checkRoomAvailability = async (params) => {
   try {
     const { propertyId, startDate, endDate } = params;
-    
-    const token = await getUserToken();
-    
-    if (!token) {
-      console.error("No authentication token found");
-      return {
-        success: false,
-        data: null,
-        message: "Please log in to check room availability",
-      };
-    }
 
-    const response = await fetch(`${API_BASE_URL}bookings/check-availability`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        startDate,
-        endDate: endDate || startDate,
-        propertyId,
-      }),
+    const response = await apiPost('bookings/check-availability', {
+      startDate,
+      endDate: endDate || startDate,
+      propertyId,
     });
 
-    if (response.ok) {
-      const result = await response.json();
+    if (response.success) {
       return {
-        success: result?.success || false,
-        unavailableRooms: result?.unavailableRooms || [],
-        message: result?.message || '',
-      };
-    } else {
-      const errorData = await response.json().catch(() => ({}));
-      return {
-        success: false,
-        unavailableRooms: [],
-        message: errorData?.message || 'Failed to check room availability',
+        success: true,
+        unavailableRooms: response.data?.unavailableRooms || [],
+        message: response.message || '',
       };
     }
+    
+    return {
+      success: false,
+      unavailableRooms: [],
+      message: response.message || 'Failed to check room availability',
+    };
   } catch (error) {
     console.error('Check room availability error:', error);
     return {
@@ -194,29 +123,12 @@ export const checkRoomAvailability = async (params) => {
  */
 export const createBooking = async (bookingData) => {
   try {
-    const token = await getUserToken();
-    const headers = {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-    };
-    
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-
-    const response = await fetch(`${API_BASE_URL}bookings`, {
-      method: 'POST',
-      headers: headers,
-      body: JSON.stringify(bookingData),
-    });
-
-    const data = await response.json();
-    
+    const response = await apiPost('bookings', bookingData);
     return {
-      success: data?.success || false,
-      data: data?.booking || data?.data || null,
-      message: data?.message || '',
-      error: data?.error || null,
+      success: response.success || false,
+      data: response.data?.booking || response.data || null,
+      message: response.message || '',
+      error: response.error || null,
     };
   } catch (error) {
     console.error('Create booking error:', error);
@@ -236,30 +148,11 @@ export const createBooking = async (bookingData) => {
  */
 export const cancelBooking = async (bookingId) => {
   try {
-    const token = await getUserToken();
-    
-    if (!token) {
-      return {
-        success: false,
-        data: null,
-        message: 'Please log in to cancel booking',
-      };
-    }
-
-    const response = await fetch(`${API_BASE_URL}bookings/${bookingId}/cancel`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-    });
-
-    const data = await response.json();
-    
+    const response = await apiPost(`bookings/${bookingId}/cancel`, {});
     return {
-      success: data?.success || false,
-      data: data?.booking || data?.data || null,
-      message: data?.message || '',
+      success: response.success || false,
+      data: response.data?.booking || response.data || null,
+      message: response.message || '',
     };
   } catch (error) {
     console.error('Cancel booking error:', error);

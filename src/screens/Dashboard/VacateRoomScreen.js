@@ -23,6 +23,7 @@ import {
   getBookingPaymentHistory,
   requestVacateRoom,
 } from '../../services/vacateService';
+import {showMessage} from 'react-native-flash-message';
 
 const VacateRoomScreen = props => {
   const stayData = props?.route?.params?.stayData || {};
@@ -76,6 +77,11 @@ const VacateRoomScreen = props => {
     setConfirmVisible(false);
 
     if (!bookingId) {
+      showMessage({
+        message: 'Booking information is missing',
+        type: 'danger',
+        floating: true,
+      });
       return;
     }
 
@@ -83,14 +89,25 @@ const VacateRoomScreen = props => {
       setIsSubmitting(true);
 
       const historyResponse = await getBookingPaymentHistory(bookingId);
+      
+      if (!historyResponse.success) {
+        showMessage({
+          message: historyResponse.message || 'Failed to check payment history',
+          type: 'danger',
+          floating: true,
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
       const outstandingAmount =
         historyResponse?.data?.outstandingAmount ??
         historyResponse?.data?.data?.outstandingAmount ??
         0;
-console.log("history response", historyResponse);
 
       if (Number(outstandingAmount) > 0) {
         setDuesVisible(true);
+        setIsSubmitting(false);
         return;
       }
 
@@ -105,11 +122,35 @@ console.log("history response", historyResponse);
         feedback,
         rating,
       });
-console.log('vacateResponse', vacateResponse);
 
-      gotoBack();
+      if (vacateResponse.success) {
+        showMessage({
+          message: vacateResponse.message || 'Vacate request submitted successfully',
+          type: 'success',
+          floating: true,
+        });
+        // Navigate to success screen after a short delay
+        setTimeout(() => {
+          props.navigation.navigate('VacateSuccess', {
+            requestId: vacateResponse.requestId,
+            bookingId: bookingId,
+            vacateData: vacateResponse.data,
+          });
+        }, 500);
+      } else {
+        showMessage({
+          message: vacateResponse.message || 'Failed to submit vacate request. Please try again.',
+          type: 'danger',
+          floating: true,
+        });
+      }
     } catch (error) {
       console.error('Vacate room flow error:', error);
+      showMessage({
+        message: error.message || 'An unexpected error occurred. Please try again.',
+        type: 'danger',
+        floating: true,
+      });
     } finally {
       setIsSubmitting(false);
     }

@@ -1,97 +1,4 @@
-import axios from 'axios';
-import { API_BASE_URL } from '../config/BaseUrl';
-
-// Create axios instance for auth endpoints
-const authApi = axios.create({
-  baseURL: API_BASE_URL + 'auth/',
-  timeout: 30000,
-  headers: {
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
-  },
-});
-
-/**
- * Get authentication headers
- * @param {string} token - JWT token (optional)
- * @returns {Object} Headers object
- */
-const getAuthHeaders = (token = null) => {
-  const headers = {
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
-  };
-  
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
-  }
-  
-  return headers;
-};
-
-/**
- * Handle API response
- * @param {Object} response - Axios response
- * @returns {Object} Formatted response
- */
-const handleResponse = (response) => {
-  if (response.data) {
-    return {
-      success: response.data.success || false,
-      data: response.data,
-      message: response.data.message || '',
-      error: response.data.error || null,
-    };
-  }
-  return {
-    success: false,
-    data: null,
-    message: 'Invalid response format',
-    error: 'Invalid response format',
-  };
-};
-
-/**
- * Handle API error
- * @param {Error} error - Axios error
- * @returns {Object} Formatted error response
- */
-const handleError = (error) => {
-  if (error.response) {
-    // Server responded with error status
-    return {
-      success: false,
-      data: null,
-      message: error.response.data?.message || 'An error occurred',
-      error: error.response.data?.error || error.message,
-      status: error.response.status,
-    };
-  } else if (error.request) {
-    // Request was made but no response received
-    const errorMessage = error.code === 'ECONNREFUSED' 
-      ? 'Connection refused. Please check if the server is running and the IP address is correct.'
-      : error.code === 'ENOTFOUND' || error.code === 'EAI_AGAIN'
-      ? 'Server not found. Please check the API URL configuration.'
-      : error.code === 'ETIMEDOUT'
-      ? 'Request timeout. Please check your network connection.'
-      : 'Network error. Please check your internet connection and server URL.';
-    
-    return {
-      success: false,
-      data: null,
-      message: errorMessage,
-      error: error.code || 'Network error',
-      details: error.message,
-    };
-  }
-  // Something else happened
-  return {
-    success: false,
-    data: null,
-    message: error.message || 'An unexpected error occurred',
-    error: error.message,
-  };
-};
+import {apiGet, apiPost} from '../utils/apiCall';
 
 /**
  * Register a new user
@@ -104,14 +11,16 @@ const handleError = (error) => {
  */
 export const register = async (userData) => {
   try {
-    const response = await authApi.post('register', userData, {
-      headers: getAuthHeaders(),
-    });
+    const response = await apiPost('auth/register', userData, {requireAuth: false});
     console.log("responsee register", response);
-    
-    return handleResponse(response);
+    return response;
   } catch (error) {
-    return handleError(error);
+    return {
+      success: false,
+      data: null,
+      message: error.message || 'Registration failed',
+      error: error.message,
+    };
   }
 };
 
@@ -124,12 +33,14 @@ export const register = async (userData) => {
  */
 export const checkUserExists = async (data) => {
   try {
-    const response = await authApi.post('check-user', data, {
-      headers: getAuthHeaders(),
-    });
-    return handleResponse(response);
+    return await apiPost('auth/check-user', data, {requireAuth: false});
   } catch (error) {
-    return handleError(error);
+    return {
+      success: false,
+      data: null,
+      message: error.message || 'Failed to check user',
+      error: error.message,
+    };
   }
 };
 
@@ -142,12 +53,14 @@ export const checkUserExists = async (data) => {
  */
 export const verifyFirebaseOTP = async (data) => {
   try {
-    const response = await authApi.post('verify-firebase-otp', data, {
-      headers: getAuthHeaders(),
-    });
-    return handleResponse(response);
+    return await apiPost('auth/verify-firebase-otp', data, {requireAuth: false});
   } catch (error) {
-    return handleError(error);
+    return {
+      success: false,
+      data: null,
+      message: error.message || 'OTP verification failed',
+      error: error.message,
+    };
   }
 };
 
@@ -159,12 +72,14 @@ export const verifyFirebaseOTP = async (data) => {
  */
 export const sendOTP = async (data) => {
   try {
-    const response = await authApi.post('send-otp', data, {
-      headers: getAuthHeaders(),
-    });
-    return handleResponse(response);
+    return await apiPost('auth/send-otp', data, {requireAuth: false});
   } catch (error) {
-    return handleError(error);
+    return {
+      success: false,
+      data: null,
+      message: error.message || 'Failed to send OTP',
+      error: error.message,
+    };
   }
 };
 
@@ -177,28 +92,35 @@ export const sendOTP = async (data) => {
  */
 export const verifyOTP = async (data) => {
   try {
-    const response = await authApi.post('verify-otp', data, {
-      headers: getAuthHeaders(),
-    });
-    return handleResponse(response);
+    return await apiPost('auth/verify-otp', data, {requireAuth: false});
   } catch (error) {
-    return handleError(error);
+    return {
+      success: false,
+      data: null,
+      message: error.message || 'OTP verification failed',
+      error: error.message,
+    };
   }
 };
 
 /**
  * Get current user profile
- * @param {string} token - JWT token
+ * @param {string} token - JWT token (optional, will be fetched automatically if not provided)
  * @returns {Promise<Object>} User profile response
  */
 export const getUser = async (token) => {
   try {
-    const response = await authApi.get('user', {
-      headers: getAuthHeaders(token),
-    });
-    return handleResponse(response);
+    // If token is provided, we'll still use the apiCall which handles auth automatically
+    // But we can pass it as a custom header if needed
+    const options = token ? {headers: {Authorization: `Bearer ${token}`}} : {};
+    return await apiGet('auth/user', options);
   } catch (error) {
-    return handleError(error);
+    return {
+      success: false,
+      data: null,
+      message: error.message || 'Failed to get user profile',
+      error: error.message,
+    };
   }
 };
 
@@ -208,10 +130,14 @@ export const getUser = async (token) => {
  */
 export const healthCheck = async () => {
   try {
-    const response = await authApi.get('health');
-    return handleResponse(response);
+    return await apiGet('auth/health', {requireAuth: false});
   } catch (error) {
-    return handleError(error);
+    return {
+      success: false,
+      data: null,
+      message: error.message || 'Health check failed',
+      error: error.message,
+    };
   }
 };
 

@@ -1,5 +1,4 @@
-import {API_BASE_URL} from '../config/BaseUrl';
-import {getUserToken} from '../utils/Api';
+import {apiGet, apiPost} from '../utils/apiCall';
 
 /**
  * Get booking details with payment information
@@ -8,28 +7,11 @@ import {getUserToken} from '../utils/Api';
  */
 export const getBookingWithPaymentDetails = async (bookingId) => {
   try {
-    const token = await getUserToken();
-    const headers = {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-    };
-    
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-
-    // Use existing getBookingById API which already returns pricing
-    const response = await fetch(`${API_BASE_URL}bookings/${bookingId}`, {
-      method: 'GET',
-      headers: headers,
-    });
-
-    const data = await response.json();
-    
+    const response = await apiGet(`bookings/${bookingId}`);
     return {
-      success: data?.success || false,
-      data: data?.booking || data?.data || null,
-      message: data?.message || '',
+      success: response.success || false,
+      data: response.data?.booking || response.data || null,
+      message: response.message || '',
     };
   } catch (error) {
     console.error('Get booking payment details error:', error);
@@ -52,28 +34,11 @@ export const getBookingWithPaymentDetails = async (bookingId) => {
  */
 export const createPaymentOrder = async (orderData) => {
   try {
-    const token = await getUserToken();
-    const headers = {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-    };
-    
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-
-    const response = await fetch(`${API_BASE_URL}payments/create-order`, {
-      method: 'POST',
-      headers: headers,
-      body: JSON.stringify(orderData),
-    });
-
-    const data = await response.json();
-    
+    const response = await apiPost('payments/create-order', orderData);
     return {
-      success: data?.success || false,
-      data: data?.order || data?.data || null,
-      message: data?.message || '',
+      success: response.success || false,
+      data: response.data?.order || response.data || null,
+      message: response.message || '',
     };
   } catch (error) {
     console.error('Create payment order error:', error);
@@ -109,29 +74,12 @@ export const verifyPayment = async (paymentData) => {
  */
 export const validatePayment = async (paymentData) => {
   try {
-    const token = await getUserToken();
-    const headers = {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-    };
-    
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-
-    const response = await fetch(`${API_BASE_URL}payments/validate-payment`, {
-      method: 'POST',
-      headers: headers,
-      body: JSON.stringify(paymentData),
-    });
-
-    const data = await response.json();
-    
+    const response = await apiPost('payments/validate-payment', paymentData);
     return {
-      success: data?.success || false,
-      data: data?.payment || data?.data || data || null,
-      booking: data?.booking || null,
-      message: data?.message || '',
+      success: response.success || false,
+      data: response.data?.payment || response.data || null,
+      booking: response.data?.booking || null,
+      message: response.message || '',
     };
   } catch (error) {
     console.error('Validate payment error:', error);
@@ -149,33 +97,71 @@ export const validatePayment = async (paymentData) => {
  */
 export const getUserPayments = async () => {
   try {
-    const token = await getUserToken();
-    if (!token) {
+    const response = await apiGet('bookings/user');
+    
+    if (!response.success) {
       return {
         success: false,
         data: [],
-        message: 'User not authenticated',
+        message: response.message || 'Failed to fetch payments',
       };
     }
 
-    const headers = {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    };
+    const bookings = response.data?.bookings || response.data?.data || Array.isArray(response.data) ? response.data : [];
 
-    const response = await fetch(`${API_BASE_URL}payments/user`, {
-      method: 'GET',
-      headers,
+    // Map bookings into a flat payments-style array for the History UI
+    const payments = bookings.bookings.map((booking) => {
+      const property = booking.property || {};
+      const paymentInfo = booking.paymentInfo || {};
+      const paymentsHistory = booking.payments || [];
+
+      // Prefer the most recent payment entry if available
+      const latestPayment =
+        paymentsHistory.length > 0
+          ? paymentsHistory[paymentsHistory.length - 1]
+          : null;
+
+      const amount =
+        latestPayment?.amount ??
+        paymentInfo.paidAmount ??
+        booking.paymentSummary?.totalPaid ??
+        0;
+
+      const date =
+        latestPayment?.date ??
+        paymentInfo.paymentDate ??
+        booking.updatedAt ??
+        booking.createdAt ??
+        null;
+
+      return {
+        // What HistoryScreen expects / uses
+        propertyName: property.name || 'N/A',
+        amount,
+        date,
+
+        // Helpful identifiers
+        bookingId: booking._id || booking.id,
+        transactionId:
+          latestPayment?.transactionId ?? paymentInfo.transactionId ?? null,
+
+        // Extra context if needed by detail screen later
+        paymentStatus: paymentInfo.paymentStatus || latestPayment?.status,
+        paymentMethod: paymentInfo.paymentMethod || latestPayment?.method,
+        razorpayOrderId:
+          latestPayment?.razorpayOrderId ?? paymentInfo.razorpayOrderId ?? null,
+        razorpayPaymentId:
+          latestPayment?.razorpayPaymentId ??
+          paymentInfo.razorpayPaymentId ??
+          null,
+        rawBooking: booking,
+      };
     });
 
-    const data = await response.json();
-    const payments = data?.payments || data?.data || [];
-
     return {
-      success: response.ok && (data?.success ?? true),
+      success: true,
       data: payments,
-      message: data?.message || '',
+      message: response.message || '',
     };
   } catch (error) {
     console.error('Get user payments error:', error);

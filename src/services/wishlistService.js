@@ -1,4 +1,4 @@
-import {API_BASE_URL} from '../config/BaseUrl';
+import {apiGet, apiPost, apiDelete} from '../utils/apiCall';
 import {getUserToken} from '../utils/Api';
 import {getUserIdFromToken} from '../utils/jwtUtils';
 
@@ -26,24 +26,13 @@ export const getUserWishlist = async () => {
       };
     }
 
-    const headers = {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
-    };
-
-    const response = await fetch(`${API_BASE_URL}wishlist/user/${userId}`, {
-      method: 'GET',
-      headers: headers,
-    });
-
-    const data = await response.json();
+    const response = await apiGet(`wishlist/user/${userId}`);
     
     return {
-      success: data?.success || false,
-      data: data?.wishlistItems || [],
-      message: data?.message || '',
-      count: data?.count || 0,
+      success: response.success || false,
+      data: response.data?.wishlistItems || [],
+      message: response.message || '',
+      count: response.data?.count || 0,
     };
   } catch (error) {
     console.error('Get wishlist error:', error);
@@ -78,27 +67,15 @@ export const addToWishlist = async (propertyId) => {
       };
     }
 
-    const headers = {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
-    };
-
-    const response = await fetch(`${API_BASE_URL}wishlist/add`, {
-      method: 'POST',
-      headers: headers,
-      body: JSON.stringify({
-        userId,
-        propertyId,
-      }),
+    const response = await apiPost('wishlist/add', {
+      userId,
+      propertyId,
     });
-
-    const data = await response.json();
     
     return {
-      success: data?.success || false,
-      message: data?.message || '',
-      data: data?.wishlistItem || null,
+      success: response.success || false,
+      message: response.message || '',
+      data: response.data?.wishlistItem || null,
     };
   } catch (error) {
     console.error('Add to wishlist error:', error);
@@ -134,23 +111,12 @@ export const checkWishlistStatus = async (propertyId) => {
       };
     }
 
-    const headers = {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
-    };
-
-    const response = await fetch(`${API_BASE_URL}wishlist/check/${userId}/${propertyId}`, {
-      method: 'GET',
-      headers: headers,
-    });
-
-    const data = await response.json();
+    const response = await apiGet(`wishlist/check/${userId}/${propertyId}`);
     
     return {
-      success: data?.success || false,
-      isInWishlist: data?.isInWishlist || false,
-      message: data?.message || '',
+      success: response.success || false,
+      isInWishlist: response.data?.isInWishlist || false,
+      message: response.message || '',
     };
   } catch (error) {
     console.error('Check wishlist status error:', error);
@@ -185,22 +151,11 @@ export const removeFromWishlist = async (propertyId) => {
       };
     }
 
-    const headers = {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
-    };
-
-    const response = await fetch(`${API_BASE_URL}wishlist/remove/${userId}/${propertyId}`, {
-      method: 'DELETE',
-      headers: headers,
-    });
-
-    const data = await response.json();
+    const response = await apiDelete(`wishlist/remove/${userId}/${propertyId}`);
     
     return {
-      success: data?.success || false,
-      message: data?.message || '',
+      success: response.success || false,
+      message: response.message || '',
     };
   } catch (error) {
     console.error('Remove from wishlist error:', error);

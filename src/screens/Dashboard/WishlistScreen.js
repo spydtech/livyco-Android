@@ -245,7 +245,7 @@ const WishlistScreen = props => {
           paddingTop: 10,
           backgroundColor: Colors.secondary,
         }}>
-        <View style={HomeStyle.headerContainerBlue}>
+        <View style={[HomeStyle.headerContainerBlue, {justifyContent: "flex-start"}]}>
           <View style={HomeStyle.profileImgContainer}>
             <TouchableOpacity onPress={gotoBack}>
               <Icons

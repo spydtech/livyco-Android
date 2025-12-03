@@ -27,7 +27,7 @@ import { deviceHight } from "../../utils/DeviceInfo";
 import {setUserToken, getUserTokenSync} from "../../utils/Api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { isDevelopment } from "../../utils/Environment";
-import { BASE_URL } from "../../config/BaseUrl";
+import { apiPost } from "../../utils/apiCall";
 
 const RegisterScreen = (props) => {
   // Basic Details fields
@@ -253,46 +253,23 @@ const RegisterScreen = (props) => {
       console.log("FormData being sent - File URI:", fileUri);
       console.log("FormData being sent - Phone:", phoneNumber);
       console.log("FormData being sent - Name:", name);
-      console.log("Base URL:", BASE_URL);
 
-      // Use fetch API directly instead of custom Api instance
-      const url = `${BASE_URL}auth/client/register-by-client`;
-      console.log("Full URL:", url);
-
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Accept': 'application/json',
-          // Don't set Content-Type - let fetch set it automatically with boundary for FormData
-        },
-        body: formData,
+      // Use reusable API function with FormData support
+      const response = await apiPost('auth/client/register-by-client', formData, {
+        isFormData: true,
+        requireAuth: false,
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {},
       });
 
-      console.log("Response status:", response.status);
-      console.log("Response ok:", response.ok);
-      console.log("Response headers:", response.headers);
+      console.log("Response data:", response);
 
-      // Parse response - handle both success and error cases
-      let responseData;
-      try {
-        const responseText = await response.text();
-        console.log("Response text:", responseText);
-        responseData = responseText ? JSON.parse(responseText) : {};
-      } catch (parseError) {
-        console.error("Failed to parse response as JSON:", parseError);
-        throw new Error("Invalid response from server. Please try again.");
-      }
-
-      console.log("Response data:", responseData);
-
-      if (response.ok && responseData && responseData.success) {
+      if (response.success) {
         // Store the new token if provided
-        if (responseData.token) {
-          await setUserToken(responseData.token);
+        if (response.data?.token) {
+          await setUserToken(response.data.token);
         }
         
-        Alert.alert("Success", responseData.message || "Registration successful", [
+        Alert.alert("Success", response.message || "Registration successful", [
           {
             text: "OK",
             onPress: () => gotoRegister(),
@@ -300,15 +277,15 @@ const RegisterScreen = (props) => {
         ]);
       } else {
         // Handle error responses
-        let errorMessage = responseData?.message || "Failed to register. Please try again.";
+        let errorMessage = response.message || "Failed to register. Please try again.";
         
         // Handle specific HTTP status codes
         if (response.status === 400) {
-          errorMessage = responseData?.message || "Invalid data. Please check all fields.";
+          errorMessage = response.message || "Invalid data. Please check all fields.";
         } else if (response.status === 401) {
           errorMessage = "Authentication failed. Please login again.";
         } else if (response.status === 409) {
-          errorMessage = responseData?.message || "User already exists with this phone or Aadhaar number.";
+          errorMessage = response.message || "User already exists with this phone or Aadhaar number.";
         } else if (response.status === 500) {
           errorMessage = "Server error. Please try again later.";
         }

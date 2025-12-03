@@ -57,7 +57,8 @@ export default function MystayDetailScreen(props) {
             </TouchableOpacity>
           </View>
           <View style={HomeStyle.iconContainer}>
-            <TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => props.navigation.navigate('Notification')}>
               <Icons
                 iconSetName={'Ionicons'}
                 iconName={'notifications-outline'}

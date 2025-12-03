@@ -1,5 +1,4 @@
-import {API_BASE_URL} from '../config/BaseUrl';
-import {getUserToken} from '../utils/Api';
+import {apiGet} from '../utils/apiCall';
 import Api from '../utils/Api';
 
 /**
@@ -8,27 +7,11 @@ import Api from '../utils/Api';
  */
 export const getAllProperties = async () => {
   try {
-    const token = await getUserToken();
-    const headers = {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-    };
-    
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-
-    const response = await fetch(`${API_BASE_URL}auth/properties/client-all`, {
-      method: 'GET',
-      headers: headers,
-    });
-
-    const data = await response.json();
-    
+    const response = await apiGet('auth/properties/client-all', {requireAuth: false});
     return {
-      success: data?.success || false,
-      data: data?.data || [],
-      message: data?.message || '',
+      success: response.success || false,
+      data: response.data?.data || response.data || [],
+      message: response.message || '',
     };
   } catch (error) {
     console.error('Get all properties error:', error);
@@ -69,27 +52,11 @@ export const getApprovedReviews = async () => {
  */
 export const getReviewsByProperty = async (propertyId) => {
   try {
-    const token = await getUserToken();
-    const headers = {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-    };
-    
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-
-    const response = await fetch(`${API_BASE_URL}custom-reviews/property/${propertyId}`, {
-      method: 'GET',
-      headers: headers,
-    });
-
-    const data = await response.json();
-    
+    const response = await apiGet(`custom-reviews/property/${propertyId}`, {requireAuth: false});
     return {
-      success: data?.success || false,
-      data: data?.data || [],
-      message: data?.message || '',
+      success: response.success || false,
+      data: response.data?.data || response.data || [],
+      message: response.message || '',
     };
   } catch (error) {
     console.error('Get reviews by property error:', error);
@@ -108,27 +75,11 @@ export const getReviewsByProperty = async (propertyId) => {
  */
 export const getLocationByProperty = async (propertyId) => {
   try {
-    const token = await getUserToken();
-    const headers = {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-    };
-    
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-
-    const response = await fetch(`${API_BASE_URL}map/${propertyId}`, {
-      method: 'GET',
-      headers: headers,
-    });
-
-    const data = await response.json();
-    
+    const response = await apiGet(`map/${propertyId}`, {requireAuth: false});
     return {
-      success: data?.success || false,
-      data: data?.location || null,
-      message: data?.message || '',
+      success: response.success || false,
+      data: response.data?.location || response.data || null,
+      message: response.message || '',
     };
   } catch (error) {
     console.error('Get location by property error:', error);
@@ -173,26 +124,12 @@ export const getMapByProperty = async (propertyId) => {
  */
 export const getNearbyProperties = async (city, excludePropertyId) => {
   try {
-    const token = await getUserToken();
-    const headers = {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-    };
+    const response = await apiGet('auth/properties/client-all', {requireAuth: false});
     
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-
-    const response = await fetch(`${API_BASE_URL}auth/properties/client-all`, {
-      method: 'GET',
-      headers: headers,
-    });
-
-    const data = await response.json();
-    
-    if (data?.success && data?.data) {
+    if (response.success && response.data) {
+      const properties = Array.isArray(response.data) ? response.data : response.data.data || [];
       // Filter properties in same city, exclude current property, and limit to 3
-      const nearbyProperties = data.data
+      const nearbyProperties = properties
         .filter(item => 
           item.property?.city === city && 
           item.property?._id !== excludePropertyId &&
@@ -210,7 +147,7 @@ export const getNearbyProperties = async (city, excludePropertyId) => {
     return {
       success: false,
       data: [],
-      message: data?.message || '',
+      message: response.message || '',
     };
   } catch (error) {
     console.error('Get nearby properties error:', error);

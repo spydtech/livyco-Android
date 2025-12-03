@@ -3,6 +3,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {Svg, Path} from 'react-native-svg';
+import {navigationRef} from '../utils/navigationRef';
 
 //Screens list
 import SplashScreen from '../screens/auth/SplashScreen';
@@ -42,7 +43,10 @@ import ChangeRequestScreen from '../screens/mystays/ChangeRequestScreen';
 import SuccessRequestScreen from '../screens/mystays/SuccessRequestScreen';
 import ViewStatusScreen from '../screens/mystays/ViewStatusScreen';
 import VacateRoomScreen from '../screens/Dashboard/VacateRoomScreen';
+import VacateSuccessScreen from '../screens/Dashboard/VacateSuccessScreen';
+import VacateStatusScreen from '../screens/Dashboard/VacateStatusScreen';
 import WishlistScreen from '../screens/Dashboard/WishlistScreen';
+import NotificationScreen from '../screens/Dashboard/NotificationScreen';
 import Registerotp from '../screens/auth/Registerotp';
 
 const Stack = createNativeStackNavigator();
@@ -246,7 +250,7 @@ function HomeTabs() {
 
 function AppNavigation(props) {
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       <Stack.Navigator
         initialRouteName="Splash"
         screenOptions={({route, navigation}) => ({
@@ -280,7 +284,10 @@ function AppNavigation(props) {
         <Stack.Screen name="SuccessRequest" component={SuccessRequestScreen} />
         <Stack.Screen name="ViewStatus" component={ViewStatusScreen} />
         <Stack.Screen name="VacateRoom" component={VacateRoomScreen} />
+        <Stack.Screen name="VacateSuccess" component={VacateSuccessScreen} />
+        <Stack.Screen name="VacateStatus" component={VacateStatusScreen} />
         <Stack.Screen name="Wishlist" component={WishlistScreen} />
+        <Stack.Screen name="Notification" component={NotificationScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

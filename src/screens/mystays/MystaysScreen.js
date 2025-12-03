@@ -17,9 +17,10 @@ import Colors from '../../styles/Colors';
 import LayoutStyle from '../../styles/LayoutStyle';
 import MystayScreen from './MystayScreen';
 import TimeSheetScreen from './TimeSheetScreen';
-import {CommonActions} from '@react-navigation/native';
+import {CommonActions, useNavigation} from '@react-navigation/native';
 
 const MystaysScreen = () => {
+  const navigation = useNavigation();
   const [selectedTab, setSelectedTab] = useState('Mystay');
   const renderTabContent = () => {
     switch (selectedTab) {
@@ -64,7 +65,9 @@ const MystaysScreen = () => {
                 iconSize={24}
               />
             </TouchableOpacity>
-            <TouchableOpacity style={{...LayoutStyle.marginLeft5}}>
+            <TouchableOpacity 
+              style={{...LayoutStyle.marginLeft5}}
+              onPress={() => navigation.navigate('Notification')}>
               <Icons
                 iconSetName={'Ionicons'}
                 iconName={'notifications-outline'}

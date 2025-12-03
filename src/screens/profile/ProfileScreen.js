@@ -104,7 +104,9 @@ const ProfileScreen = () => {
             <Text style={[ProfileStyle.headerTitle]}>{'Profile'}</Text>
           </View>
           <View style={MystaysStyle.iconContainer}>
-            <TouchableOpacity style={{ ...LayoutStyle.marginLeft5 }}>
+            <TouchableOpacity 
+              style={{ ...LayoutStyle.marginLeft5 }}
+              onPress={() => navigation.navigate('Notification')}>
               <Icons
                 iconSetName={'Ionicons'}
                 iconName={'notifications-outline'}

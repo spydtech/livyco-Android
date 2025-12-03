@@ -1,5 +1,4 @@
-import {API_BASE_URL} from '../config/BaseUrl';
-import {getUserToken} from '../utils/Api';
+import {apiGet} from '../utils/apiCall';
 
 /**
  * Get food items for a specific booking and day
@@ -9,35 +8,11 @@ import {getUserToken} from '../utils/Api';
  */
 export const getFoodItemsByBookingAndDay = async (bookingId, day) => {
   try {
-    const token = await getUserToken();
-    if (!token) {
-      return {
-        success: false,
-        data: [],
-        message: 'User not authenticated',
-      };
-    }
-
-    const headers = {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    };
-
-    const response = await fetch(
-      `${API_BASE_URL}menu/booking/${bookingId}/day/${day}`,
-      {
-        method: 'GET',
-        headers,
-      },
-    );
-
-    const data = await response.json();
-
+    const response = await apiGet(`menu/booking/${bookingId}/day/${day}`);
     return {
-      success: response.ok && (data?.success ?? true),
-      data: data?.data || [],
-      message: data?.message || '',
+      success: response.success || false,
+      data: response.data?.data || response.data || [],
+      message: response.message || '',
     };
   } catch (error) {
     console.error('Get food items error:', error);
@@ -56,32 +31,11 @@ export const getFoodItemsByBookingAndDay = async (bookingId, day) => {
  */
 export const getFoodItemsByBooking = async (bookingId) => {
   try {
-    const token = await getUserToken();
-    if (!token) {
-      return {
-        success: false,
-        data: [],
-        message: 'User not authenticated',
-      };
-    }
-
-    const headers = {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    };
-
-    const response = await fetch(`${API_BASE_URL}menu/booking/${bookingId}`, {
-      method: 'GET',
-      headers,
-    });
-
-    const data = await response.json();
-
+    const response = await apiGet(`menu/booking/${bookingId}`);
     return {
-      success: response.ok && (data?.success ?? true),
-      data: data?.data || [],
-      message: data?.message || '',
+      success: response.success || false,
+      data: response.data?.data || response.data || [],
+      message: response.message || '',
     };
   } catch (error) {
     console.error('Get food items error:', error);
@@ -100,39 +54,19 @@ export const getFoodItemsByBooking = async (bookingId) => {
  */
 export const getFoodItems = async params => {
   try {
-    const token = await getUserToken();
-    if (!token) {
-      return {
-        success: false,
-        data: [],
-        message: 'User not authenticated',
-      };
-    }
-
     const queryParams = new URLSearchParams();
     if (params?.day) queryParams.append('day', params.day);
     if (params?.category) queryParams.append('category', params.category);
     if (params?.propertyId) queryParams.append('propertyId', params.propertyId);
     if (params?.bookingId) queryParams.append('bookingId', params.bookingId);
 
-    const headers = {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    };
-
-    const url = `${API_BASE_URL}menu/?${queryParams.toString()}`;
-    const response = await fetch(url, {
-      method: 'GET',
-      headers,
-    });
-
-    const data = await response.json();
+    const endpoint = `menu/?${queryParams.toString()}`;
+    const response = await apiGet(endpoint);
 
     return {
-      success: response.ok && (data?.success ?? true),
-      data: data?.data || [],
-      message: data?.message || '',
+      success: response.success || false,
+      data: response.data?.data || response.data || [],
+      message: response.message || '',
     };
   } catch (error) {
     console.error('Get food items error:', error);
@@ -152,37 +86,17 @@ export const getFoodItems = async params => {
  */
 export const getWeeklyMenu = async (bookingId, propertyId = null) => {
   try {
-    const token = await getUserToken();
-    if (!token) {
-      return {
-        success: false,
-        data: {},
-        message: 'User not authenticated',
-      };
-    }
-
     const queryParams = new URLSearchParams();
     queryParams.append('bookingId', bookingId);
     if (propertyId) queryParams.append('propertyId', propertyId);
 
-    const headers = {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    };
-
-    const url = `${API_BASE_URL}menu/weekly?${queryParams.toString()}`;
-    const response = await fetch(url, {
-      method: 'GET',
-      headers,
-    });
-
-    const data = await response.json();
+    const endpoint = `menu/weekly?${queryParams.toString()}`;
+    const response = await apiGet(endpoint);
 
     return {
-      success: response.ok && (data?.success ?? true),
-      data: data?.data || {},
-      message: data?.message || '',
+      success: response.success || false,
+      data: response.data?.data || response.data || {},
+      message: response.message || '',
     };
   } catch (error) {
     console.error('Get weekly menu error:', error);

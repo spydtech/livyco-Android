@@ -366,7 +366,9 @@ const HomeScreen = props => {
               </Text>
             </View>
             <View style={HomeStyle.iconContainer}>
-              <TouchableOpacity style={[HomeStyle.iconPadding10]}>
+              <TouchableOpacity 
+                style={[HomeStyle.iconPadding10]}
+                onPress={() => props.navigation.navigate('Notification')}>
                 <Icons
                   iconSetName={'Ionicons'}
                   iconName={'notifications-outline'}
