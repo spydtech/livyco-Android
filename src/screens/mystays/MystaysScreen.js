@@ -66,7 +66,7 @@ const MystaysScreen = () => {
               />
             </TouchableOpacity>
             <TouchableOpacity 
-              style={{...LayoutStyle.marginLeft5}}
+              style={{...LayoutStyle.marginLeft15}}
               onPress={() => navigation.navigate('Notification')}>
               <Icons
                 iconSetName={'Ionicons'}
@@ -76,14 +76,14 @@ const MystaysScreen = () => {
               />
               <View style={MystaysStyle.smallRound}></View>
             </TouchableOpacity>
-            <TouchableOpacity style={{...LayoutStyle.marginLeft5}}>
+            {/* <TouchableOpacity style={{...LayoutStyle.marginLeft5}}>
               <Icons
                 iconSetName={'FontAwesome6'}
                 iconName={'circle-question'}
                 iconColor={Colors.white}
                 iconSize={24}
               />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
         </View>
       </SafeAreaView>

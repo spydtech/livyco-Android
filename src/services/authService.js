@@ -1,4 +1,4 @@
-import {apiGet, apiPost} from '../utils/apiCall';
+import {apiGet, apiPost, apiPut} from '../utils/apiCall';
 
 /**
  * Register a new user
@@ -125,6 +125,27 @@ export const getUser = async (token) => {
 };
 
 /**
+ * Update user profile
+ * @param {FormData} formData - FormData containing user profile fields and optional profileImage file
+ * @returns {Promise<Object>} Update profile response
+ */
+export const updateUserProfile = async (formData) => {
+  try {
+    return await apiPut('auth/user/profile', formData, {
+      isFormData: true,
+      requireAuth: true,
+    });
+  } catch (error) {
+    return {
+      success: false,
+      data: null,
+      message: error.message || 'Failed to update profile',
+      error: error.message,
+    };
+  }
+};
+
+/**
  * Health check endpoint
  * @returns {Promise<Object>} Health check response
  */
@@ -148,6 +169,7 @@ export default {
   sendOTP,
   verifyOTP,
   getUser,
+  updateUserProfile,
   healthCheck,
 };
 

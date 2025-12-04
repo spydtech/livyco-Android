@@ -60,7 +60,8 @@ export const apiCall = async (endpoint, options = {}) => {
     if (body) {
       if (isFormData || body instanceof FormData) {
         requestBody = body;
-        // Don't set Content-Type for FormData - let browser set it with boundary
+        // Don't set Content-Type for FormData - let fetch set it automatically with boundary
+        // React Native fetch will automatically set multipart/form-data with boundary
         delete requestHeaders['Content-Type'];
       } else {
         requestBody = JSON.stringify(body);

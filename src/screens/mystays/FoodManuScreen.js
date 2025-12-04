@@ -174,7 +174,9 @@ const FoodManuScreen = props => {
                 iconSize={24}
               />
             </TouchableOpacity>
-            <TouchableOpacity style={{...LayoutStyle.marginLeft15}}>
+            <TouchableOpacity 
+              style={{...LayoutStyle.marginLeft15}}
+              onPress={() => props.navigation.navigate('Wishlist')}>
               <Icons
                 iconSetName={'Ionicons'}
                 iconName={'heart-outline'}

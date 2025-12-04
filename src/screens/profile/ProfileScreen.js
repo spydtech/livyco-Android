@@ -10,6 +10,7 @@ import {
   ScrollView,
   Switch,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import MystaysStyle from '../../styles/MystaysStyle';
@@ -21,7 +22,7 @@ import IMAGES from '../../assets/Images';
 import CommonStyles from '../../styles/CommonStyles';
 import { CommonActions, useNavigation } from '@react-navigation/native';
 import { getUser } from '../../services/authService';
-import { getUserToken } from '../../utils/Api';
+import { getUserToken, clearUserToken } from '../../utils/Api';
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
@@ -81,6 +82,42 @@ const ProfileScreen = () => {
     }
     return 'LVC0000000';
   };
+
+  // Handle logout
+  const handleLogout = () => {
+    Alert.alert(
+      'Logout',
+      'Are you sure you want to logout?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Logout',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              // Clear the token from AsyncStorage
+              await clearUserToken();
+              
+              // Reset navigation stack and navigate to Welcome screen
+              navigation.dispatch(
+                CommonActions.reset({
+                  index: 0,
+                  routes: [{ name: 'Welcome' }],
+                })
+              );
+            } catch (error) {
+              console.error('Error during logout:', error);
+              Alert.alert('Error', 'Failed to logout. Please try again.');
+            }
+          },
+        },
+      ],
+      { cancelable: true }
+    );
+  };
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -126,11 +163,11 @@ const ProfileScreen = () => {
         ) : (
           <View style={[ProfileStyle.profileSection]}>
             <View style={[ProfileStyle.userNameContainer]}>
-              <View style={[ProfileStyle.imageContaienr, { padding:5}]}>
+              <View style={[ProfileStyle.imageContaienr, { padding:0}]}>
                 {userData?.profileImage ? (
                   <Image
                     source={{ uri: userData.profileImage }}
-                    style={[ProfileStyle.profileImg]}
+                    style={[ProfileStyle.profileImg, {height: 60, width: 60, resizeMode: "stretch"}]}
                   />
                 ) : (
                   <Image
@@ -153,7 +190,10 @@ const ProfileScreen = () => {
                 </Text>
               </View>
             </View>
-            <TouchableOpacity style={[ProfileStyle.editButton]}>
+            <TouchableOpacity 
+              style={[ProfileStyle.editButton]}
+              onPress={() => navigation.navigate('Register', { isEditMode: true })}
+            >
               <Icons
                 iconSetName={'FontAwesome'}
                 iconName={'edit'}
@@ -233,7 +273,10 @@ const ProfileScreen = () => {
             </View>
           </TouchableOpacity>
         </ScrollView>
-        <TouchableOpacity style={[ProfileStyle.logoutBtn, { marginBottom: 30 }]}>
+        <TouchableOpacity 
+          style={[ProfileStyle.logoutBtn, { marginBottom: 30 }]}
+          onPress={handleLogout}
+        >
           <Text style={[ProfileStyle.logoutText]}>{'Logout'}</Text>
           <Icons
             iconSetName={'MaterialIcons'}

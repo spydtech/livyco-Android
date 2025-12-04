@@ -377,7 +377,9 @@ const HomeScreen = props => {
                 />
                 <View style={HomeStyle.smallRound}></View>
               </TouchableOpacity>
-              <TouchableOpacity style={[HomeStyle.iconPadding10]}>
+              <TouchableOpacity 
+                style={[HomeStyle.iconPadding10]}
+                onPress={() => props.navigation.navigate('Wishlist')}>
                 <Icons
                   iconSetName={'Ionicons'}
                   iconName={'heart-outline'}

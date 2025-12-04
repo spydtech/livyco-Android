@@ -75,7 +75,9 @@ export default function MystayDetailScreen(props) {
                 iconSize={26}
               />
             </TouchableOpacity>
-            <TouchableOpacity style={{...LayoutStyle.marginLeft5}}>
+            <TouchableOpacity 
+              style={{...LayoutStyle.marginLeft5}}
+              onPress={() => props.navigation.navigate('Wishlist')}>
               <Icons
                 iconSetName={'Ionicons'}
                 iconName={'heart-outline'}

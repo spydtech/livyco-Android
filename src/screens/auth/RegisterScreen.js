@@ -28,39 +28,44 @@ import {setUserToken, getUserTokenSync} from "../../utils/Api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { isDevelopment } from "../../utils/Environment";
 import { apiPost } from "../../utils/apiCall";
+import { getUser, updateUserProfile } from "../../services/authService";
 
 const RegisterScreen = (props) => {
+  // Check if in edit mode
+  const isEditMode = props.route?.params?.isEditMode || false;
+  
   // Basic Details fields
-  const [name, setName] = useState(isDevelopment() ? "John Doe" : "");
-  const [email, setEmail] = useState(isDevelopment() ? "john.doe@example.com" : "");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [gender, setGender] = useState("male");
-  const [dob, setDob] = useState("DD/MM/YYYY");
+  const [dob, setDob] = useState("");
   const [dobDate, setDobDate] = useState(null); // Store actual date object
   
   // Contact Information fields
-  const [phoneNumber, setPhoneNumber] = useState(isDevelopment() ? "9876543210" : "");
-  const [location, setLocation] = useState(isDevelopment() ? "New York" : "");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [location, setLocation] = useState("");
   const [selected, setSelected] = useState('student'); // Changed to match backend enum
   const [isEnabled, setIsEnabled] = useState(false);
-  const [organizationName, setOrganizationName] = useState(isDevelopment() ? "ABC Organization" : "");
-  const [emergencyContactName, setEmergencyContactName] = useState(isDevelopment() ? "John Doe" : "");
-  const [emergencyContactNumber, setEmergencyContactNumber] = useState(isDevelopment() ? "9876543210" : "");
-  const [instituteName, setInstituteName] = useState(isDevelopment() ? "ABC Institute" : "");
-  const [guardianName, setGuardianName] = useState(isDevelopment() ? "John Doe" : "");
-  const [guardianContact, setGuardianContact] = useState(isDevelopment() ? "9876543210" : "");
+  const [organizationName, setOrganizationName] = useState("");
+  const [emergencyContactName, setEmergencyContactName] = useState("");
+  const [emergencyContactNumber, setEmergencyContactNumber] = useState("");
+  const [instituteName, setInstituteName] = useState("");
+  const [guardianName, setGuardianName] = useState("");
+  const [guardianContact, setGuardianContact] = useState("");
   
   // KYC fields
-  const [aadhaarNumber, setAadhaarNumber] = useState(isDevelopment() ? "123456789012" : null);
+  const [aadhaarNumber, setAadhaarNumber] = useState("");
   const [aadharPhotoPath, setAadharPhotoPath] = useState(""); // Store the actual file path
   
   // UI state
   const [screenName, setScreenName] = useState("first");
   const [open, setOpen] = useState(false);
   const [profile, setProfile] = useState("");
-  const [doc, setDoc] = useState(isDevelopment() ? "aadhar.jpg" : "");
+  const [doc, setDoc] = useState("");
   const [pickerType, setPickerType] = useState("");
   const [isBottomSheet, setIsBottomSheet] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingUserData, setIsLoadingUserData] = useState(false);
 
   const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
   const gotoUpdateScreen = () => {
@@ -87,37 +92,54 @@ const RegisterScreen = (props) => {
     setPickerType(type);
   };
   const openGallery = () => {
+    const currentPickerType = pickerType; // Capture the current pickerType before closing bottom sheet
     gotoBottomSheetClose();
     ImagePicker.openPicker({
       width: 300,
       height: 400,
     }).then((image) => {
       console.log(image);
-      if (pickerType === "img") {
+      console.log("Picker type:", currentPickerType);
+      if (currentPickerType === "img") {
         setProfile(image.path);
-      } else if (pickerType === "doc") {
+        // Ensure doc fields are not affected
+        if (doc && !aadharPhotoPath) {
+          // Only clear if doc was set but no file path exists (meaning it was a profile selection)
+        }
+      } else if (currentPickerType === "doc") {
         console.log("i am in print==>", image);
         setDoc(image.filename || image.path);
         setAadharPhotoPath(image.path); // Store the actual path for file upload
+        // Ensure profile is not affected when doc is selected
+        if (profile && (profile.startsWith('/') || profile.startsWith('file://') || profile.startsWith('content://'))) {
+          // Profile remains unchanged
+        }
       }
+    }).catch((error) => {
+      console.log("Image picker cancelled or error:", error);
     });
   };
   const openCamera = () => {
+    const currentPickerType = pickerType; // Capture the current pickerType before closing bottom sheet
     gotoBottomSheetClose();
     ImagePicker.openCamera({
       width: 300,
       height: 400,
-      cropping: true,
+      cropping: currentPickerType === "img", // Only crop for profile images
     }).then((image) => {
       console.log("Print the image", image);
-      if (pickerType === "img") {
+      console.log("Picker type:", currentPickerType);
+      if (currentPickerType === "img") {
         setProfile(image.path);
-      } else if (pickerType === "doc") {
+        // Ensure doc fields are not affected
+      } else if (currentPickerType === "doc") {
         console.log("DOC", image);
-        
         setDoc(image.filename || image.path);
         setAadharPhotoPath(image.path); // Store the actual path for file upload
+        // Ensure profile is not affected when doc is selected
       }
+    }).catch((error) => {
+      console.log("Camera cancelled or error:", error);
     });
   };
   const gotoBasicDetails = () => {
@@ -125,6 +147,289 @@ const RegisterScreen = (props) => {
   };
   const gotoContactInfo = () => {
     setScreenName("second");
+  };
+
+  // Load user data when in edit mode
+  useEffect(() => {
+    if (isEditMode) {
+      loadUserData();
+    }
+  }, [isEditMode]);
+
+  const loadUserData = async () => {
+    try {
+      setIsLoadingUserData(true);
+      const token = await AsyncStorage.getItem('userToken');
+      if (!token) {
+        Alert.alert("Error", "Please login first");
+        setIsLoadingUserData(false);
+        return;
+      }
+
+      const response = await getUser(token);
+      console.log("response==>", response);
+      
+      if (response.success && response.data?.user) {
+        const userData = response.data.user;
+        
+        // Populate basic details - always set, use empty string if not present
+        setName(userData.name || "");
+        setEmail(userData.email || "");
+        setGender(userData.gender || "male");
+        if (userData.dob) {
+          const dobMoment = moment(userData.dob);
+          setDob(dobMoment.format("DD-MM-YYYY"));
+          setDobDate(dobMoment.toDate());
+        } else {
+          setDob("");
+          setDobDate(null);
+        }
+        if (userData.profileImage) setProfile(userData.profileImage);
+        
+        // Populate contact information - always set, use empty string if not present
+        setPhoneNumber(userData.phone || "");
+        setLocation(userData.location || "");
+        setSelected(userData.userType || "student");
+        setIsEnabled(userData.whatsappUpdates !== undefined ? userData.whatsappUpdates : false);
+        
+        // Populate user type specific fields - always set, use empty string if not present
+        if (userData.userType === "student") {
+          setInstituteName(userData.instituteName || "");
+          setGuardianName(userData.guardianName || "");
+          setGuardianContact(userData.guardianContact || "");
+          // Clear professional fields
+          setOrganizationName("");
+          setEmergencyContactName("");
+          setEmergencyContactNumber("");
+        } else if (userData.userType === "professional") {
+          setOrganizationName(userData.organizationName || "");
+          setEmergencyContactName(userData.emergencyContactName || "");
+          setEmergencyContactNumber(userData.emergencyContactNumber || "");
+          // Clear student fields
+          setInstituteName("");
+          setGuardianName("");
+          setGuardianContact("");
+        } else {
+          // If userType is not set, clear all type-specific fields
+          setInstituteName("");
+          setGuardianName("");
+          setGuardianContact("");
+          setOrganizationName("");
+          setEmergencyContactName("");
+          setEmergencyContactNumber("");
+        }
+        
+        // Populate KYC fields
+        if (userData.aadhaarNumber) {
+          setAadhaarNumber(userData.aadhaarNumber);
+        } else {
+          setAadhaarNumber("");
+        }
+        if (userData.aadharPhoto) {
+          setDoc(userData.aadharPhoto);
+          // Note: We can't set the file path for existing aadhar photo, user needs to re-upload if changing
+        } else {
+          setDoc("");
+        }
+      } else {
+        Alert.alert("Error", response.message || "Failed to load user data");
+      }
+    } catch (error) {
+      console.error("Error loading user data:", error);
+      Alert.alert("Error", "Failed to load user data. Please try again.");
+    } finally {
+      setIsLoadingUserData(false);
+    }
+  };
+
+  // API call to update user profile
+  const handleUpdateProfile = async () => {
+    // Validation - Basic Details
+    if (!name || name.trim().length === 0) {
+      Alert.alert("Error", "Please enter your full name");
+      return;
+    }
+    
+    if (!email || email.trim().length === 0) {
+      Alert.alert("Error", "Please enter your email address");
+      return;
+    }
+    
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      Alert.alert("Error", "Please enter a valid email address");
+      return;
+    }
+    
+    // Validation - Contact Information
+    if (!phoneNumber || phoneNumber.length < 10) {
+      Alert.alert("Error", "Please enter a valid mobile number");
+      return;
+    }
+
+    if (!location || location.trim().length === 0) {
+      Alert.alert("Error", "Please enter your location");
+      return;
+    }
+
+    if (selected === "professional") {
+      if (!organizationName || !emergencyContactName || !emergencyContactNumber) {
+        Alert.alert("Error", "Please fill all required fields for professional");
+        return;
+      }
+    } else if (selected === "student") {
+      if (!instituteName || !guardianName || !guardianContact) {
+        Alert.alert("Error", "Please fill all required fields for student");
+        return;
+      }
+    }
+
+    setIsLoading(true);
+
+    try {
+      // Get token from AsyncStorage
+      const token = await AsyncStorage.getItem('userToken');
+      
+      if (!token) {
+        Alert.alert("Error", "Please login first");
+        setIsLoading(false);
+        return;
+      }
+
+      const formData = new FormData();
+      
+      // Add profile image if selected (only if it's a new file, not a URL)
+      if (profile && (profile.startsWith('/') || profile.startsWith('file://') || profile.startsWith('content://'))) {
+        // New profile image selected
+        let fileUri = profile;
+        if (Platform.OS === 'android' && !fileUri.startsWith('file://') && !fileUri.startsWith('content://')) {
+          fileUri = fileUri.startsWith('/') ? `file://${fileUri}` : `file:///${fileUri}`;
+        }
+        
+        const getFileType = (uri) => {
+          const ext = uri?.toLowerCase().split('.').pop();
+          if (ext === 'png') return 'image/png';
+          if (ext === 'jpg' || ext === 'jpeg') return 'image/jpeg';
+          return 'image/jpeg';
+        };
+        
+        const fileName = `profile_${Date.now()}.jpg`;
+        const fileType = getFileType(profile);
+        
+        formData.append('profileImage', {
+          uri: fileUri,
+          type: fileType,
+          name: fileName,
+        });
+      }
+
+      // Add basic details fields - ALWAYS send required fields as strings
+      // Ensure all values are strings for FormData compatibility
+      formData.append('name', String(name || '').trim());
+      formData.append('email', String(email || '').trim());
+      formData.append('phone', String(phoneNumber || '').trim());
+      formData.append('location', String(location || '').trim());
+      formData.append('gender', String(gender || 'male'));
+      if (dobDate) {
+        // Format date as YYYY-MM-DD for backend
+        const formattedDob = moment(dobDate).format('YYYY-MM-DD');
+        formData.append('dob', String(formattedDob));
+      } else {
+        formData.append('dob', '');
+      }
+      
+      // Add KYC fields
+      if (aadhaarNumber) {
+        formData.append('aadhaarNumber', String(aadhaarNumber));
+      } else {
+        formData.append('aadhaarNumber', '');
+      }
+      
+      // Add contact information fields - ALWAYS send as strings
+      formData.append('userType', String(selected || 'student'));
+      formData.append('whatsappUpdates', String(isEnabled));
+
+      // Add user type specific fields - ALWAYS send as strings, even if empty
+      if (selected === "student") {
+        formData.append('institute', String(instituteName || '').trim());
+        formData.append('instituteName', String(instituteName || '').trim());
+        formData.append('guardianName', String(guardianName || '').trim());
+        formData.append('guardianContact', String(guardianContact || '').trim());
+        // Clear professional fields
+        formData.append('organizationName', '');
+        formData.append('emergencyContactName', '');
+        formData.append('emergencyContactNumber', '');
+      } else if (selected === "professional") {
+        formData.append('organizationName', String(organizationName || '').trim());
+        formData.append('emergencyContactName', String(emergencyContactName || '').trim());
+        formData.append('emergencyContactNumber', String(emergencyContactNumber || '').trim());
+        // Clear student fields
+        formData.append('institute', '');
+        formData.append('instituteName', '');
+        formData.append('guardianName', '');
+        formData.append('guardianContact', '');
+      } else {
+        // If userType is not set, send empty strings for all type-specific fields
+        formData.append('institute', '');
+        formData.append('instituteName', '');
+        formData.append('guardianName', '');
+        formData.append('guardianContact', '');
+        formData.append('organizationName', '');
+        formData.append('emergencyContactName', '');
+        formData.append('emergencyContactNumber', '');
+      }
+
+      // Verify FormData is properly constructed
+      if (!formData) {
+        Alert.alert("Error", "Failed to prepare form data");
+        setIsLoading(false);
+        return;
+      }
+
+      const response = await updateUserProfile(formData);
+
+      console.log("Update profile response:", response);
+
+      if (response.success) {
+        Alert.alert("Success", response.message || "Profile updated successfully", [
+          {
+            text: "OK",
+            onPress: () => props.navigation.goBack(),
+          },
+        ]);
+      } else {
+        let errorMessage = response.message || "Failed to update profile. Please try again.";
+        
+        if (response.status === 400) {
+          errorMessage = response.message || "Invalid data. Please check all fields.";
+        } else if (response.status === 401) {
+          errorMessage = "Authentication failed. Please login again.";
+        } else if (response.status === 500) {
+          errorMessage = "Server error. Please try again later.";
+        }
+        
+        Alert.alert("Error", errorMessage);
+      }
+    } catch (error) {
+      console.error("Update profile error:", error);
+      
+      let errorMessage = "Failed to update profile. Please try again.";
+      
+      if (error.message) {
+        if (error.message.includes('Network request failed') || error.message.includes('Failed to fetch')) {
+          errorMessage = "Network error. Please check your internet connection and try again.";
+        } else if (error.message.includes('JSON')) {
+          errorMessage = "Invalid response from server. Please try again.";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      Alert.alert("Error", errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // API call to register by client
@@ -325,12 +630,24 @@ const RegisterScreen = (props) => {
         barStyle="dark-content"
         backgroundColor={Colors.goastWhite}
       />
+      {isEditMode && (
+        <View style={{ paddingHorizontal: 20, paddingTop: 10, paddingBottom: 10 }}>
+          <TouchableOpacity onPress={() => props.navigation.goBack()}>
+            <Icons
+              iconSetName={"Ionicons"}
+              iconName={"arrow-back"}
+              iconColor={Colors.black}
+              iconSize={24}
+            />
+          </TouchableOpacity>
+        </View>
+      )}
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={AuthStyle.registerContainer}
       >
         <ScrollView contentContainerStyle={{ paddingHorizontal: 20 }}>
-        <TouchableOpacity style={[AuthStyle.photoContainer]} onPress={() => openImgOption("img")}>
+        <View style={[AuthStyle.photoContainer]}>
           {profile ? (
             <Image source={{ uri: profile }} style={[AuthStyle.profileImg]} />
           ) : (
@@ -343,7 +660,7 @@ const RegisterScreen = (props) => {
               />
             </View>
           )}
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => openImgOption("img")} activeOpacity={0.7}>
               <View style={[AuthStyle.plusIcon, {height: 40, width: 40, justifyContent: "center", alignItems: "center" }]}>
               <Icons
                 iconSetName={"FontAwesome6"}
@@ -353,6 +670,7 @@ const RegisterScreen = (props) => {
               />
             </View>
           </TouchableOpacity>
+        </View>
           {screenName == "first" ? (
             <View>
               <Text style={[AuthStyle.registerTitle]}>{"Basic Details"}</Text>
@@ -373,7 +691,7 @@ const RegisterScreen = (props) => {
                 onPress={() => setOpen(true)}
                 style={[AuthStyle.dateView]}
               >
-                <Text style={[AuthStyle.textDate]}>{dob}</Text>
+                <Text style={[AuthStyle.textDate]}>{dob || "Select date"}</Text>
                 <DatePicker
                   mode={"date"}
                   modal
@@ -488,8 +806,6 @@ const RegisterScreen = (props) => {
                   style={AuthStyle.input}
                   value={location}
                   onChangeText={setLocation}
-                  placeholder="Enter your location"
-                  placeholderTextColor={Colors.placeholder}
                   cursorColor={Colors.secondary}
                 />
               </View>
@@ -626,7 +942,7 @@ const RegisterScreen = (props) => {
               <Text style={[AuthStyle.inputText]}>{"Upload Aadhar Document*"}</Text>
 
               <View style={[AuthStyle.uploadImgContainer]}>
-                <Text>{doc || "No file selected"}</Text>
+                <Text>{doc || ""}</Text>
                 <TouchableOpacity
                   style={[AuthStyle.uploadIcon]}
                   onPress={() => openImgOption("doc")}
@@ -640,14 +956,14 @@ const RegisterScreen = (props) => {
                 </TouchableOpacity>
               </View>
               <View style={{ ...LayoutStyle.marginTop30 }}>
-                {isLoading ? (
+                {isLoading || isLoadingUserData ? (
                   <View style={{ alignItems: "center", padding: 15 }}>
                     <ActivityIndicator size="large" color={Colors.primary} />
                   </View>
                 ) : (
                   <Button
-                    onPress={handleRegisterByClient}
-                    btnName={"SUBMIT"}
+                    onPress={isEditMode ? handleUpdateProfile : handleRegisterByClient}
+                    btnName={isEditMode ? "UPDATE" : "SUBMIT"}
                     bgColor={Colors.primary}
                     btnTextColor={Colors.blackText}
                   />
@@ -655,7 +971,6 @@ const RegisterScreen = (props) => {
               </View>
             </View>
           )}
-        </TouchableOpacity>
       </ScrollView>
       {isBottomSheet && (
         <BottomSheet

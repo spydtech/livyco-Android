@@ -375,7 +375,9 @@ const TrendingScreen = props => {
                 />
                 <View style={HomeStyle.smallRound}></View>
               </TouchableOpacity>
-              <TouchableOpacity style={{...LayoutStyle.marginLeft5}}>
+              <TouchableOpacity 
+                style={{...LayoutStyle.marginLeft5}}
+                onPress={() => props.navigation.navigate('Wishlist')}>
                 <Icons
                   iconSetName={'Ionicons'}
                   iconName={'heart-outline'}
