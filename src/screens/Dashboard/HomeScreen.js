@@ -18,7 +18,7 @@ import HomeStyle from '../../styles/HomeStyle';
 import Colors from '../../styles/Colors';
 import FastImage from 'react-native-fast-image';
 import LayoutStyle from '../../styles/LayoutStyle';
-import { Button, Icons, Input, DropDown } from '../../components';
+import { Button, Icons, Input, DropDown, CitySelectionModal } from '../../components';
 import IMAGES from '../../assets/Images';
 import CommonStyles from '../../styles/CommonStyles';
 import { Dropdown } from "react-native-element-dropdown";
@@ -47,6 +47,7 @@ const HomeScreen = props => {
   const [selectedCity, setSelectedCity] = useState('');
   const [moveInDate, setMoveInDate] = useState('');
   const [moveInDateOpen, setMoveInDateOpen] = useState(false);
+  const [cityModalVisible, setCityModalVisible] = useState(false);
 
   // Dropdown data
   const sharingTypeData = [
@@ -339,6 +340,11 @@ const HomeScreen = props => {
     setMoveInDate(formattedDate);
   };
 
+  const handleCitySelect = (city) => {
+    setSelectedCity(city.name);
+    setCityModalVisible(false);
+  };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -351,14 +357,14 @@ const HomeScreen = props => {
           resizeMode="cover">
           <View style={HomeStyle.headerContainer}>
             <View style={HomeStyle.profileImgContainer}>
-              <View style={HomeStyle.profileView}>
+              <View style={[HomeStyle.profileView, {padding: user?.profileImage ? 0 : 5}]}>
                 <FastImage
-                  style={HomeStyle.profileImg}
+                  style={[HomeStyle.profileImg, {borderRadius: 15}]}
                   source={{
                     uri: user?.profileImage || 'https://cdn.pixabay.com/photo/2014/03/25/16/32/user-297330_1280.png',
                     priority: FastImage.priority.normal,
                   }}
-                  resizeMode={FastImage.resizeMode.cover}
+                  resizeMode={FastImage.resizeMode.stretch}
                 />
               </View>
               <Text style={HomeStyle.userName} numberOfLines={1}>
@@ -518,14 +524,18 @@ const HomeScreen = props => {
                 </View>
 
                 {/* Select City Button */}
-                <TouchableOpacity style={HomeStyle.selectCityButton}>
+                <TouchableOpacity 
+                  style={HomeStyle.selectCityButton}
+                  onPress={() => setCityModalVisible(true)}>
                   <Icons
                     iconSetName={'Ionicons'}
                     iconName={'location'}
                     iconColor={Colors.black}
                     iconSize={20}
                   />
-                  <Text style={HomeStyle.selectCityText}>Select City</Text>
+                  <Text style={HomeStyle.selectCityText}>
+                    {selectedCity || 'Select City'}
+                  </Text>
                 </TouchableOpacity>
 
                 {/* Move In Date */}
@@ -849,6 +859,13 @@ const HomeScreen = props => {
               <Image source={IMAGES.chat} style={[HomeStyle.chatImg]} />
             </TouchableOpacity>
           </>
+
+          {/* City Selection Modal */}
+          <CitySelectionModal
+            visible={cityModalVisible}
+            onClose={() => setCityModalVisible(false)}
+            onSelectCity={handleCitySelect}
+          />
         </ImageBackground>
       </SafeAreaView>
     </KeyboardAvoidingView>

@@ -28,5 +28,16 @@ const IMAGES = {
   category: require('./images/category.png'),
   food: require('./images/food.png'),
   thumbsUp: require('./images/thumbs-up.png'),
+  // City images
+  mumbai: require('./images/mumbai.png'),
+  delhi: require('./images/delhi.png'),
+  bangalore: require('./images/banglore.png'),
+  hyderabad: require('./images/hydrabad.png'),
+  chandigarh: require('./images/chandigrah.png'),
+  ahmedabad: require('./images/ahmedabad.png'),
+  pune: require('./images/pune.png'),
+  chennai: require('./images/chennai.png'),
+  kolkata: require('./images/kolkata.png'),
+  kochi: require('./images/kochi.png'),
 };
 export default IMAGES;

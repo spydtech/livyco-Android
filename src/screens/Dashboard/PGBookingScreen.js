@@ -480,7 +480,27 @@ console.log("propertyData", propertyData);
 
   const handleChat = () => {
     // Navigate to chat screen with owner
-    // props.navigation.navigate('Chat', { userId: owner._id });
+    if (!owner?._id || !propertyId) {
+      showMessage({
+        message: 'Error',
+        description: 'Owner or property information is missing',
+        type: 'danger',
+        floating: true,
+        statusBarHeight: 40,
+        icon: 'auto',
+        autoHide: true,
+        duration: 3000,
+      });
+      return;
+    }
+
+    props.navigation.navigate('MessageList', {
+      recipientId: owner._id || owner.id,
+      propertyId: propertyId,
+      recipientName: owner?.name || 'Owner Name',
+      recipientImage: owner?.profileImage,
+      recipientTag: owner?.email || property?.name || 'Tag',
+    });
   };
   const gotoBack = () => {
     props.navigation.dispatch(CommonActions.goBack());

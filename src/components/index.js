@@ -10,6 +10,7 @@ import DropDown from './DropDown';
 // import AnswerOptions from "./AnswerOptions";
 import BottomSheet from './BottomSheet';
 import Overlay from './Overlay';
+import CitySelectionModal from './CitySelectionModal';
 // import Loader from "./Loader";
 // import RadioButton from "./RadioButton";
 // import ValidationText from "./ValidationText";
@@ -29,6 +30,7 @@ export {
   // AnswerOptions,
   BottomSheet,
   Overlay,
+  CitySelectionModal,
   // Loader,
   // RadioButton,
   // ValidationText,

@@ -6,14 +6,13 @@ import {
   StatusBar,
   SafeAreaView,
   TouchableOpacity,
-  ImageBackground,
 } from 'react-native';
 import React, {useState} from 'react';
+import {CommonActions} from '@react-navigation/native';
 import ChatStyle from '../../styles/ChatStyle';
 import Colors from '../../styles/Colors';
 import {Icons} from '../../components';
 import LayoutStyle from '../../styles/LayoutStyle';
-import IMAGES from '../../assets/Images';
 import ChatListScreen from './ChatListScreen';
 import ContactedScreen from './ContactedScreen';
 
@@ -35,7 +34,7 @@ const ChatsScreen = props => {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={ChatStyle.homeContainer}>
+      style={[ChatStyle.homeContainer, {flex:1}]}>
       <StatusBar barStyle="light-content" backgroundColor={Colors.secondary} />
       <SafeAreaView
         style={{
@@ -57,10 +56,7 @@ const ChatsScreen = props => {
         </View>
       </SafeAreaView>
 
-      <ImageBackground
-        source={IMAGES.primaryBG}
-        style={[ChatStyle.formContainer, {flex: 1}]}
-        resizeMode="cover">
+      <View style={{flex: 1, backgroundColor: Colors.white}}>
         <View style={ChatStyle.tabContainer}>
           <TouchableOpacity
             style={[
@@ -91,8 +87,10 @@ const ChatsScreen = props => {
             </Text>
           </TouchableOpacity>
         </View>
-        {renderTabContent()}
-      </ImageBackground>
+        <View style={{flex: 1, backgroundColor: Colors.white}}>
+          {renderTabContent()}
+        </View>
+      </View>
     </KeyboardAvoidingView>
   );
 };
