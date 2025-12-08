@@ -4,7 +4,7 @@ import {
   ImageBackground,
   KeyboardAvoidingView,
   Platform,
-  SafeAreaView,
+  // SafeAreaView,
   ScrollView,
   StatusBar,
   Text,
@@ -12,6 +12,7 @@ import {
   View,
   ActivityIndicator,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import React, {useState, useEffect} from 'react';
 import {CommonActions} from '@react-navigation/native';
 import HomeStyle from '../../styles/HomeStyle';
@@ -148,9 +149,8 @@ const FoodManuScreen = props => {
       <StatusBar barStyle="light-content" backgroundColor={Colors.secondary} />
       <SafeAreaView
         style={{
-          paddingTop: 10,
           backgroundColor: Colors.secondary,
-        }}>
+        }} edges={['top']}>
         <View style={MystaysStyle.headerContainerBlue}>
           <TouchableOpacity
             onPress={() => {

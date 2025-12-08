@@ -5,12 +5,13 @@ import {
   Platform,
   StatusBar,
   TouchableOpacity,
-  SafeAreaView,
+  // SafeAreaView,
   FlatList,
   TextInput,
   ActivityIndicator,
   Keyboard,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { Icons } from '../../components';
 import FastImage from 'react-native-fast-image';
@@ -243,9 +244,8 @@ console.log("item", item, currentUserId);
       <StatusBar barStyle="light-content" backgroundColor={Colors.secondary} />
       <SafeAreaView
         style={{
-          paddingTop: 10,
           backgroundColor: Colors.secondary,
-        }}>
+        }} edges={['top']}>
         <View style={ChatStyle.headerContainerBlue}>
           <View style={ChatStyle.profileImgContainer}>
             <TouchableOpacity onPress={() => gotoBack()}>

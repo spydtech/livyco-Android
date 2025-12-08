@@ -5,10 +5,11 @@ import {
   Platform,
   StatusBar,
   TouchableOpacity,
-  SafeAreaView,
+  // SafeAreaView,
   ScrollView,
   Image,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import React from 'react';
 import HomeStyle from '../../styles/HomeStyle';
 import Colors from '../../styles/Colors';
@@ -39,9 +40,8 @@ export default function MystayDetailScreen(props) {
       <StatusBar barStyle="light-content" backgroundColor={Colors.secondary} />
       <SafeAreaView
         style={{
-          paddingTop: 10,
           backgroundColor: Colors.secondary,
-        }}>
+        }} edges={['top']}>
         <View style={HomeStyle.headerContainerBlue}>
           <View style={HomeStyle.profileImgContainer}>
             <TouchableOpacity

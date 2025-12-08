@@ -5,7 +5,7 @@ import {
   StatusBar,
   TouchableOpacity,
   KeyboardAvoidingView,
-  SafeAreaView,
+  // SafeAreaView,
   ImageBackground,
   ScrollView,
   FlatList,
@@ -13,6 +13,7 @@ import {
   ActivityIndicator,
   Linking,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import React, { useState, useEffect } from 'react';
 import HomeStyle from '../../styles/HomeStyle';
 import Colors from '../../styles/Colors';
@@ -29,6 +30,7 @@ import { useCallback } from 'react';
 import { getReviewsByProperty, getLocationByProperty, getNearbyProperties, getMapByProperty } from '../../services/homeService';
 import MapView, { Marker } from 'react-native-maps';
 import AuthStyle from '../../styles/AuthStyle';
+import { isGuestUser, showGuestRestrictionAlert } from '../../utils/authUtils';
 
 const PGBookingScreen = props => {
   const propertyData = props.route?.params?.propertyData;
@@ -307,12 +309,24 @@ const PGBookingScreen = props => {
     setIsBottomSheet(false);
   };
 
-  const gotoContactClick = () => {
+  const gotoContactClick = async () => {
+    // Check if user is a guest before allowing contact
+    const isGuest = await isGuestUser();
+    if (isGuest) {
+      showGuestRestrictionAlert(props.navigation);
+      return;
+    }
     setIsBottomSheet(true);
     setIsContact(true);
   };
 
-  const gotoBookClick = () => {
+  const gotoBookClick = async () => {
+    // Check if user is a guest before allowing booking
+    const isGuest = await isGuestUser();
+    if (isGuest) {
+      showGuestRestrictionAlert(props.navigation);
+      return;
+    }
     setIsBottomSheet(true);
     setIsContact(false);
   };
@@ -472,13 +486,25 @@ console.log("propertyData", propertyData);
     );
   };
 
-  const handleCall = () => {
+  const handleCall = async () => {
+     // Check if user is a guest before allowing booking
+     const isGuest = await isGuestUser();
+     if (isGuest) {
+       showGuestRestrictionAlert(props.navigation);
+       return;
+     }
     if (owner?.phone) {
       Linking.openURL(`tel:${owner.phone}`);
     }
   };
 
-  const handleChat = () => {
+  const handleChat = async() => {
+     // Check if user is a guest before allowing booking
+     const isGuest = await isGuestUser();
+     if (isGuest) {
+       showGuestRestrictionAlert(props.navigation);
+       return;
+     }
     // Navigate to chat screen with owner
     if (!owner?._id || !propertyId) {
       showMessage({
@@ -516,9 +542,8 @@ console.log("propertyData", propertyData);
       <StatusBar barStyle="light-content" backgroundColor={Colors.secondary} />
       <SafeAreaView
         style={{
-          paddingTop: 10,
           backgroundColor: Colors.secondary,
-        }}>
+        }} edges={['top']}>
         <View style={HomeStyle.headerContainerBlue}>
           <View style={HomeStyle.profileImgContainer}>
             <TouchableOpacity

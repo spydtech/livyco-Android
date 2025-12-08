@@ -6,8 +6,9 @@ import {
   StatusBar,
   TouchableOpacity,
   ScrollView,
-  SafeAreaView,
+  // SafeAreaView,
 } from "react-native";
+import { SafeAreaView } from 'react-native-safe-area-context';
 import React from "react";
 import PaymentStyle from "../../styles/PaymentStyle";
 import Colors from "../../styles/Colors";
@@ -27,9 +28,8 @@ const HistoryDetailScreen = (props) => {
       <StatusBar barStyle="light-content" backgroundColor={Colors.secondary} />
       <SafeAreaView
         style={{
-          paddingTop: 10,
           backgroundColor: Colors.secondary,
-        }}
+        }} edges={['top']}
       >
         <View style={[PaymentStyle.headerContainerBlue]}>
           <TouchableOpacity onPress={() => gotoBack()}>

@@ -54,6 +54,7 @@ export const sendFirebaseOTP = async (phoneNumber) => {
       ? phoneNumber 
       : `+91${phoneNumber}`;
     const confirmation = await auth().signInWithPhoneNumber(formattedPhone);
+    console.log("confirmation", confirmation);
     
     return {
       success: true,

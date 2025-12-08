@@ -4,6 +4,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {Svg, Path} from 'react-native-svg';
 import {navigationRef} from '../utils/navigationRef';
+import {isGuestUser, showGuestRestrictionAlert} from '../utils/authUtils';
 
 //Screens list
 import SplashScreen from '../screens/auth/SplashScreen';
@@ -235,6 +236,25 @@ function HomeTabs() {
                 </Svg>
               </View>
             );
+          },
+        })}
+        listeners={({ navigation, route }) => ({
+          tabPress: async (e) => {
+            console.log("tabPress", route.name);
+            
+            // Allow HomeTab always
+            if (route.name === 'HomeTab') {
+              return;
+            }
+
+            // Check if user is a guest for other tabs
+            const isGuest = await isGuestUser();
+            if (isGuest) {
+              // Prevent default navigation
+              e.preventDefault();
+              // Show alert and navigate to Register
+              showGuestRestrictionAlert(navigation);
+            }
           },
         })}
       >

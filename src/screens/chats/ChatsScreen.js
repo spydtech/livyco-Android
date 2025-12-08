@@ -4,20 +4,38 @@ import {
   KeyboardAvoidingView,
   Platform,
   StatusBar,
-  SafeAreaView,
+  // SafeAreaView,
   TouchableOpacity,
 } from 'react-native';
 import React, {useState} from 'react';
-import {CommonActions} from '@react-navigation/native';
+import {CommonActions, useFocusEffect} from '@react-navigation/native';
 import ChatStyle from '../../styles/ChatStyle';
 import Colors from '../../styles/Colors';
 import {Icons} from '../../components';
 import LayoutStyle from '../../styles/LayoutStyle';
 import ChatListScreen from './ChatListScreen';
 import ContactedScreen from './ContactedScreen';
+import {isGuestUser, showGuestRestrictionAlert} from '../../utils/authUtils';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const ChatsScreen = props => {
   const [selectedTab, setSelectedTab] = useState('ChatList');
+
+  // Check guest status when screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      const checkGuestStatus = async () => {
+        const isGuest = await isGuestUser();
+        if (isGuest) {
+          // Redirect to HomeTab if guest
+          props.navigation.navigate('HomeTab');
+          showGuestRestrictionAlert(props.navigation);
+        }
+      };
+      checkGuestStatus();
+    }, [props.navigation])
+  );
+
   const renderTabContent = () => {
     switch (selectedTab) {
       case 'ChatList':
@@ -38,9 +56,9 @@ const ChatsScreen = props => {
       <StatusBar barStyle="light-content" backgroundColor={Colors.secondary} />
       <SafeAreaView
         style={{
-          paddingTop: 10,
+          // paddingTop: 10,
           backgroundColor: Colors.secondary,
-        }}>
+        }} edges={['top']}>
         <View style={ChatStyle.headerContainerBlue}>
           <View style={ChatStyle.profileImgContainer}>
             <TouchableOpacity onPress={() => gotoBack()}>

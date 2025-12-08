@@ -5,13 +5,14 @@ import {
   Platform,
   StatusBar,
   TouchableOpacity,
-  SafeAreaView,
+  // SafeAreaView,
   Image,
   ScrollView,
   Switch,
   ActivityIndicator,
   Alert,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import React, { useState, useEffect } from 'react';
 import MystaysStyle from '../../styles/MystaysStyle';
 import Colors from '../../styles/Colors';
@@ -20,14 +21,30 @@ import LayoutStyle from '../../styles/LayoutStyle';
 import ProfileStyle from '../../styles/ProfileStyle';
 import IMAGES from '../../assets/Images';
 import CommonStyles from '../../styles/CommonStyles';
-import { CommonActions, useNavigation } from '@react-navigation/native';
+import { CommonActions, useNavigation, useFocusEffect } from '@react-navigation/native';
 import { getUser } from '../../services/authService';
 import { getUserToken, clearUserToken } from '../../utils/Api';
+import { isGuestUser, showGuestRestrictionAlert } from '../../utils/authUtils';
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // Check guest status when screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      const checkGuestStatus = async () => {
+        const isGuest = await isGuestUser();
+        if (isGuest) {
+          // Redirect to HomeTab if guest
+          navigation.navigate('HomeTab');
+          showGuestRestrictionAlert(navigation);
+        }
+      };
+      checkGuestStatus();
+    }, [navigation])
+  );
 
   const gotoBack = () => {
     navigation.dispatch(CommonActions.goBack());
@@ -125,9 +142,8 @@ const ProfileScreen = () => {
       <StatusBar barStyle="light-content" backgroundColor={Colors.secondary} />
       <SafeAreaView
         style={{
-          paddingTop: 10,
           backgroundColor: Colors.secondary,
-        }}>
+        }} edges={['top']}>
         <View style={MystaysStyle.headerContainerBlue}>
           <View style={MystaysStyle.profileImgContainer}>
             <TouchableOpacity onPress={() => gotoBack()}>

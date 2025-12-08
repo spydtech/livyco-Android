@@ -1,7 +1,6 @@
 import {
   View,
   Text,
-  SafeAreaView,
   KeyboardAvoidingView,
   StatusBar,
   TouchableOpacity,
@@ -28,6 +27,9 @@ import moment from 'moment';
 import { getUser } from '../../services/authService';
 import { getAllProperties, getApprovedReviews } from '../../services/homeService';
 import { getUserToken } from '../../utils/Api';
+import { isGuestUser, showGuestRestrictionAlert } from '../../utils/authUtils';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useFocusEffect } from '@react-navigation/native';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -99,6 +101,14 @@ const HomeScreen = props => {
     fetchHomeData();
   }, []);
 
+  // Update StatusBar when screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      StatusBar.setBarStyle('dark-content');
+      StatusBar.setBackgroundColor(Colors.white);
+    }, [])
+  );
+
   const fetchHomeData = async () => {
     try {
       setLoading(true);
@@ -134,7 +144,14 @@ const HomeScreen = props => {
     }
   };
 
-  const gotoPGDetails = (item) => {
+  const gotoPGDetails = async (item) => {
+    // Check if user is a guest before allowing booking
+    const isGuest = await isGuestUser();
+    if (isGuest) {
+      showGuestRestrictionAlert(props.navigation);
+      return;
+    }
+
     // Pass the complete property data object
     const propertyData = {
       property: item.property || {},
@@ -346,11 +363,11 @@ const HomeScreen = props => {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={HomeStyle.homeContainer}>
-      <StatusBar barStyle="dark-content" backgroundColor={Colors.white} />
-      <SafeAreaView style={{ flex: 1, backgroundColor: Colors.white }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.white }} edges={['top']}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={HomeStyle.homeContainer}>
+        <StatusBar barStyle="dark-content" backgroundColor={Colors.white} />
         <ImageBackground
           source={IMAGES.primaryBG}
           style={HomeStyle.formContainer}
@@ -867,8 +884,8 @@ const HomeScreen = props => {
             onSelectCity={handleCitySelect}
           />
         </ImageBackground>
-      </SafeAreaView>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 

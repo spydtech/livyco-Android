@@ -1,10 +1,11 @@
-import { LogBox, SafeAreaView, Text, View } from 'react-native';
+import { LogBox, Text, View } from 'react-native';
 import React from 'react';
 import FlashMessage from 'react-native-flash-message';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import AppNavigation from './navigations/AppNavigation';
 import {
   SafeAreaProvider,
+  SafeAreaView,
   initialWindowMetrics,
 } from 'react-native-safe-area-context';
 
@@ -20,10 +21,10 @@ const App = () => {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-        <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
+        {/* <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}> */}
           <FlashMessage position="top" />
           <AppNavigation />
-        </SafeAreaView>
+        {/* </SafeAreaView> */}
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

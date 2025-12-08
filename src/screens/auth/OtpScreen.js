@@ -13,6 +13,7 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
+import auth from '@react-native-firebase/auth';
 import IMAGES from '../../assets/Images';
 import {Button, Icons} from '../../components';
 import Colors from '../../styles/Colors';
@@ -34,6 +35,9 @@ const OtpScreen = props => {
   const [confirmation, setConfirmation] = useState(null);
   const [isLogin, setIsLogin] = useState(false);
   const [registrationData, setRegistrationData] = useState(null);
+  const [isAutoVerified, setIsAutoVerified] = useState(false);
+  const [showOtpInput, setShowOtpInput] = useState(true);
+  const [autoVerificationProcessed, setAutoVerificationProcessed] = useState(false);
 
   // Get phone number and confirmation from navigation params
   useEffect(() => {
@@ -46,6 +50,93 @@ const OtpScreen = props => {
     setIsLogin(login);
     setRegistrationData(regData);
   }, [props.route?.params]);
+
+  // Handle auto-verification when user is authenticated
+  const handleAutoVerification = async (user) => {
+    if (!user || autoVerificationProcessed) {
+      return;
+    }
+
+    console.log('Firebase auto-verification detected for user:', user.phoneNumber);
+    
+    // Mark as processed to prevent multiple triggers
+    setAutoVerificationProcessed(true);
+    setIsAutoVerified(true);
+    setShowOtpInput(false);
+    setLoading(true);
+
+    try {
+      // Get ID token from Firebase user
+      const idToken = await user.getIdToken();
+      console.log('ID token obtained from auto-verified user');
+
+      // Verify with backend
+      const backendResponse = await verifyFirebaseOTP({
+        idToken: idToken,
+      });
+      console.log("Backend Response (Auto-verified)", backendResponse);
+
+      if (backendResponse.success && backendResponse.data?.token) {
+        // Store token
+        await setUserToken(backendResponse.data.token);
+
+        Alert.alert(
+          'Success',
+          'OTP auto-verified! Login successful.',
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                props.navigation.replace('Success');
+              },
+            },
+          ],
+        );
+      } else {
+        const errorMessage = backendResponse.message || 'Verification failed. Please try again.';
+        setError(errorMessage);
+        setShowOtpInput(true);
+        setIsAutoVerified(false);
+        setAutoVerificationProcessed(false);
+        console.error('Backend verification error:', backendResponse);
+      }
+    } catch (error) {
+      console.error('Auto-verification error:', error);
+      Alert.alert('Error', 'An error occurred during auto-verification. Please enter OTP manually.');
+      setShowOtpInput(true);
+      setIsAutoVerified(false);
+      setAutoVerificationProcessed(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Check initial auth state and set up listener for auto-verification
+  useEffect(() => {
+    // Only set up listener in production mode (Firebase mode)
+    if (isDevelopment() || !confirmation || confirmation?.isDevelopment) {
+      return;
+    }
+
+    // Check if user is already authenticated when component mounts
+    const currentUser = auth().currentUser;
+    if (currentUser && !autoVerificationProcessed) {
+      handleAutoVerification(currentUser);
+      return;
+    }
+
+    // Set up auth state listener to detect auto-verification
+    const unsubscribe = auth().onAuthStateChanged(async (user) => {
+      if (user && !autoVerificationProcessed) {
+        handleAutoVerification(user);
+      }
+    });
+
+    // Cleanup listener on unmount
+    return () => {
+      unsubscribe();
+    };
+  }, [confirmation, autoVerificationProcessed]);
 
   const handleChange = (text, index) => {
     const newOtp = [...otp];
@@ -85,6 +176,12 @@ const OtpScreen = props => {
 
     if (!confirmation && !isDevelopment()) {
       setError('OTP session expired. Please request a new OTP.');
+      return;
+    }
+
+    // Check if already auto-verified
+    if (isAutoVerified) {
+      setError('OTP was already auto-verified. Please wait...');
       return;
     }
 
@@ -137,7 +234,39 @@ console.log("confirmation", confirmation);
       console.log('firebaseresult', firebaseResult);
 
       if (!firebaseResult.success) {
-        setError(firebaseResult.message || 'Invalid OTP. Please try again.');
+        // Check if error is due to code already being used (auto-verification)
+        if (firebaseResult.error?.includes('session-expired') || 
+            firebaseResult.error?.includes('code-expired') ||
+            firebaseResult.message?.includes('already been used')) {
+          setError('OTP was already verified automatically. Please wait...');
+          // Try to get current user and proceed
+          const currentUser = auth().currentUser;
+          if (currentUser) {
+            try {
+              const idToken = await currentUser.getIdToken();
+              const backendResponse = await verifyFirebaseOTP({
+                idToken: idToken,
+              });
+              if (backendResponse.success && backendResponse.data?.token) {
+                await setUserToken(backendResponse.data.token);
+                Alert.alert('Success', 'OTP auto-verified! Login successful.', [
+                  {
+                    text: 'OK',
+                    onPress: () => {
+                      props.navigation.replace('Success');
+                    },
+                  },
+                ]);
+                setLoading(false);
+                return;
+              }
+            } catch (err) {
+              console.error('Error getting token from current user:', err);
+            }
+          }
+        } else {
+          setError(firebaseResult.message || 'Invalid OTP. Please try again.');
+        }
         setLoading(false);
         return;
       }
@@ -169,8 +298,40 @@ console.log("confirmation", confirmation);
         console.error('Backend verification error:', backendResponse);
       }
     } catch (error) {
-      Alert.alert('Error', 'An unexpected error occurred. Please try again.');
-      console.error('OTP verification error:', error);
+      // Check if error is due to code already being used (auto-verification)
+      if (error.message?.includes('session-expired') || 
+          error.message?.includes('code-expired') ||
+          error.message?.includes('already been used')) {
+        setError('OTP was already verified automatically. Please wait...');
+        // Try to get current user and proceed
+        const currentUser = auth().currentUser;
+        if (currentUser) {
+          try {
+            const idToken = await currentUser.getIdToken();
+            const backendResponse = await verifyFirebaseOTP({
+              idToken: idToken,
+            });
+            if (backendResponse.success && backendResponse.data?.token) {
+              await setUserToken(backendResponse.data.token);
+              Alert.alert('Success', 'OTP auto-verified! Login successful.', [
+                {
+                  text: 'OK',
+                  onPress: () => {
+                    props.navigation.replace('Success');
+                  },
+                },
+              ]);
+              setLoading(false);
+              return;
+            }
+          } catch (err) {
+            console.error('Error getting token from current user:', err);
+          }
+        }
+      } else {
+        Alert.alert('Error', 'An unexpected error occurred. Please try again.');
+        console.error('OTP verification error:', error);
+      }
     } finally {
       setLoading(false);
     }
@@ -204,6 +365,7 @@ console.log("confirmation", confirmation);
 
       // Send OTP using Firebase
       const otpResponse = await sendFirebaseOTP(phoneNumber.trim());
+console.log("firebase otp response", otpResponse);
 
       if (otpResponse.success) {
         setConfirmation(otpResponse.confirmation);
@@ -235,42 +397,57 @@ console.log("confirmation", confirmation);
             <Text style={AuthStyle.loginTitle}>{'OTP Verification'}</Text>
             <View style={{...CommonStyles.directionRowCenter}}>
               <Text style={AuthStyle.loginSubtitle}>
-                {`Enter 6 digit OTP sent to +91 ${phoneNumber || '******'}`}
+                {isAutoVerified 
+                  ? 'Auto-verifying OTP! Logging you in...'
+                  : `Enter 6 digit OTP sent to +91 ${phoneNumber || '******'}`}
               </Text>
             </View>
           </View>
-          <View style={[AuthStyle.otpBoxContainer]}>
-            {otp.map((digit, index) => (
-              <TextInput
-                key={index}
-                ref={el => (inputRefs.current[index] = el)}
-                value={digit}
-                cursorColor={Colors.secondary}
-                style={[AuthStyle.otpBox]}
-                keyboardType="numeric"
-                maxLength={1}
-                returnKeyType="next"
-                autoFocus={index === 0}
-                onChangeText={text => handleChange(text, index)}
-                onKeyPress={e => handleKeyPress(e, index)}
-                selectTextOnFocus={true}
-              />
-            ))}
-          </View>
+          {isAutoVerified && (
+            <View style={{...LayoutStyle.marginTop20, alignItems: 'center'}}>
+              <ActivityIndicator size="large" color={Colors.secondary} />
+              <Text style={[AuthStyle.inputLabel, {color: Colors.secondary, marginTop: 10}]}>
+                OTP was automatically verified. Please wait...
+              </Text>
+            </View>
+          )}
+          {showOtpInput && (
+            <View style={[AuthStyle.otpBoxContainer]}>
+              {otp.map((digit, index) => (
+                <TextInput
+                  key={index}
+                  ref={el => (inputRefs.current[index] = el)}
+                  value={digit}
+                  cursorColor={Colors.secondary}
+                  style={[AuthStyle.otpBox]}
+                  keyboardType="numeric"
+                  maxLength={1}
+                  returnKeyType="next"
+                  autoFocus={index === 0}
+                  onChangeText={text => handleChange(text, index)}
+                  onKeyPress={e => handleKeyPress(e, index)}
+                  selectTextOnFocus={true}
+                  editable={!isAutoVerified && !loading}
+                />
+              ))}
+            </View>
+          )}
           {error ? (
             <Text style={[AuthStyle.inputLabel, {color: Colors.danger, fontSize: 12, textAlign: 'center', marginTop: 10}]}>
               {error}
             </Text>
           ) : null}
-          <View style={{...LayoutStyle.paddingTop30}}>
-            <Button
-              onPress={handleVerifyOTP}
-              btnName={loading ? 'VERIFYING...' : 'VERIFY OTP'}
-              bgColor={loading ? Colors.gray : Colors.primary}
-              btnTextColor={Colors.blackText}
-              disabled={loading}
-            />
-          </View>
+          {showOtpInput && (
+            <View style={{...LayoutStyle.paddingTop30}}>
+              <Button
+                onPress={handleVerifyOTP}
+                btnName={loading ? 'VERIFYING...' : 'VERIFY OTP'}
+                bgColor={loading || isAutoVerified ? Colors.gray : Colors.primary}
+                btnTextColor={Colors.blackText}
+                disabled={loading || isAutoVerified}
+              />
+            </View>
+          )}
           {loading && (
             <View style={{...LayoutStyle.marginTop10, alignItems: 'center'}}>
               <ActivityIndicator size="small" color={Colors.secondary} />

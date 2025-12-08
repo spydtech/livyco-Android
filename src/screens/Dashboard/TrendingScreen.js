@@ -3,7 +3,7 @@ import {
   Text,
   KeyboardAvoidingView,
   StatusBar,
-  SafeAreaView,
+  // SafeAreaView,
   TouchableOpacity,
   ImageBackground,
   FlatList,
@@ -11,17 +11,18 @@ import {
   Platform,
   ActivityIndicator,
 } from 'react-native';
-import React, {useState, useEffect} from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import React, { useState, useEffect } from 'react';
 import HomeStyle from '../../styles/HomeStyle';
 import Colors from '../../styles/Colors';
-import {BottomSheet, Icons, Input} from '../../components';
+import { BottomSheet, Icons, Input } from '../../components';
 import LayoutStyle from '../../styles/LayoutStyle';
 import IMAGES from '../../assets/Images';
 import CommonStyles from '../../styles/CommonStyles';
-import {deviceHight} from '../../utils/DeviceInfo';
+import { deviceHight } from '../../utils/DeviceInfo';
 import FilterComponent from './FilterComponent';
-import {CommonActions} from '@react-navigation/native';
-import {getAllProperties} from '../../services/homeService';
+import { CommonActions } from '@react-navigation/native';
+import { getAllProperties } from '../../services/homeService';
 import FastImage from 'react-native-fast-image';
 
 const TrendingScreen = props => {
@@ -50,12 +51,12 @@ const TrendingScreen = props => {
     try {
       setLoading(true);
       const response = await getAllProperties();
-      console.log("response",response);
-      
+      console.log('response', response);
+
       if (response.success && response.data) {
         // Filter only approved properties with PG data
         const approvedPGProperties = response.data.filter(
-          item => item.property?.status === 'approved' && item.pgProperty
+          item => item.property?.status === 'approved' && item.pgProperty,
         );
         setOriginalList(approvedPGProperties);
         setPgList(approvedPGProperties);
@@ -68,14 +69,16 @@ const TrendingScreen = props => {
   };
 
   // Get minimum price from property
-  const getMinPrice = (item) => {
+  const getMinPrice = item => {
     if (!item?.rooms?.roomTypes || item.rooms.roomTypes.length === 0) return 0;
-    const prices = item.rooms.roomTypes.map(room => room.price || 0).filter(p => p > 0);
+    const prices = item.rooms.roomTypes
+      .map(room => room.price || 0)
+      .filter(p => p > 0);
     return prices.length > 0 ? Math.min(...prices) : 0;
   };
 
   // Apply filters based on filterData
-  const applyFilters = (list) => {
+  const applyFilters = list => {
     if (!filterData) return list;
 
     let filtered = [...list];
@@ -83,9 +86,9 @@ const TrendingScreen = props => {
     // Filter by gender
     if (filterData.gender) {
       const genderMap = {
-        'Male': 'Male',
-        'Female': 'Female',
-        'Co-Living': 'Co Living'
+        Male: 'Male',
+        Female: 'Female',
+        'Co-Living': 'Co Living',
       };
       const targetGender = genderMap[filterData.gender] || filterData.gender;
       filtered = filtered.filter(item => {
@@ -102,9 +105,10 @@ const TrendingScreen = props => {
         'Triple Sharing': 'Triple',
         'Four Sharing': 'Four',
         'Five Sharing': 'Five',
-        'Five + Sharing': 'Five+'
+        'Five + Sharing': 'Five+',
       };
-      const targetRoomType = roomTypeMap[filterData.roomType] || filterData.roomType;
+      const targetRoomType =
+        roomTypeMap[filterData.roomType] || filterData.roomType;
       filtered = filtered.filter(item => {
         const roomTypes = item.rooms?.roomTypes || [];
         return roomTypes.some(room => {
@@ -125,9 +129,11 @@ const TrendingScreen = props => {
     // Filter by amenities
     if (filterData.amenities && filterData.amenities.length > 0) {
       filtered = filtered.filter(item => {
-        const propertyAmenities = (item.pgProperty?.amenities || []).map(a => a.toLowerCase());
-        return filterData.amenities.some(amenity => 
-          propertyAmenities.some(pa => pa.includes(amenity.toLowerCase()))
+        const propertyAmenities = (item.pgProperty?.amenities || []).map(a =>
+          a.toLowerCase(),
+        );
+        return filterData.amenities.some(amenity =>
+          propertyAmenities.some(pa => pa.includes(amenity.toLowerCase())),
         );
       });
     }
@@ -145,7 +151,7 @@ const TrendingScreen = props => {
   };
 
   // Apply sorting based on selected option
-  const applySorting = (list) => {
+  const applySorting = list => {
     if (!selected) return list;
 
     const sorted = [...list];
@@ -182,13 +188,13 @@ const TrendingScreen = props => {
   // Apply both filters and sorting
   const applyFiltersAndSort = () => {
     let result = [...originalList];
-    
+
     // Apply filters first
     result = applyFilters(result);
-    
+
     // Then apply sorting
     result = applySorting(result);
-    
+
     setPgList(result);
   };
   const options = [
@@ -198,13 +204,13 @@ const TrendingScreen = props => {
     'Freshness',
   ];
 
-  const gotoBooking = (propertyData) => {
+  const gotoBooking = propertyData => {
     props.navigation.navigate('PGBooking', { propertyData });
   };
   const handleRating = selectedRating => {
     setRating(selectedRating);
   };
-  const renderPGList = ({item, index}) => {
+  const renderPGList = ({ item, index }) => {
     if (!item || !item.property || !item.pgProperty) return null;
 
     const property = item.property;
@@ -216,12 +222,16 @@ const TrendingScreen = props => {
     const propertyImage = media?.images?.[0]?.url || IMAGES.bed;
     const propertyName = property.name || 'PG Property';
     const gender = pgProperty.gender || 'Co Living';
-    const location = `${property.locality || ''}, ${property.city || ''}`.trim();
-    
+    const location = `${property.locality || ''}, ${
+      property.city || ''
+    }`.trim();
+
     // Get minimum price from room types
     let minPrice = 0;
     if (rooms?.roomTypes && rooms.roomTypes.length > 0) {
-      const prices = rooms.roomTypes.map(room => room.price || 0).filter(p => p > 0);
+      const prices = rooms.roomTypes
+        .map(room => room.price || 0)
+        .filter(p => p > 0);
       minPrice = prices.length > 0 ? Math.min(...prices) : 0;
     }
 
@@ -230,21 +240,22 @@ const TrendingScreen = props => {
     const displayAmenities = amenities.slice(0, 7);
 
     return (
-      <TouchableOpacity 
-        key={'flatlist' + index} 
+      <TouchableOpacity
+        key={'flatlist' + index}
         onPress={() => gotoBooking(item)}
-        activeOpacity={0.7}>
+        activeOpacity={0.7}
+      >
         <View style={[HomeStyle.bedListContainer]}>
           {propertyImage ? (
             <FastImage
-              source={{uri: propertyImage}}
+              source={{ uri: propertyImage }}
               style={[HomeStyle.bedimg]}
               resizeMode={FastImage.resizeMode.cover}
             />
           ) : (
             <Image source={IMAGES.bed} style={[HomeStyle.bedimg]} />
           )}
-          <View style={{flex: 1, marginLeft: 10}}>
+          <View style={{ flex: 1, marginLeft: 10 }}>
             <Text style={[HomeStyle.hostelTitle]} numberOfLines={1}>
               {propertyName}
             </Text>
@@ -255,14 +266,18 @@ const TrendingScreen = props => {
               {location || 'Location not available'}
             </Text>
             {minPrice > 0 && (
-              <View style={{...CommonStyles.directionRowCenter, marginTop: 5}}>
+              <View
+                style={{ ...CommonStyles.directionRowCenter, marginTop: 5 }}
+              >
                 <Text style={[HomeStyle.reviewText]}>{'Starting from '}</Text>
-                <Text style={[HomeStyle.price]}>{`₹ ${minPrice.toLocaleString()}/-`}</Text>
+                <Text
+                  style={[HomeStyle.price]}
+                >{`₹ ${minPrice.toLocaleString()}/-`}</Text>
               </View>
             )}
-            <View style={{...CommonStyles.directionRowCenter, marginTop: 5}}>
+            <View style={{ ...CommonStyles.directionRowCenter, marginTop: 5 }}>
               <View style={[HomeStyle.rateImg]}>
-                {Array.from({length: 5}, (_, idx) => (
+                {Array.from({ length: 5 }, (_, idx) => (
                   <Icons
                     key={'rate' + idx}
                     iconSetName={'Ionicons'}
@@ -274,24 +289,39 @@ const TrendingScreen = props => {
               </View>
               <Text style={[HomeStyle.reviewText]}>{'  49 reviews'}</Text>
             </View>
-            <View style={{...CommonStyles.directionRowCenter, marginTop: 5, flexWrap: 'wrap'}}>
+            <View
+              style={{
+                ...CommonStyles.directionRowCenter,
+                marginTop: 5,
+                flexWrap: 'wrap',
+              }}
+            >
               {displayAmenities.map((amenity, idx) => {
                 let iconName = 'star-outline';
                 let iconSet = 'Ionicons';
-                
+
                 // Map amenities to icons
-                if (amenity.toLowerCase().includes('wifi') || amenity.toLowerCase().includes('internet')) {
+                if (
+                  amenity.toLowerCase().includes('wifi') ||
+                  amenity.toLowerCase().includes('internet')
+                ) {
                   iconName = 'wifi';
-                } else if (amenity.toLowerCase().includes('parking') || amenity.toLowerCase().includes('car')) {
+                } else if (
+                  amenity.toLowerCase().includes('parking') ||
+                  amenity.toLowerCase().includes('car')
+                ) {
                   iconName = 'car-sport';
                 } else if (amenity.toLowerCase().includes('gym')) {
                   iconName = 'barbell';
-                } else if (amenity.toLowerCase().includes('ac') || amenity.toLowerCase().includes('air')) {
+                } else if (
+                  amenity.toLowerCase().includes('ac') ||
+                  amenity.toLowerCase().includes('air')
+                ) {
                   iconName = 'snow-outline';
                 } else {
                   iconName = 'checkmark-circle-outline';
                 }
-                
+
                 return (
                   <Icons
                     key={'amenity' + idx}
@@ -299,7 +329,7 @@ const TrendingScreen = props => {
                     iconName={iconName}
                     iconColor={Colors.gray}
                     iconSize={18}
-                    style={{marginRight: 5}}
+                    style={{ marginRight: 5 }}
                   />
                 );
               })}
@@ -318,7 +348,7 @@ const TrendingScreen = props => {
     setSortByModal(false);
   };
 
-  const handleSortSelect = (sortOption) => {
+  const handleSortSelect = sortOption => {
     setSelected(sortOption);
     // Close modal after a short delay to show selection
     setTimeout(() => {
@@ -330,7 +360,7 @@ const TrendingScreen = props => {
     setIsFilterl(false);
   };
 
-  const handleApply = (data) => {
+  const handleApply = data => {
     console.log('Selected Data:', data);
     setFilterData(data);
     // Modal will be closed by FilterComponent's onApply
@@ -348,50 +378,67 @@ const TrendingScreen = props => {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={HomeStyle.homeContainer}>
+      style={HomeStyle.homeContainer}
+    >
       <StatusBar barStyle="light-content" backgroundColor={statusColor} />
       {!isFilterl ? (
-        <SafeAreaView style={{}}>
-          <View style={HomeStyle.headerContainerBlue}>
-            <View style={HomeStyle.profileImgContainer}>
-              <TouchableOpacity onPress={() => gotoBack()}>
-                <Icons
-                  iconSetName={'MaterialCommunityIcons'}
-                  iconName={'arrow-left'}
-                  iconColor={Colors.white}
-                  iconSize={26}
-                />
-              </TouchableOpacity>
-              <Text style={HomeStyle.screenNameWhite}>{'Trending PG’s'}</Text>
+        <>
+          <SafeAreaView
+            style={{
+              backgroundColor: Colors.secondary,
+            }}
+            edges={['top']}
+          >
+            <View style={HomeStyle.headerContainerBlue}>
+              <View style={HomeStyle.profileImgContainer}>
+                <TouchableOpacity onPress={() => gotoBack()}>
+                  <Icons
+                    iconSetName={'MaterialCommunityIcons'}
+                    iconName={'arrow-left'}
+                    iconColor={Colors.white}
+                    iconSize={26}
+                  />
+                </TouchableOpacity>
+                <Text style={HomeStyle.screenNameWhite}>{'Trending PG’s'}</Text>
+              </View>
+              <View style={HomeStyle.iconContainer}>
+                <TouchableOpacity
+                  onPress={() => props.navigation.navigate('Notification')}
+                >
+                  <Icons
+                    iconSetName={'Ionicons'}
+                    iconName={'notifications-outline'}
+                    iconColor={Colors.white}
+                    iconSize={26}
+                  />
+                  <View style={HomeStyle.smallRound}></View>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{ ...LayoutStyle.marginLeft5 }}
+                  onPress={() => props.navigation.navigate('Wishlist')}
+                >
+                  <Icons
+                    iconSetName={'Ionicons'}
+                    iconName={'heart-outline'}
+                    iconColor={Colors.white}
+                    iconSize={26}
+                  />
+                </TouchableOpacity>
+              </View>
             </View>
-            <View style={HomeStyle.iconContainer}>
-              <TouchableOpacity
-                onPress={() => props.navigation.navigate('Notification')}>
-                <Icons
-                  iconSetName={'Ionicons'}
-                  iconName={'notifications-outline'}
-                  iconColor={Colors.white}
-                  iconSize={26}
-                />
-                <View style={HomeStyle.smallRound}></View>
-              </TouchableOpacity>
-              <TouchableOpacity 
-                style={{...LayoutStyle.marginLeft5}}
-                onPress={() => props.navigation.navigate('Wishlist')}>
-                <Icons
-                  iconSetName={'Ionicons'}
-                  iconName={'heart-outline'}
-                  iconColor={Colors.white}
-                  iconSize={26}
-                />
-              </TouchableOpacity>
-            </View>
-          </View>
+          </SafeAreaView>
           <ImageBackground
             source={IMAGES.primaryBG}
             style={HomeStyle.formContainer}
-            resizeMode="cover">
-            <View style={{paddingHorizontal: 20, paddingTop: 20, backgroundColor: 'transparent'}}>
+            resizeMode="cover"
+          >
+            <View
+              style={{
+                paddingHorizontal: 20,
+                paddingTop: 20,
+                backgroundColor: 'transparent',
+              }}
+            >
               <Input
                 placeholder={'Search for locality or landmark'}
                 inputStyle={HomeStyle.searchInput}
@@ -404,25 +451,45 @@ const TrendingScreen = props => {
               />
             </View>
             {loading ? (
-              <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', paddingTop: 50}}>
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  paddingTop: 50,
+                }}
+              >
                 <ActivityIndicator size="large" color={Colors.secondary} />
-                <Text style={[HomeStyle.reviewText, {marginTop: 10}]}>Loading PG properties...</Text>
+                <Text style={[HomeStyle.reviewText, { marginTop: 10 }]}>
+                  Loading PG properties...
+                </Text>
               </View>
             ) : pgList.length === 0 ? (
-              <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', paddingTop: 50}}>
-                <Text style={[HomeStyle.reviewText]}>No PG properties found</Text>
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  paddingTop: 50,
+                }}
+              >
+                <Text style={[HomeStyle.reviewText]}>
+                  No PG properties found
+                </Text>
               </View>
             ) : (
               <FlatList
                 data={pgList}
                 renderItem={renderPGList}
                 scrollEnabled={true}
-                keyExtractor={(item, index) => item?.property?._id?.toString() || index.toString()}
+                keyExtractor={(item, index) =>
+                  item?.property?._id?.toString() || index.toString()
+                }
                 contentContainerStyle={{
                   paddingHorizontal: 20,
                   paddingBottom: 150,
                 }}
-                style={{flex: 1}}
+                style={{ flex: 1 }}
                 showsVerticalScrollIndicator={false}
               />
             )}
@@ -430,7 +497,8 @@ const TrendingScreen = props => {
               <TouchableOpacity
                 onPress={() => {
                   setSortByModal(true);
-                }}>
+                }}
+              >
                 <View style={[HomeStyle.filterIconText]}>
                   <Image source={IMAGES.sort} style={[HomeStyle.iconFilter]} />
                   <Text style={[HomeStyle.filterName]}>{'Sort'}</Text>
@@ -439,7 +507,8 @@ const TrendingScreen = props => {
               <TouchableOpacity
                 onPress={() => {
                   setIsFilterl(true);
-                }}>
+                }}
+              >
                 <View style={[HomeStyle.filterIconText]}>
                   <Image
                     source={IMAGES.filter}
@@ -449,44 +518,53 @@ const TrendingScreen = props => {
                 </View>
               </TouchableOpacity>
             </View>
-            {sortByModal && <BottomSheet
-              maxHeight={deviceHight / 2}
-              isOpen={sortByModal}
-              onClose={() => gotoBottomSheetClose()}
-              renderContent={() => {
-                return (
-                  <View style={[]}>
-                    <Text style={[HomeStyle.blackTextbigCenter, {marginTop: 20}]}>
-                      {'Sort By'}
-                    </Text>
-                    {options.map((item, index) => (
-                      <TouchableOpacity
-                        key={'opt' + index}
+            {sortByModal && (
+              <BottomSheet
+                maxHeight={deviceHight / 2}
+                isOpen={sortByModal}
+                onClose={() => gotoBottomSheetClose()}
+                renderContent={() => {
+                  return (
+                    <View style={[]}>
+                      <Text
                         style={[
-                          HomeStyle.option,
-                          selected === item && HomeStyle.selectedOption,
-                          {paddingHorizontal: 20}
+                          HomeStyle.blackTextbigCenter,
+                          { marginTop: 20 },
                         ]}
-                        onPress={() => handleSortSelect(item)}>
-                        <Text
+                      >
+                        {'Sort By'}
+                      </Text>
+                      {options.map((item, index) => (
+                        <TouchableOpacity
+                          key={'opt' + index}
                           style={[
-                            HomeStyle.optionText,
-                            selected === item && HomeStyle.selectedText,
-                          ]}>
-                          {item}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                );
-              }}
-            />}
+                            HomeStyle.option,
+                            selected === item && HomeStyle.selectedOption,
+                            { paddingHorizontal: 20 },
+                          ]}
+                          onPress={() => handleSortSelect(item)}
+                        >
+                          <Text
+                            style={[
+                              HomeStyle.optionText,
+                              selected === item && HomeStyle.selectedText,
+                            ]}
+                          >
+                            {item}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  );
+                }}
+              />
+            )}
           </ImageBackground>
-        </SafeAreaView>
+        </>
       ) : (
         <FilterComponent
           key={'index-filter'}
-          onApply={(data) => {
+          onApply={data => {
             handleApply(data);
             closeModal(); // Close the modal after applying the filter
           }}

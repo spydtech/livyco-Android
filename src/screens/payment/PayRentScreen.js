@@ -3,7 +3,7 @@ import {
   Text,
   KeyboardAvoidingView,
   TouchableOpacity,
-  SafeAreaView,
+  // SafeAreaView,
   StatusBar,
   ScrollView,
   Image,
@@ -15,7 +15,9 @@ import Colors from '../../styles/Colors';
 import {Button, Icons, Input} from '../../components';
 import IMAGES from '../../assets/Images';
 import CommonStyles from '../../styles/CommonStyles';
-import {CommonActions} from '@react-navigation/native';
+import {CommonActions, useFocusEffect} from '@react-navigation/native';
+import { isGuestUser, showGuestRestrictionAlert } from '../../utils/authUtils';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const PayRentScreen = props => {
   const [rating, setRating] = useState(4);
@@ -24,6 +26,21 @@ const PayRentScreen = props => {
   const gotoHistory = () => {
     props.navigation.navigate('PayTab', {screen: 'History'});
   };
+  
+  // Check guest status when screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      const checkGuestStatus = async () => {
+        const isGuest = await isGuestUser();
+        if (isGuest) {
+          // Redirect to HomeTab if guest
+          props.navigation.navigate('HomeTab');
+          showGuestRestrictionAlert(props.navigation);
+        }
+      };
+      checkGuestStatus();
+    }, [props.navigation])
+  );
 
   const gotoBack = () => {
     props.navigation.dispatch(CommonActions.goBack());
@@ -38,9 +55,9 @@ const PayRentScreen = props => {
       <StatusBar barStyle="light-content" backgroundColor={Colors.secondary} />
       <SafeAreaView
         style={{
-          paddingTop: 10,
+          // paddingTop: 10,
           backgroundColor: Colors.secondary,
-        }}>
+        }} edges={['top']}>
         <View style={PaymentStyle.headerContainerBlue}>
           <TouchableOpacity onPress={() => gotoBack()}>
             <Icons
@@ -54,7 +71,7 @@ const PayRentScreen = props => {
       </SafeAreaView>
       <ScrollView
         keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{}}
+        contentContainerStyle={{ padding: 20 }}
         showsVerticalScrollIndicator={false}>
         <View style={[PaymentStyle.payContainer]}>
           <Image source={IMAGES.bed} style={[PaymentStyle.pgImg]} />

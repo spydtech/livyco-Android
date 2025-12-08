@@ -4,12 +4,13 @@ import {
   KeyboardAvoidingView,
   Platform,
   StatusBar,
-  SafeAreaView,
+  // SafeAreaView,
   TouchableOpacity,
   ScrollView,
   FlatList,
   ActivityIndicator,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import React, {useState, useEffect} from 'react';
 import PaymentStyle from '../../styles/PaymentStyle';
 import Colors from '../../styles/Colors';
@@ -120,9 +121,8 @@ const HistoryScreen = props => {
       <StatusBar barStyle="light-content" backgroundColor={Colors.secondary} />
       <SafeAreaView
         style={{
-          paddingTop: 10,
           backgroundColor: Colors.secondary,
-        }}>
+        }} edges={['top']}>
         <View style={PaymentStyle.headerContainerBlue}>
           <View style={CommonStyles.directionRowSB}>
             <View style={CommonStyles.directionRowCenter}>

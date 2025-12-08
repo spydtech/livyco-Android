@@ -1,6 +1,6 @@
 // API Configuration
 // Set to 'development' for local development or 'production' for live server
-const ENVIRONMENT = __DEV__ ? 'development' : 'production';
+const ENVIRONMENT = !__DEV__ ? 'development' : 'production';
 
 // API URLs
 const API_URLS = {

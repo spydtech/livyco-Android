@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "948960032829-upaalasdu6oog64ciakeqrlv3h4hjd12.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.livyco",
+            "certificate_hash": "3786669fd70d2eb7918e6af99fa87a71ad7f2c4f"
+          }
+        },
+        {
           "client_id": "948960032829-u4a5t24tob5qp9p8ksc2ibe90beah108.apps.googleusercontent.com",
           "client_type": 3
         }

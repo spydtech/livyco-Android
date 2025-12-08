@@ -13,6 +13,7 @@ import {
   PermissionsAndroid,
   KeyboardAvoidingView,
   ScrollView,
+  SafeAreaView,
 } from 'react-native';
 import { Icons } from './index';
 import Colors from '../styles/Colors';
@@ -243,10 +244,10 @@ const CitySelectionModal = ({ visible, onClose, onSelectCity }) => {
       animationType="slide"
       onRequestClose={onClose}
       statusBarTranslucent={true}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      <SafeAreaView
+        // behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.modalOverlay}
-        keyboardVerticalOffset={0}>
+        >
         <TouchableOpacity
           style={styles.backdrop}
           activeOpacity={1}
@@ -324,7 +325,7 @@ const CitySelectionModal = ({ visible, onClose, onSelectCity }) => {
             </>
           )}
         </View>
-      </KeyboardAvoidingView>
+      </SafeAreaView>
     </Modal>
   );
 };

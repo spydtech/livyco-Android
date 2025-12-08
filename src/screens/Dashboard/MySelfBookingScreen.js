@@ -4,13 +4,14 @@ import {
   KeyboardAvoidingView,
   Platform,
   StatusBar,
-  SafeAreaView,
+  // SafeAreaView,
   TouchableOpacity,
   ImageBackground,
   ScrollView,
   FlatList,
   TextInput,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import React, { useState, useEffect } from 'react';
 import HomeStyle from '../../styles/HomeStyle';
 import Colors from '../../styles/Colors';
@@ -155,9 +156,8 @@ const MySelfBookingScreen = props => {
   return (
     <SafeAreaView
       style={{
-        paddingTop: 10,
         backgroundColor: Colors.secondary,
-      }}>
+      }} edges={['top']}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={HomeStyle.homeContainer}>
