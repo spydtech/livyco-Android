@@ -36,6 +36,7 @@ const ProfileScreen = () => {
     React.useCallback(() => {
       const checkGuestStatus = async () => {
         const isGuest = await isGuestUser();
+        fetchUserData();
         if (isGuest) {
           // Redirect to HomeTab if guest
           navigation.navigate('HomeTab');

@@ -24,20 +24,19 @@ const SuccessScreen = props => {
         if (userResponse.success && userResponse.data?.user) {
           const user = userResponse.data.user;
           
-          // Check if user has completed registration (has name, phone, and location)
-          const hasName = user.name && user.name.trim() !== '';
-          const hasPhone = user.phone && user.phone.trim() !== '';
+          // Check if user has completed profile (only check location)
+          // Name and email are collected during registration, but location may be missing
           const hasLocation = user.location && user.location.trim() !== '';
           
-          if (hasName && hasPhone && hasLocation) {
-            // User has completed registration, navigate to home screen
+          if (hasLocation) {
+            // User has completed profile, navigate to home screen
             setTimeout(() => {
               props.navigation.replace('Tab');
             }, 3000);
           } else {
-            // User hasn't completed registration, navigate to Register screen
+            // User is missing location, navigate to Register screen for profile completion
             setTimeout(() => {
-              props.navigation.replace('Register');
+              props.navigation.replace('Register', { isProfileCompletion: true });
             }, 3000);
           }
         } else {

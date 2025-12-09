@@ -28,11 +28,13 @@ import {setUserToken, getUserTokenSync} from "../../utils/Api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { isDevelopment } from "../../utils/Environment";
 import { apiPost } from "../../utils/apiCall";
-import { getUser, updateUserProfile } from "../../services/authService";
+import { getUser, updateUserProfile, uploadProfileImage } from "../../services/authService";
 
 const RegisterScreen = (props) => {
   // Check if in edit mode
   const isEditMode = props.route?.params?.isEditMode || false;
+  // Check if this is profile completion flow (from SuccessScreen due to missing location)
+  const isProfileCompletion = props.route?.params?.isProfileCompletion || false;
   
   // Basic Details fields
   const [name, setName] = useState("");
@@ -72,6 +74,12 @@ const RegisterScreen = (props) => {
     setScreenName("second");
   };
   const gotoKycScreen = () => {
+    // Don't navigate to KYC screen if in edit mode (not profile completion)
+    if (isEditMode && !isProfileCompletion) {
+      // In edit mode, directly call update profile instead
+      handleUpdateProfile();
+      return;
+    }
     setScreenName("third");
   };
   const handleMovingDate = (date) => {
@@ -149,12 +157,12 @@ const RegisterScreen = (props) => {
     setScreenName("second");
   };
 
-  // Load user data when in edit mode
+  // Load user data when in edit mode or profile completion flow
   useEffect(() => {
-    if (isEditMode) {
+    if (isEditMode || isProfileCompletion) {
       loadUserData();
     }
-  }, [isEditMode]);
+  }, [isEditMode, isProfileCompletion]);
 
   const loadUserData = async () => {
     try {
@@ -194,7 +202,8 @@ const RegisterScreen = (props) => {
         
         // Populate user type specific fields - always set, use empty string if not present
         if (userData.userType === "student") {
-          setInstituteName(userData.instituteName || "");
+          // Check both institute and instituteName fields (backend returns both for compatibility)
+          setInstituteName(userData.instituteName || userData.institute || "");
           setGuardianName(userData.guardianName || "");
           setGuardianContact(userData.guardianContact || "");
           // Clear professional fields
@@ -297,11 +306,9 @@ const RegisterScreen = (props) => {
         return;
       }
 
-      const formData = new FormData();
-      
-      // Add profile image if selected (only if it's a new file, not a URL)
+      // Step 1: Upload profile image if a new one is selected
       if (profile && (profile.startsWith('/') || profile.startsWith('file://') || profile.startsWith('content://'))) {
-        // New profile image selected
+        // New profile image selected - upload it first
         let fileUri = profile;
         if (Platform.OS === 'android' && !fileUri.startsWith('file://') && !fileUri.startsWith('content://')) {
           fileUri = fileUri.startsWith('/') ? `file://${fileUri}` : `file:///${fileUri}`;
@@ -317,77 +324,79 @@ const RegisterScreen = (props) => {
         const fileName = `profile_${Date.now()}.jpg`;
         const fileType = getFileType(profile);
         
-        formData.append('profileImage', {
+        const profileImageFormData = new FormData();
+        profileImageFormData.append('profileImage', {
           uri: fileUri,
           type: fileType,
           name: fileName,
         });
+
+        console.log("Uploading profile image...");
+        const imageResponse = await uploadProfileImage(profileImageFormData);
+        
+        if (!imageResponse.success) {
+          let errorMessage = imageResponse.message || "Failed to upload profile image. Please try again.";
+          
+          if (imageResponse.status === 400) {
+            errorMessage = imageResponse.message || "Invalid image file. Please try again.";
+          } else if (imageResponse.status === 401) {
+            errorMessage = "Authentication failed. Please login again.";
+          } else if (imageResponse.status === 500) {
+            errorMessage = "Server error. Please try again later.";
+          }
+          
+          Alert.alert("Error", errorMessage);
+          setIsLoading(false);
+          return;
+        }
+        
+        console.log("Profile image uploaded successfully");
       }
 
-      // Add basic details fields - ALWAYS send required fields as strings
-      // Ensure all values are strings for FormData compatibility
-      formData.append('name', String(name || '').trim());
-      formData.append('email', String(email || '').trim());
-      formData.append('phone', String(phoneNumber || '').trim());
-      formData.append('location', String(location || '').trim());
-      formData.append('gender', String(gender || 'male'));
-      if (dobDate) {
-        // Format date as YYYY-MM-DD for backend
-        const formattedDob = moment(dobDate).format('YYYY-MM-DD');
-        formData.append('dob', String(formattedDob));
-      } else {
-        formData.append('dob', '');
-      }
-      
-      // Add KYC fields
-      if (aadhaarNumber) {
-        formData.append('aadhaarNumber', String(aadhaarNumber));
-      } else {
-        formData.append('aadhaarNumber', '');
-      }
-      
-      // Add contact information fields - ALWAYS send as strings
-      formData.append('userType', String(selected || 'student'));
-      formData.append('whatsappUpdates', String(isEnabled));
+      // Step 2: Update profile data (without image) as JSON
+      const profileData = {
+        name: String(name || '').trim(),
+        email: String(email || '').trim(),
+        phone: String(phoneNumber || '').trim(),
+        location: String(location || '').trim(),
+        gender: String(gender || 'male'),
+        dob: dobDate ? moment(dobDate).format('YYYY-MM-DD') : '',
+        userType: String(selected || 'student'),
+        whatsappUpdates: isEnabled,
+      };
 
-      // Add user type specific fields - ALWAYS send as strings, even if empty
+      // Add user type specific fields
       if (selected === "student") {
-        formData.append('institute', String(instituteName || '').trim());
-        formData.append('instituteName', String(instituteName || '').trim());
-        formData.append('guardianName', String(guardianName || '').trim());
-        formData.append('guardianContact', String(guardianContact || '').trim());
+        profileData.institute = String(instituteName || '').trim();
+        profileData.instituteName = String(instituteName || '').trim();
+        profileData.guardianName = String(guardianName || '').trim();
+        profileData.guardianContact = String(guardianContact || '').trim();
         // Clear professional fields
-        formData.append('organizationName', '');
-        formData.append('emergencyContactName', '');
-        formData.append('emergencyContactNumber', '');
+        profileData.organizationName = '';
+        profileData.emergencyContactName = '';
+        profileData.emergencyContactNumber = '';
       } else if (selected === "professional") {
-        formData.append('organizationName', String(organizationName || '').trim());
-        formData.append('emergencyContactName', String(emergencyContactName || '').trim());
-        formData.append('emergencyContactNumber', String(emergencyContactNumber || '').trim());
+        profileData.organizationName = String(organizationName || '').trim();
+        profileData.emergencyContactName = String(emergencyContactName || '').trim();
+        profileData.emergencyContactNumber = String(emergencyContactNumber || '').trim();
         // Clear student fields
-        formData.append('institute', '');
-        formData.append('instituteName', '');
-        formData.append('guardianName', '');
-        formData.append('guardianContact', '');
+        profileData.institute = '';
+        profileData.instituteName = '';
+        profileData.guardianName = '';
+        profileData.guardianContact = '';
       } else {
         // If userType is not set, send empty strings for all type-specific fields
-        formData.append('institute', '');
-        formData.append('instituteName', '');
-        formData.append('guardianName', '');
-        formData.append('guardianContact', '');
-        formData.append('organizationName', '');
-        formData.append('emergencyContactName', '');
-        formData.append('emergencyContactNumber', '');
+        profileData.institute = '';
+        profileData.instituteName = '';
+        profileData.guardianName = '';
+        profileData.guardianContact = '';
+        profileData.organizationName = '';
+        profileData.emergencyContactName = '';
+        profileData.emergencyContactNumber = '';
       }
 
-      // Verify FormData is properly constructed
-      if (!formData) {
-        Alert.alert("Error", "Failed to prepare form data");
-        setIsLoading(false);
-        return;
-      }
-
-      const response = await updateUserProfile(formData);
+      console.log("Updating profile data...", profileData);
+      const response = await updateUserProfile(profileData);
 
       console.log("Update profile response:", response);
 
@@ -395,7 +404,14 @@ const RegisterScreen = (props) => {
         Alert.alert("Success", response.message || "Profile updated successfully", [
           {
             text: "OK",
-            onPress: () => props.navigation.goBack(),
+            onPress: () => {
+              // If in profile completion flow, navigate to home instead of going back
+              if (isProfileCompletion) {
+                props.navigation.replace('Tab');
+              } else {
+                props.navigation.goBack();
+              }
+            },
           },
         ]);
       } else {
@@ -630,7 +646,7 @@ const RegisterScreen = (props) => {
         barStyle="dark-content"
         backgroundColor={Colors.goastWhite}
       />
-      {isEditMode && (
+      {isEditMode && !isProfileCompletion && (
         <View style={{ paddingHorizontal: 20, paddingTop: 10, paddingBottom: 10 }}>
           <TouchableOpacity onPress={() => props.navigation.goBack()}>
             <Icons
@@ -646,7 +662,7 @@ const RegisterScreen = (props) => {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={AuthStyle.registerContainer}
       >
-        <ScrollView contentContainerStyle={{ paddingHorizontal: 20 }}>
+        <ScrollView contentContainerStyle={{ paddingHorizontal: 20 , paddingBottom: 30}}>
         <View style={[AuthStyle.photoContainer]}>
           {profile ? (
             <Image source={{ uri: profile }} style={[AuthStyle.profileImg]} />
@@ -748,14 +764,16 @@ const RegisterScreen = (props) => {
                 <Text style={[AuthStyle.registerTitleGray]}>
                   {"Contact Information"}
                 </Text>
-                <Text
-                  style={[
-                    AuthStyle.registerTitleGray,
-                    { ...LayoutStyle.marginTop10 },
-                  ]}
-                >
-                  {"KYC information"}
-                </Text>
+                {!(isEditMode && !isProfileCompletion) && (
+                  <Text
+                    style={[
+                      AuthStyle.registerTitleGray,
+                      { ...LayoutStyle.marginTop10 },
+                    ]}
+                  >
+                    {"KYC information"}
+                  </Text>
+                )}
                 <View style={{ ...LayoutStyle.marginTop20 }}>
                   <Button
                     onPress={() => gotoUpdateScreen()}
@@ -897,21 +915,33 @@ const RegisterScreen = (props) => {
               )}
 
               <View style={[AuthStyle.buttonContainer]}>
-                <Text
-                  style={[
-                    AuthStyle.registerTitleGray,
-                    { ...LayoutStyle.marginTop10 },
-                  ]}
-                >
-                  {"KYC information"}
-                </Text>
+                {!(isEditMode && !isProfileCompletion) && (
+                  <Text
+                    style={[
+                      AuthStyle.registerTitleGray,
+                      { ...LayoutStyle.marginTop10 },
+                    ]}
+                  >
+                    {"KYC information"}
+                  </Text>
+                )}
                 <View style={{ ...LayoutStyle.marginTop20 }}>
-                  <Button
-                    onPress={() => gotoKycScreen()}
-                    btnName={"NEXT"}
-                    bgColor={Colors.primary}
-                    btnTextColor={Colors.blackText}
-                  />
+                  {(isEditMode && !isProfileCompletion) ? (
+                    <Button
+                      onPress={handleUpdateProfile}
+                      btnName={isLoading ? "UPDATING..." : "UPDATE"}
+                      bgColor={Colors.primary}
+                      btnTextColor={Colors.blackText}
+                      disabled={isLoading}
+                    />
+                  ) : (
+                    <Button
+                      onPress={() => gotoKycScreen()}
+                      btnName={"NEXT"}
+                      bgColor={Colors.primary}
+                      btnTextColor={Colors.blackText}
+                    />
+                  )}
                 </View>
               </View>
             </View>
@@ -927,34 +957,38 @@ const RegisterScreen = (props) => {
                   {"Contact Information"}
                 </Text>
               </TouchableOpacity>
-              <Text style={[AuthStyle.registerTitle]}>{"KYC information"}</Text>
-              <Input
-                InputLabel={"Aadhar Card Number*"}
-                value={aadhaarNumber}
-                onChangeText={(text) => {
-                  // Only allow numbers and limit to 12 digits
-                  const numericText = text.replace(/[^0-9]/g, '').slice(0, 12);
-                  setAadhaarNumber(numericText);
-                }}
-                keyboardType="phone-pad"
-                maxLength={12}
-              />
-              <Text style={[AuthStyle.inputText]}>{"Upload Aadhar Document*"}</Text>
-
-              <View style={[AuthStyle.uploadImgContainer]}>
-                <Text>{doc || ""}</Text>
-                <TouchableOpacity
-                  style={[AuthStyle.uploadIcon]}
-                  onPress={() => openImgOption("doc")}
-                >
-                  <Icons
-                    iconSetName={"MaterialCommunityIcons"}
-                    iconName={"upload"}
-                    iconColor={Colors.gray}
-                    iconSize={26}
+              {!(isEditMode && !isProfileCompletion) && (
+                <>
+                  <Text style={[AuthStyle.registerTitle]}>{"KYC information"}</Text>
+                  <Input
+                    InputLabel={"Aadhar Card Number*"}
+                    value={aadhaarNumber}
+                    onChangeText={(text) => {
+                      // Only allow numbers and limit to 12 digits
+                      const numericText = text.replace(/[^0-9]/g, '').slice(0, 12);
+                      setAadhaarNumber(numericText);
+                    }}
+                    keyboardType="phone-pad"
+                    maxLength={12}
                   />
-                </TouchableOpacity>
-              </View>
+                  <Text style={[AuthStyle.inputText]}>{"Upload Aadhar Document*"}</Text>
+
+                  <View style={[AuthStyle.uploadImgContainer]}>
+                    <Text>{doc || ""}</Text>
+                    <TouchableOpacity
+                      style={[AuthStyle.uploadIcon]}
+                      onPress={() => openImgOption("doc")}
+                    >
+                      <Icons
+                        iconSetName={"MaterialCommunityIcons"}
+                        iconName={"upload"}
+                        iconColor={Colors.gray}
+                        iconSize={26}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                </>
+              )}
               <View style={{ ...LayoutStyle.marginTop30 }}>
                 {isLoading || isLoadingUserData ? (
                   <View style={{ alignItems: "center", padding: 15 }}>
@@ -962,10 +996,11 @@ const RegisterScreen = (props) => {
                   </View>
                 ) : (
                   <Button
-                    onPress={isEditMode ? handleUpdateProfile : handleRegisterByClient}
-                    btnName={isEditMode ? "UPDATE" : "SUBMIT"}
+                    onPress={(isEditMode || isProfileCompletion) ? handleUpdateProfile : handleRegisterByClient}
+                    btnName={(isEditMode || isProfileCompletion) ? (isLoading ? "UPDATING..." : "UPDATE") : "SUBMIT"}
                     bgColor={Colors.primary}
                     btnTextColor={Colors.blackText}
+                    disabled={isLoading}
                   />
                 )}
               </View>

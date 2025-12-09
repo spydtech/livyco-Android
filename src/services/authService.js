@@ -125,14 +125,35 @@ export const getUser = async (token) => {
 };
 
 /**
- * Update user profile
- * @param {FormData} formData - FormData containing user profile fields and optional profileImage file
+ * Upload profile image
+ * @param {FormData} formData - FormData containing profileImage file
+ * @returns {Promise<Object>} Upload profile image response
+ */
+export const uploadProfileImage = async (formData) => {
+  try {
+    return await apiPost('auth/user/upload-profile-image', formData, {
+      isFormData: true,
+      requireAuth: true,
+    });
+  } catch (error) {
+    return {
+      success: false,
+      data: null,
+      message: error.message || 'Failed to upload profile image',
+      error: error.message,
+    };
+  }
+};
+
+/**
+ * Update user profile (without profile image)
+ * @param {Object} profileData - User profile fields (JSON object, not FormData)
  * @returns {Promise<Object>} Update profile response
  */
-export const updateUserProfile = async (formData) => {
+export const updateUserProfile = async (profileData) => {
   try {
-    return await apiPut('auth/user/profile', formData, {
-      isFormData: true,
+    return await apiPut('auth/user/profile', profileData, {
+      isFormData: false,
       requireAuth: true,
     });
   } catch (error) {
@@ -169,6 +190,7 @@ export default {
   sendOTP,
   verifyOTP,
   getUser,
+  uploadProfileImage,
   updateUserProfile,
   healthCheck,
 };
