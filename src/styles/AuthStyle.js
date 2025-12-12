@@ -28,6 +28,12 @@ const AuthStyle = StyleSheet.create({
     width: deviceWidth / 1.5,
    
   },
+  logoAnimationContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingTop: deviceHight / 10,
+  },
   bgImageWel: {
     height: deviceHight,
     width: deviceWidth,

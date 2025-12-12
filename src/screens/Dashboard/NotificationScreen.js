@@ -221,7 +221,7 @@ const NotificationScreen = props => {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={HomeStyle.homeContainer}>
+      style={[HomeStyle.homeContainer, {flex: 1}]}>
       <StatusBar barStyle="light-content" backgroundColor={Colors.secondary} />
       <SafeAreaView
         style={{

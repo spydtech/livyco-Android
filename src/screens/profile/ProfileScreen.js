@@ -11,6 +11,7 @@ import {
   Switch,
   ActivityIndicator,
   Alert,
+  Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import React, { useState, useEffect } from 'react';
@@ -22,14 +23,17 @@ import ProfileStyle from '../../styles/ProfileStyle';
 import IMAGES from '../../assets/Images';
 import CommonStyles from '../../styles/CommonStyles';
 import { CommonActions, useNavigation, useFocusEffect } from '@react-navigation/native';
-import { getUser } from '../../services/authService';
+import { getUser, deleteUserAccount } from '../../services/authService';
 import { getUserToken, clearUserToken } from '../../utils/Api';
 import { isGuestUser, showGuestRestrictionAlert } from '../../utils/authUtils';
+import { deviceHight, deviceWidth } from '../../utils/DeviceInfo';
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
+  const [showDeleteSuccessModal, setShowDeleteSuccessModal] = useState(false);
 
   // Check guest status when screen comes into focus
   useFocusEffect(
@@ -54,6 +58,10 @@ const ProfileScreen = () => {
   useEffect(() => {
     fetchUserData();
   }, []);
+
+  useEffect(() => {
+    console.log('showDeleteConfirmModal changed:', showDeleteConfirmModal);
+  }, [showDeleteConfirmModal]);
 
   const fetchUserData = async () => {
     try {
@@ -99,6 +107,64 @@ const ProfileScreen = () => {
       return user.clientId;
     }
     return 'LVC0000000';
+  };
+
+  // Handle delete account
+  const handleDeleteAccount = () => {
+    console.log('Delete account button clicked - showing modal');
+    console.log('Setting showDeleteConfirmModal to true');
+    setShowDeleteConfirmModal(true);
+    console.log('showDeleteConfirmModal state:', showDeleteConfirmModal);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      setShowDeleteConfirmModal(false);
+      
+      // Call API to delete account
+      const response = await deleteUserAccount();
+      
+      if (response.success) {
+        // Show success modal
+        setShowDeleteSuccessModal(true);
+        
+        // After showing success, navigate to Welcome screen
+        setTimeout(async () => {
+          try {
+            // Clear the token from AsyncStorage
+            await clearUserToken();
+            
+            // Reset navigation stack and navigate to Welcome screen
+            navigation.dispatch(
+              CommonActions.reset({
+                index: 0,
+                routes: [{ name: 'Welcome' }],
+              })
+            );
+          } catch (error) {
+            console.error('Error during account deletion:', error);
+          }
+        }, 2000);
+      } else {
+        // Show error alert if API call failed
+        Alert.alert(
+          'Error',
+          response.message || 'Failed to delete account. Please try again.',
+          [{ text: 'OK' }]
+        );
+      }
+    } catch (error) {
+      console.error('Error deleting account:', error);
+      Alert.alert(
+        'Error',
+        'Failed to delete account. Please try again.',
+        [{ text: 'OK' }]
+      );
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setShowDeleteConfirmModal(false);
   };
 
   // Handle logout
@@ -256,7 +322,8 @@ const ProfileScreen = () => {
               />
             </View>
           </TouchableOpacity> */}
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Help')}>
             <View style={ProfileStyle.accountOptionRow}>
               <Text style={[ProfileStyle.listOption]}>{'Help & support'}</Text>
               <Icons
@@ -267,7 +334,8 @@ const ProfileScreen = () => {
               />
             </View>
           </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('TermsAndConditions')}>
             <View style={ProfileStyle.accountOptionRow}>
               <Text style={[ProfileStyle.listOption]}>{'Term & policy'}</Text>
               <Icons
@@ -278,7 +346,7 @@ const ProfileScreen = () => {
               />
             </View>
           </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={handleDeleteAccount}>
             <View style={ProfileStyle.accountOptionRow}>
               <Text style={[ProfileStyle.listOption]}>{'Delete Account'}</Text>
               <Icons
@@ -302,6 +370,79 @@ const ProfileScreen = () => {
             iconSize={24}
           />
         </TouchableOpacity>
+
+      {/* Delete Account Confirmation Modal */}
+        <Modal
+          visible={showDeleteConfirmModal}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={handleCancelDelete}
+          statusBarTranslucent={true}>
+          <View style={ProfileStyle.modalOverlay}>
+            <TouchableOpacity
+              style={ProfileStyle.modalOverlayBackdrop}
+              activeOpacity={1}
+              onPress={handleCancelDelete}
+            />
+            <View 
+              style={ProfileStyle.modalContainer}
+              onStartShouldSetResponder={() => true}>
+              <View style={ProfileStyle.modalContent}>
+                <Text style={ProfileStyle.modalTitle}>
+                  Are you sure you want to delete your account?
+                </Text>
+                <Text style={ProfileStyle.modalWarning}>
+                  This action is irreversible, and all your data will be permanently lost.
+                </Text>
+                <View style={ProfileStyle.modalButtons}>
+                  <TouchableOpacity
+                    style={ProfileStyle.modalButton}
+                    onPress={handleConfirmDelete}
+                    activeOpacity={0.8}>
+                    <Icons
+                      iconSetName={'MaterialIcons'}
+                      iconName={'check'}
+                      iconColor={Colors.white}
+                      iconSize={20}
+                    />
+                    <Text style={ProfileStyle.modalButtonText}>Yes</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={ProfileStyle.modalButton}
+                    onPress={handleCancelDelete}
+                    activeOpacity={0.8}>
+                    <Icons
+                      iconSetName={'MaterialIcons'}
+                      iconName={'close'}
+                      iconColor={Colors.white}
+                      iconSize={20}
+                    />
+                    <Text style={ProfileStyle.modalButtonText}>No</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </View>
+        </Modal>
+
+      {/* Delete Account Success Modal */}
+        <Modal
+          visible={showDeleteSuccessModal}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={() => setShowDeleteSuccessModal(false)}
+          statusBarTranslucent={true}>
+          <View style={ProfileStyle.modalOverlay}>
+            <View style={ProfileStyle.modalOverlayBackdrop} />
+            <View style={ProfileStyle.modalContainer}>
+              <View style={ProfileStyle.successModalContent}>
+                <Text style={ProfileStyle.successModalText}>
+                  Your account has been successfully deleted.
+                </Text>
+              </View>
+            </View>
+          </View>
+        </Modal>
       </View>
     </KeyboardAvoidingView>
   );

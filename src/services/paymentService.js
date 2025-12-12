@@ -1,6 +1,135 @@
 import {apiGet, apiPost} from '../utils/apiCall';
 
 /**
+ * Fetch current user's bookings and surface the most recent active booking
+ * with an outstanding/monthly rent amount. This is used for Pay Rent flow.
+ */
+export const getPendingRentDetails = async () => {
+  try {
+    // Get all user bookings to find the one with pending rent
+    const response = await apiGet('bookings/user');
+console.log("response", response);
+
+    if (!response.success) {
+      return {
+        success: false,
+        data: null,
+        message: response.message || 'Failed to fetch bookings',
+      };
+    }
+
+    const bookings =
+      response.data?.bookings ||
+      response.data?.data ||
+      (Array.isArray(response.data) ? response.data : []);
+
+    if (!bookings || bookings.length === 0) {
+      return {
+        success: false,
+        data: null,
+        message: 'No bookings found for the user',
+      };
+    }
+
+    // Prefer an active booking with an outstanding amount
+    const activeStatuses = ['approved', 'confirmed', 'checked_in', 'active'];
+    const prioritizedBooking =
+      bookings.find(
+        b =>
+          activeStatuses.includes(
+            (b.bookingStatus || '').toLowerCase().trim(),
+          ) && (b.outstandingAmount || 0) > 0,
+      ) ||
+      bookings.find(b =>
+        activeStatuses.includes((b.bookingStatus || '').toLowerCase().trim()),
+      ) ||
+      bookings[0];
+
+    const pricing = prioritizedBooking.pricing || {};
+    const paymentSummary = prioritizedBooking.paymentSummary || {};
+
+    const monthlyRent =
+      pricing.monthlyRent ||
+      pricing.totalRent ||
+      paymentSummary.monthlyRent ||
+      paymentSummary.totalRent ||
+      0;
+    const outstandingAmount =
+      prioritizedBooking.outstandingAmount ??
+      paymentSummary.outstandingAmount ??
+      0;
+
+    const amount = outstandingAmount > 0 ? outstandingAmount : monthlyRent;
+
+    if (!amount || amount <= 0) {
+      return {
+        success: false,
+        data: null,
+        message: 'No pending rent found for the current month',
+      };
+    }
+
+    // Extract identifiers
+    const bookingId =
+      prioritizedBooking.id ||
+      prioritizedBooking._id ||
+      prioritizedBooking.bookingId;
+    
+    // Validate bookingId exists
+    if (!bookingId) {
+      return {
+        success: false,
+        data: null,
+        message: 'Booking ID not found in booking data',
+      };
+    }
+    
+    const property =
+      prioritizedBooking.property ||
+      prioritizedBooking.propertyId ||
+      prioritizedBooking.propertyData ||
+      {};
+
+    const propertyId =
+      property._id || property.id || prioritizedBooking.propertyId || null;
+
+    return {
+      success: true,
+      data: {
+        bookingId: String(bookingId), // Ensure it's a string for API calls
+        propertyId: propertyId ? String(propertyId) : null,
+        propertyName:
+          property.name ||
+          property.propertyName ||
+          prioritizedBooking.propertyName ||
+          'Property',
+        moveInDate:
+          prioritizedBooking.moveInDate ||
+          prioritizedBooking.checkInDate ||
+          null,
+        customerDetails: prioritizedBooking.customerDetails || {},
+        roomType:
+          prioritizedBooking.roomType ||
+          prioritizedBooking.booking?.roomType ||
+          null,
+        pricing,
+        outstandingAmount,
+        monthlyRent: monthlyRent || amount,
+        amount,
+      },
+      message: response.message || '',
+    };
+  } catch (error) {
+    console.error('Get pending rent error:', error);
+    return {
+      success: false,
+      data: null,
+      message: error.message || 'Failed to fetch pending rent',
+    };
+  }
+};
+
+/**
  * Get booking details with payment information
  * @param {string} bookingId - Booking ID
  * @returns {Promise<Object>} Booking details with pricing
@@ -92,6 +221,50 @@ export const validatePayment = async (paymentData) => {
 };
 
 /**
+ * Create a Razorpay rent order
+ * @param {Object} orderData - Rent order data (amount in paise, currency, receipt, rentData)
+ */
+export const createRentOrder = async orderData => {
+  try {
+    const response = await apiPost('payments/create-rent-order', orderData);
+    return {
+      success: response.success || false,
+      data: response.order || response.data?.order || response.data || null,
+      message: response.message || '',
+    };
+  } catch (error) {
+    console.error('Create rent order error:', error);
+    return {
+      success: false,
+      data: null,
+      message: error.message || 'Failed to create rent payment order',
+    };
+  }
+};
+
+/**
+ * Validate rent payment
+ * @param {Object} paymentData - Validation payload containing Razorpay IDs and rentData
+ */
+export const validateRentPayment = async paymentData => {
+  try {
+    const response = await apiPost('payments/validate-rent-payment', paymentData);
+    return {
+      success: response.success || false,
+      data: response.data || null,
+      message: response.message || '',
+    };
+  } catch (error) {
+    console.error('Validate rent payment error:', error);
+    return {
+      success: false,
+      data: null,
+      message: error.message || 'Failed to validate rent payment',
+    };
+  }
+};
+
+/**
  * Get user payment history
  * @returns {Promise<Object>} User payments response
  */
@@ -174,10 +347,13 @@ export const getUserPayments = async () => {
 };
 
 export default {
+  getPendingRentDetails,
   getBookingWithPaymentDetails,
   createPaymentOrder,
+  createRentOrder,
   verifyPayment,
   validatePayment,
+  validateRentPayment,
   getUserPayments,
 };
 

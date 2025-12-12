@@ -104,6 +104,7 @@ const HomeScreen = props => {
   // Update StatusBar when screen comes into focus
   useFocusEffect(
     React.useCallback(() => {
+      fetchHomeData();
       StatusBar.setBarStyle('dark-content');
       StatusBar.setBackgroundColor(Colors.white);
     }, [])

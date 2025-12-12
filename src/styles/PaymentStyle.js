@@ -121,11 +121,11 @@ const PaymentStyle = StyleSheet.create({
     fontFamily: FontFamily.RobotoMedium,
     ...LayoutStyle.fontSize12,
     color: Colors.blackText,
-    ...LayoutStyle.marginTop5,
+    // ...LayoutStyle.marginTop5,
   },
   arrowIcon: {
     ...LayoutStyle.padding5,
-    ...LayoutStyle.marginTop20,
+    // ...LayoutStyle.marginTop20,
     backgroundColor: Colors.paleBlue,
     borderRadius: 30,
   },

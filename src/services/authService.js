@@ -1,4 +1,4 @@
-import {apiGet, apiPost, apiPut} from '../utils/apiCall';
+import {apiGet, apiPost, apiPut, apiDelete} from '../utils/apiCall';
 
 /**
  * Register a new user
@@ -183,6 +183,25 @@ export const healthCheck = async () => {
   }
 };
 
+/**
+ * Delete user account/profile
+ * @returns {Promise<Object>} Delete account response
+ */
+export const deleteUserAccount = async () => {
+  try {
+    return await apiDelete('auth/profile', {
+      requireAuth: true,
+    });
+  } catch (error) {
+    return {
+      success: false,
+      data: null,
+      message: error.message || 'Failed to delete account',
+      error: error.message,
+    };
+  }
+};
+
 export default {
   register,
   checkUserExists,
@@ -193,5 +212,6 @@ export default {
   uploadProfileImage,
   updateUserProfile,
   healthCheck,
+  deleteUserAccount,
 };
 

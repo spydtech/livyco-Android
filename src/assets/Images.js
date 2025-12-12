@@ -1,6 +1,9 @@
 const IMAGES = {
   primaryBG: require('./images/splashbg.png'),
   logo: require('./images/logo.png'),
+  logo1: require('./images/logo-1.png'),
+  logo2: require('./images/logo-2.png'),
+  logo3: require('./images/logo-3.png'),
   welscreenImg: require('./images/welimg.png'),
   boarding1: require('./images/boarding1.png'),
   boarding2: require('./images/boarding2.png'),
@@ -39,5 +42,10 @@ const IMAGES = {
   chennai: require('./images/chennai.png'),
   kolkata: require('./images/kolkata.png'),
   kochi: require('./images/kochi.png'),
+  // Help & Support images
+  ticketStatus: require('./images/ticket-status.png'),
+  chatSupport: require('./images/chat-support.png'),
+  voiceSupport: require('./images/voice-support.png'),
+  emailSupport: require('./images/email-support.png'),
 };
 export default IMAGES;

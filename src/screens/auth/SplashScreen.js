@@ -1,9 +1,10 @@
-import {View, Text, StatusBar, ImageBackground, Image} from 'react-native';
+import {View, StatusBar, ImageBackground} from 'react-native';
 import React, {useEffect} from 'react';
 import {initializeToken} from '../../utils/Api';
 import {getUser} from '../../services/authService';
 import AuthStyle from '../../styles/AuthStyle';
 import IMAGES from '../../assets/Images';
+import IntroLogoAnimation from '../../components/IntroLogoAnimation';
 
 const isProfileComplete = (user) => {
   if (!user) return false;
@@ -39,7 +40,7 @@ const SplashScreen = props => {
         console.log(" token", token);
         
         // Wait a bit for splash screen to show
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        await new Promise(resolve => setTimeout(resolve, 2600));
         
         if (token) {
           // Token exists, check user profile
@@ -77,7 +78,9 @@ const SplashScreen = props => {
       <StatusBar translucent backgroundColor="transparent" />
       <View style={[AuthStyle.opacityImgBlue]}>
         <ImageBackground source={IMAGES.primaryBG} style={[AuthStyle.bgImage]}>
-          <Image style={AuthStyle.logo} source={IMAGES.logo} />
+          <View style={AuthStyle.logoAnimationContainer}>
+            <IntroLogoAnimation />
+          </View>
         </ImageBackground>
       </View>
     </View>
