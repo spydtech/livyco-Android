@@ -45,16 +45,6 @@ export const apiCall = async (endpoint, options = {}) => {
       ...headers,
     };
 
-    // Set Content-Type only if not FormData
-    if (!isFormData) {
-      requestHeaders['Content-Type'] = 'application/json';
-    }
-
-    // Add authorization header if token exists
-    if (token) {
-      requestHeaders['Authorization'] = `Bearer ${token}`;
-    }
-
     // Prepare request body
     let requestBody = null;
     if (body) {
@@ -62,10 +52,22 @@ export const apiCall = async (endpoint, options = {}) => {
         requestBody = body;
         // Don't set Content-Type for FormData - let fetch set it automatically with boundary
         // React Native fetch will automatically set multipart/form-data with boundary
-        delete requestHeaders['Content-Type'];
       } else {
         requestBody = JSON.stringify(body);
+        // Set Content-Type for JSON body
+        requestHeaders['Content-Type'] = 'application/json';
       }
+    } else {
+      // For DELETE and GET requests without body, don't set Content-Type
+      // Some servers reject requests with Content-Type header but no body
+      if (method.toUpperCase() !== 'DELETE' && method.toUpperCase() !== 'GET') {
+        requestHeaders['Content-Type'] = 'application/json';
+      }
+    }
+
+    // Add authorization header if token exists
+    if (token) {
+      requestHeaders['Authorization'] = `Bearer ${token}`;
     }
 
     // Make API call

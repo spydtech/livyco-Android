@@ -47,5 +47,12 @@ const IMAGES = {
   chatSupport: require('./images/chat-support.png'),
   voiceSupport: require('./images/voice-support.png'),
   emailSupport: require('./images/email-support.png'),
+  // No Data images
+  noChat: require('./images/no-data/no-chat.png'),
+  noMap: require('./images/no-data/no-map.png'),
+  noNotification: require('./images/no-data/no-notification.png'),
+  noPaymentHistory: require('./images/no-data/no-payment-history.png'),
+  noWishlist: require('./images/no-data/no-wishlist.png'),
+  reviewsNot: require('./images/no-data/reviews-not.png'),
 };
 export default IMAGES;

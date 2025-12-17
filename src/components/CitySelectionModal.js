@@ -14,7 +14,9 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   SafeAreaView,
+  Linking,
 } from 'react-native';
+import Geolocation from 'react-native-geolocation-service';
 import { Icons } from './index';
 import Colors from '../styles/Colors';
 import LayoutStyle from '../styles/LayoutStyle';
@@ -79,79 +81,138 @@ const CitySelectionModal = ({ visible, onClose, onSelectCity }) => {
     }
   }, [searchQuery]);
 
+  const requestLocationPermission = async () => {
+    if (Platform.OS === 'android') {
+      // Check if permission is already granted
+      const hasPermission = await PermissionsAndroid.check(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+      );
+
+      if (hasPermission) {
+        return true;
+      }
+
+      // Check if we need to request ACCESS_COARSE_LOCATION for Android 12 and below
+      const androidVersion = Platform.Version;
+      const needsCoarseLocation = androidVersion < 31;
+
+      // Request permissions
+      const permissions = needsCoarseLocation
+        ? [
+            PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+            PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION,
+          ]
+        : [PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION];
+
+      try {
+        const result = await PermissionsAndroid.requestMultiple(permissions);
+        
+        if (
+          result[PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION] ===
+            PermissionsAndroid.RESULTS.GRANTED ||
+          (needsCoarseLocation &&
+            result[PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION] ===
+              PermissionsAndroid.RESULTS.GRANTED)
+        ) {
+          return true;
+        } else if (
+          result[PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION] ===
+            PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN ||
+          (needsCoarseLocation &&
+            result[PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION] ===
+              PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN)
+        ) {
+          Alert.alert(
+            'Permission Denied',
+            'Location permission is permanently denied. Please enable it from app settings.',
+            [
+              { text: 'Cancel', style: 'cancel' },
+              {
+                text: 'Open Settings',
+                onPress: () => Linking.openSettings(),
+              },
+            ]
+          );
+          return false;
+        } else {
+          Alert.alert(
+            'Permission Denied',
+            'Location permission is required to detect your city. Please grant permission to continue.'
+          );
+          return false;
+        }
+      } catch (err) {
+        console.error('Permission request error:', err);
+        Alert.alert('Error', 'Failed to request location permission.');
+        return false;
+      }
+    }
+    // For iOS, permissions are handled automatically by the library
+    return true;
+  };
+
   const handleDetectLocation = async () => {
     setIsDetectingLocation(true);
     try {
-      // Request location permission
-      if (Platform.OS === 'android') {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-          {
-            title: 'Location Permission',
-            message: 'Livyco needs access to your location to detect your city',
-            buttonNeutral: 'Ask Me Later',
-            buttonNegative: 'Cancel',
-            buttonPositive: 'OK',
-          }
-        );
-        if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-          Alert.alert(
-            'Permission Denied',
-            'Location permission is required to detect your city.'
-          );
-          setIsDetectingLocation(false);
-          return;
-        }
-      }
-
-      // Get current position using React Native's Geolocation API
-      // React Native includes Geolocation in navigator.geolocation
-      // For React Native 0.60+, geolocation is available globally
-      let geolocation;
-      if (typeof navigator !== 'undefined' && navigator.geolocation) {
-        geolocation = navigator.geolocation;
-      } else if (typeof global !== 'undefined' && global.navigator?.geolocation) {
-        geolocation = global.navigator.geolocation;
-      } else {
-        // Try to require Geolocation polyfill if available
-        try {
-          geolocation = require('@react-native-community/geolocation');
-        } catch (e) {
-          Alert.alert(
-            'Geolocation Not Available',
-            'Location services are not available on this device. Please select a city manually.'
-          );
-          setIsDetectingLocation(false);
-          return;
-        }
-      }
-
-      if (!geolocation || !geolocation.getCurrentPosition) {
-        Alert.alert(
-          'Geolocation Not Available',
-          'Location services are not available on this device. Please select a city manually.'
-        );
+      // Request location permission first
+      const hasPermission = await requestLocationPermission();
+      if (!hasPermission) {
         setIsDetectingLocation(false);
         return;
       }
 
-      geolocation.getCurrentPosition(
+      // For iOS, check if location services are enabled
+      if (Platform.OS === 'ios') {
+        const locationEnabled = await Geolocation.requestAuthorization();
+        if (locationEnabled !== 'granted') {
+          Alert.alert(
+            'Location Services Disabled',
+            'Please enable location services in your device settings to detect your city.',
+            [
+              { text: 'Cancel', style: 'cancel' },
+              {
+                text: 'Open Settings',
+                onPress: () => Linking.openSettings(),
+              },
+            ]
+          );
+          setIsDetectingLocation(false);
+          return;
+        }
+      }
+      // Get current position
+      Geolocation.getCurrentPosition(
         async (position) => {
           const { latitude, longitude } = position.coords;
+          console.log("latitude", latitude);
+          console.log("longitude", longitude);
           
           // Reverse geocoding to get city name
           try {
             const response = await fetch(
               `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
             );
-            const data = await response.json();
             
-            if (data && data.city) {
-              const detectedCity = data.city;
-              // Find matching city in our list
+            if (!response.ok) {
+              throw new Error('Reverse geocoding API error');
+            }
+            
+            const data = await response.json();
+            console.log("dataaaa", data);
+            
+            if (data && (data.city || data.locality || data.principalSubdivision)) {
+              // Try to get city name from different fields
+              const detectedCity = data.city || data.locality || data.principalSubdivision;
+              
+              // Find matching city in our list (case-insensitive partial match)
               const matchedCity = ALL_CITIES.find(
-                city => city.name.toLowerCase().includes(detectedCity.toLowerCase()) ||
-                        detectedCity.toLowerCase().includes(city.name.toLowerCase())
+                city => {
+                  const cityNameLower = city.name.toLowerCase();
+                  const detectedLower = detectedCity.toLowerCase();
+                  return cityNameLower.includes(detectedLower) || 
+                         detectedLower.includes(cityNameLower) ||
+                         cityNameLower === detectedLower;
+                }
               );
               
               if (matchedCity) {
@@ -169,31 +230,50 @@ const CitySelectionModal = ({ visible, onClose, onSelectCity }) => {
                 onClose();
               }
             } else {
-              Alert.alert('Error', 'Could not determine your city from location.');
+              Alert.alert(
+                'Error',
+                'Could not determine your city from location. Please select a city manually.'
+              );
             }
           } catch (error) {
             console.error('Reverse geocoding error:', error);
-            Alert.alert('Error', 'Failed to get city name from location.');
+            Alert.alert(
+              'Error',
+              'Failed to get city name from location. Please check your internet connection or select a city manually.'
+            );
           }
           setIsDetectingLocation(false);
         },
         (error) => {
           console.error('Geolocation error:', error);
-          Alert.alert(
-            'Location Error',
-            'Failed to get your location. Please check your location settings or select a city manually.'
-          );
+          let errorMessage = 'Failed to get your location. ';
+          
+          if (error.code === 1) {
+            errorMessage += 'Location permission was denied.';
+          } else if (error.code === 2) {
+            errorMessage += 'Location is unavailable. Please check your location settings.';
+          } else if (error.code === 3) {
+            errorMessage += 'Location request timed out. Please try again.';
+          } else {
+            errorMessage += 'Please check your location settings or select a city manually.';
+          }
+          
+          Alert.alert('Location Error', errorMessage);
           setIsDetectingLocation(false);
         },
         {
           enableHighAccuracy: true,
           timeout: 15000,
           maximumAge: 10000,
+          distanceFilter: 10,
         }
       );
     } catch (error) {
       console.error('Location detection error:', error);
-      Alert.alert('Error', 'Failed to detect location. Please select a city manually.');
+      Alert.alert(
+        'Error',
+        'Failed to detect location. Please select a city manually.'
+      );
       setIsDetectingLocation(false);
     }
   };

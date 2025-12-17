@@ -14,7 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import React, {useState, useEffect} from 'react';
 import HomeStyle from '../../styles/HomeStyle';
 import Colors from '../../styles/Colors';
-import {Icons} from '../../components';
+import {Icons, EmptyState} from '../../components';
 import LayoutStyle from '../../styles/LayoutStyle';
 import IMAGES from '../../assets/Images';
 import {CommonActions} from '@react-navigation/native';
@@ -256,20 +256,12 @@ const NotificationScreen = props => {
             </Text>
           </View>
         ) : notifications.length === 0 ? (
-          <View style={styles.emptyContainer}>
-            <Icons
-              iconSetName={'Ionicons'}
-              iconName={'notifications-outline'}
-              iconColor={Colors.gray}
-              iconSize={60}
-            />
-            <Text style={[HomeStyle.screenTitle, {marginTop: 20, textAlign: 'center'}]}>
-              No notifications
-            </Text>
-            <Text style={[HomeStyle.pgDesc, {textAlign: 'center', marginTop: 10}]}>
-              You don't have any notifications yet
-            </Text>
-          </View>
+          <EmptyState
+            image={IMAGES.noNotification}
+            title="No notifications"
+            description="You don't have any notifications yet"
+            containerStyle={styles.emptyContainer}
+          />
         ) : (
           <FlatList
             data={notifications}

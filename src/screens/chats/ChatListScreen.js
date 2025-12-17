@@ -2,8 +2,9 @@ import {View, Text, FlatList, TouchableOpacity, ActivityIndicator, RefreshContro
 import React, {useState, useEffect, useCallback} from 'react';
 import ChatStyle from '../../styles/ChatStyle';
 import FastImage from 'react-native-fast-image';
-import {Icons} from '../../components';
+import {Icons, EmptyState} from '../../components';
 import Colors from '../../styles/Colors';
+import IMAGES from '../../assets/Images';
 import LayoutStyle from '../../styles/LayoutStyle';
 import {useNavigation} from '@react-navigation/native';
 import {getConversations} from '../../services/chatService';
@@ -238,11 +239,12 @@ const ChatListScreen = props => {
           />
         }
         ListEmptyComponent={
-          <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', paddingTop: 50}}>
-            <Text style={{color: Colors.grayText, ...LayoutStyle.fontSize12}}>
-              No conversations yet. Start chatting!
-            </Text>
-          </View>
+          <EmptyState
+            image={IMAGES.noChat}
+            title="No conversations yet"
+            description="Start chatting with property owners!"
+            containerStyle={{paddingTop: 50}}
+          />
         }
       />
     </View>

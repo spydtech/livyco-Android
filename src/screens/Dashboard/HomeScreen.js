@@ -29,18 +29,20 @@ import { getAllProperties, getApprovedReviews } from '../../services/homeService
 import { getUserToken } from '../../utils/Api';
 import { isGuestUser, showGuestRestrictionAlert } from '../../utils/authUtils';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
 const HomeScreen = props => {
+  const isFocused = useIsFocused();
   const [rating, setRating] = useState(4);
   const [shortVisit, setShortVisit] = useState(false);
   const [open, setOpen] = useState(false);
   const [checkOut, setCheckOut] = useState('');
   const [checkIn, setCheckIn] = useState('');
   const [user, setUser] = useState(null);
-  const [properties, setProperties] = useState([]);
+  const [originalProperties, setOriginalProperties] = useState([]);
+  const [filteredProperties, setFilteredProperties] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedGender, setSelectedGender] = useState('For Him');
@@ -105,8 +107,6 @@ const HomeScreen = props => {
   useFocusEffect(
     React.useCallback(() => {
       fetchHomeData();
-      StatusBar.setBarStyle('dark-content');
-      StatusBar.setBackgroundColor(Colors.white);
     }, [])
   );
 
@@ -126,11 +126,14 @@ const HomeScreen = props => {
       // Fetch properties
       const propertiesResponse = await getAllProperties();
       if (propertiesResponse.success) {
-        // Filter only approved properties
+        // Filter only approved properties and keep original copy for search filtering
         const approvedProperties = propertiesResponse.data
-          .filter(item => item.property?.status === 'approved')
-          .slice(0, 10);
-        setProperties(approvedProperties);
+          .filter(item => item.property?.status === 'approved');
+        setOriginalProperties(approvedProperties);
+        setFilteredProperties(approvedProperties);
+      } else {
+        setOriginalProperties([]);
+        setFilteredProperties([]);
       }
 
       // Fetch reviews
@@ -143,6 +146,72 @@ const HomeScreen = props => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Get minimum price from room types for budget filtering
+  const getMinPrice = item => {
+    if (!item?.rooms?.roomTypes || item.rooms.roomTypes.length === 0) return 0;
+    const prices = item.rooms.roomTypes
+      .map(room => room.price || 0)
+      .filter(p => p > 0);
+    return prices.length > 0 ? Math.min(...prices) : 0;
+  };
+
+  // Apply filters from the search UI
+  const applySearchFilters = () => {
+    if (!originalProperties.length) {
+      setFilteredProperties([]);
+      return;
+    }
+
+    let filtered = [...originalProperties];
+
+    // Gender filter (maps UI text to backend values)
+    if (selectedGender) {
+      const genderMap = {
+        'For Him': 'Male',
+        'For Her': 'Female',
+        'Co Living': 'Co Living',
+      };
+      const targetGender = genderMap[selectedGender] || selectedGender;
+      filtered = filtered.filter(item => {
+        const pgGender = item.pgProperty?.gender || '';
+        return pgGender.toLowerCase() === targetGender.toLowerCase();
+      });
+    }
+
+    // Sharing type filter (checks room labels/types)
+    if (sharingType) {
+      const targetSharing = sharingType.toLowerCase();
+      filtered = filtered.filter(item => {
+        const roomTypes = item.rooms?.roomTypes || [];
+        return roomTypes.some(room => {
+          const label = (room.label || room.type || '').toLowerCase();
+          return label.includes(targetSharing);
+        });
+      });
+    }
+
+    // Budget filter using minimum room price
+    if (budget) {
+      const [minStr, maxStr] = budget.split('-');
+      const budgetMin = parseInt(minStr, 10) || 0;
+      const budgetMax = budget.includes('+') ? Infinity : parseInt(maxStr, 10) || Infinity;
+
+      filtered = filtered.filter(item => {
+        const minPrice = getMinPrice(item);
+        return minPrice >= budgetMin && minPrice <= budgetMax;
+      });
+    }
+
+    // City filter
+    if (selectedCity) {
+      filtered = filtered.filter(item =>
+        (item.property?.city || '').toLowerCase() === selectedCity.toLowerCase(),
+      );
+    }
+
+    setFilteredProperties(filtered);
   };
 
   const gotoPGDetails = async (item) => {
@@ -368,7 +437,9 @@ const HomeScreen = props => {
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={HomeStyle.homeContainer}>
-        <StatusBar barStyle="dark-content" backgroundColor={Colors.white} />
+        {isFocused && (
+          <StatusBar barStyle="dark-content" backgroundColor={Colors.white} />
+        )}
         <ImageBackground
           source={IMAGES.primaryBG}
           style={HomeStyle.formContainer}
@@ -591,6 +662,7 @@ const HomeScreen = props => {
                   btnTextColor={Colors.black}
                   bgColor={Colors.darkYellowButton}
                   btnStyle={HomeStyle.searchButtonStyle}
+                  onPress={applySearchFilters}
                 />
               </View>
             </View>
@@ -610,9 +682,9 @@ const HomeScreen = props => {
 
             {loading ? (
               <ActivityIndicator size="large" color={Colors.primary} style={{ marginVertical: 20 }} />
-            ) : properties.length > 0 ? (
+            ) : filteredProperties.length > 0 ? (
               <FlatList
-                data={properties}
+                data={filteredProperties}
                 renderItem={renderPGList}
                 horizontal
                 showsHorizontalScrollIndicator={false}
@@ -665,9 +737,9 @@ const HomeScreen = props => {
 
             {loading ? (
               <ActivityIndicator size="large" color={Colors.primary} style={{ marginVertical: 20 }} />
-            ) : properties.length > 0 ? (
+            ) : filteredProperties.length > 0 ? (
               <FlatList
-                data={properties.slice(0, 5)}
+                data={filteredProperties.slice(0, 5)}
                 renderItem={renderPGList}
                 horizontal
                 showsHorizontalScrollIndicator={false}

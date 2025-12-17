@@ -12,9 +12,10 @@ const Button = ({
   btnTextColor,
   btnStyle,
   flexContainer,
+  disabled
 }) => {
   return (
-    <TouchableOpacity onPress={onPress} style={[flexContainer]}>
+    <TouchableOpacity onPress={onPress} style={[flexContainer]} disabled={disabled}>
       <View
         style={[
           styles.btnContainer,

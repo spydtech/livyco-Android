@@ -14,8 +14,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import React, {useState, useEffect} from 'react';
 import PaymentStyle from '../../styles/PaymentStyle';
 import Colors from '../../styles/Colors';
-import {Icons} from '../../components';
+import {Icons, EmptyState} from '../../components';
 import CommonStyles from '../../styles/CommonStyles';
+import IMAGES from '../../assets/Images';
 import {CommonActions} from '@react-navigation/native';
 import {getUserPayments} from '../../services/paymentService';
 import moment from 'moment';
@@ -149,9 +150,12 @@ const HistoryScreen = props => {
               <ActivityIndicator size="large" color={Colors.secondary} />
             </View>
           ) : payments.length === 0 ? (
-            <View style={PaymentStyle.emptyContainer}>
-              <Text style={PaymentStyle.emptyText}>No payment history found</Text>
-            </View>
+            <EmptyState
+              image={IMAGES.noPaymentHistory}
+              title="No payment history found"
+              description="Your payment history will appear here once you make a payment"
+              containerStyle={PaymentStyle.emptyContainer}
+            />
           ) : (
             <FlatList
               data={payments}

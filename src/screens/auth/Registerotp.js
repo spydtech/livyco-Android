@@ -187,8 +187,8 @@ const Registerotp = props => {
               <Image source={IMAGES.indianFlag} style={AuthStyle.flag} />
               <Text style={AuthStyle.code}>{'+91'}</Text>
               <Icons
-                iconSetName={'FontAwesome6'}
-                iconName={'caret-down'}
+                iconSetName={'Ionicons'}
+                iconName={'chevron-down'}
                 iconColor={Colors.gray}
                 iconSize={18}
               />

@@ -123,6 +123,7 @@ const ProfileScreen = () => {
       
       // Call API to delete account
       const response = await deleteUserAccount();
+      console.log("Delete account response:", JSON.stringify(response, null, 2));
       
       if (response.success) {
         // Show success modal
@@ -147,9 +148,21 @@ const ProfileScreen = () => {
         }, 2000);
       } else {
         // Show error alert if API call failed
+        const errorMessage = response.message || 
+          (response.status === 500 
+            ? 'Server error occurred. Please try again later or contact support.' 
+            : 'Failed to delete account. Please try again.');
+        
+        console.error('Delete account failed:', {
+          success: response.success,
+          message: response.message,
+          error: response.error,
+          status: response.status,
+        });
+        
         Alert.alert(
           'Error',
-          response.message || 'Failed to delete account. Please try again.',
+          errorMessage,
           [{ text: 'OK' }]
         );
       }
@@ -157,7 +170,7 @@ const ProfileScreen = () => {
       console.error('Error deleting account:', error);
       Alert.alert(
         'Error',
-        'Failed to delete account. Please try again.',
+        error.message || 'Failed to delete account. Please try again.',
         [{ text: 'OK' }]
       );
     }

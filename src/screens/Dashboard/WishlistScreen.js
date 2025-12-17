@@ -17,7 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import React, {useState, useEffect} from 'react';
 import HomeStyle from '../../styles/HomeStyle';
 import Colors from '../../styles/Colors';
-import {Button, Icons} from '../../components';
+import {Button, Icons, EmptyState} from '../../components';
 import LayoutStyle from '../../styles/LayoutStyle';
 import IMAGES from '../../assets/Images';
 import CommonStyles from '../../styles/CommonStyles';
@@ -273,20 +273,12 @@ const WishlistScreen = props => {
             </Text>
           </View>
         ) : wishlistItems.length === 0 ? (
-          <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 20}}>
-            <Icons
-              iconSetName={'Ionicons'}
-              iconName={'heart-outline'}
-              iconColor={Colors.gray}
-              iconSize={60}
-            />
-            <Text style={[HomeStyle.screenTitle, {marginTop: 20, textAlign: 'center'}]}>
-              Your wishlist is empty
-            </Text>
-            <Text style={[HomeStyle.pgDesc, {textAlign: 'center', marginTop: 10}]}>
-              Start adding properties to your wishlist to see them here
-            </Text>
-          </View>
+          <EmptyState
+            image={IMAGES.noWishlist}
+            title="Your wishlist is empty"
+            description="Start adding properties to your wishlist to see them here"
+            containerStyle={{flex: 1, paddingHorizontal: 20}}
+          />
         ) : (
           <FlatList
             data={wishlistItems}

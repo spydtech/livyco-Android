@@ -12,12 +12,14 @@ import {
   Image,
   ActivityIndicator,
   Linking,
+  Modal,
+  Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import HomeStyle from '../../styles/HomeStyle';
 import Colors from '../../styles/Colors';
-import { Button, Icons, BottomSheet } from '../../components';
+import { Button, Icons, BottomSheet, EmptyState } from '../../components';
 import LayoutStyle from '../../styles/LayoutStyle';
 import IMAGES from '../../assets/Images';
 import CommonStyles from '../../styles/CommonStyles';
@@ -31,10 +33,12 @@ import { getReviewsByProperty, getLocationByProperty, getNearbyProperties, getMa
 import MapView, { Marker } from 'react-native-maps';
 import AuthStyle from '../../styles/AuthStyle';
 import { isGuestUser, showGuestRestrictionAlert } from '../../utils/authUtils';
+import { createContact } from '../../services/contactService';
 
 const PGBookingScreen = props => {
   const propertyData = props.route?.params?.propertyData;
-  const [rating, setRating] = useState(4);
+  const [rating, setRating] = useState(0);
+  const [reviewCount, setReviewCount] = useState(0);
   const [isBottomSheet, setIsBottomSheet] = useState(false);
   const [isContact, setIsContact] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -42,11 +46,15 @@ const PGBookingScreen = props => {
   const [wishlistLoading, setWishlistLoading] = useState(false);
   const [neighborhoodData, setNeighborhoodData] = useState(null);
   const [reviews, setReviews] = useState([]);
+  const [showAllReviews, setShowAllReviews] = useState(false);
   const [nearbyProperties, setNearbyProperties] = useState([]);
   const [mapCoordinates, setMapCoordinates] = useState({
     latitude: 28.6139,
     longitude: 77.2090,
   });
+  const [isImageViewerVisible, setIsImageViewerVisible] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const imageCarouselRef = useRef(null);
 
   // Extract data from propertyData
   const property = propertyData?.property || {};
@@ -134,7 +142,21 @@ const PGBookingScreen = props => {
     try {
       const response = await getReviewsByProperty(propertyId);
       if (response.success) {
-        setReviews(response.data || []);
+        const reviewData = response.data || [];
+        setReviews(reviewData);
+console.log("reviewData", reviewData);
+
+        const totalReviews = reviewData.length;
+        const avgRating =
+          totalReviews > 0
+            ? reviewData.reduce(
+                (sum, review) => sum + (review.rating || 0),
+                0,
+              ) / totalReviews
+            : 0;
+
+        setReviewCount(totalReviews);
+        setRating(Math.round(avgRating));
       }
     } catch (error) {
       console.error('Error fetching reviews:', error);
@@ -472,7 +494,11 @@ console.log("propertyData", propertyData);
     return (
       <TouchableOpacity
         key={index}
-        onPress={() => setSelectedImageIndex(index)}
+        onPress={() => {
+          setSelectedImageIndex(index);
+          setCurrentImageIndex(index);
+          setIsImageViewerVisible(true);
+        }}
         style={{ marginRight: 10 }}>
         <FastImage
           source={imageUrl ? { uri: imageUrl } : IMAGES.property}
@@ -486,6 +512,47 @@ console.log("propertyData", propertyData);
     );
   };
 
+  const openImageViewer = (index = 0) => {
+    setCurrentImageIndex(index);
+    setIsImageViewerVisible(true);
+  };
+
+  // Scroll to the correct image when modal opens
+  useEffect(() => {
+    if (isImageViewerVisible && imageCarouselRef.current && images.length > 0) {
+      setTimeout(() => {
+        imageCarouselRef.current?.scrollToIndex({
+          index: currentImageIndex,
+          animated: false,
+        });
+      }, 100);
+    }
+  }, [isImageViewerVisible, currentImageIndex]);
+
+  const closeImageViewer = () => {
+    setIsImageViewerVisible(false);
+  };
+
+  const renderFullScreenImage = ({ item, index }) => {
+    const imageUrl = item?.url;
+    return (
+      <View style={{ width: deviceWidth, height: deviceHight, justifyContent: 'center', alignItems: 'center' }}>
+        <FastImage
+          source={imageUrl ? { uri: imageUrl } : IMAGES.property}
+          style={{ width: deviceWidth, height: deviceHight }}
+          resizeMode={FastImage.resizeMode.contain}
+        />
+      </View>
+    );
+  };
+
+  const onImageScroll = (event) => {
+    const slideSize = event.nativeEvent.layoutMeasurement.width;
+    const index = Math.round(event.nativeEvent.contentOffset.x / slideSize);
+    setCurrentImageIndex(index);
+    setSelectedImageIndex(index);
+  };
+
   const handleCall = async () => {
      // Check if user is a guest before allowing booking
      const isGuest = await isGuestUser();
@@ -493,8 +560,54 @@ console.log("propertyData", propertyData);
        showGuestRestrictionAlert(props.navigation);
        return;
      }
-    if (owner?.phone) {
-      Linking.openURL(`tel:${owner.phone}`);
+
+    // Validate required data
+    if (!owner?._id || !propertyId) {
+      showMessage({
+        message: 'Error',
+        description: 'Owner or property information is missing',
+        type: 'danger',
+        floating: true,
+        statusBarHeight: 40,
+        icon: 'auto',
+        autoHide: true,
+        duration: 3000,
+      });
+      return;
+    }
+
+    // Create contact record before making the call
+    try {
+      const contactResponse = await createContact({
+        propertyId: propertyId,
+        propertyName: property?.name || pgProperty?.name || 'Property',
+        clientId: owner._id || owner.id,
+        clientName: owner?.name || 'Property Owner',
+        clientPhone: owner?.phone || '',
+        contactMethod: 'call',
+        contactType: 'inquiry',
+        message: `Interested in ${property?.name || pgProperty?.name || 'property'}`,
+      });
+      console.log("contactResponse", contactResponse);
+
+      if (contactResponse.success) {
+        // Contact created successfully, now make the call
+        if (owner?.phone) {
+          Linking.openURL(`tel:${owner.phone}`);
+        }
+      } else {
+        // Still allow the call even if contact creation fails
+        console.warn('Failed to create contact:', contactResponse.message);
+        if (owner?.phone) {
+          Linking.openURL(`tel:${owner.phone}`);
+        }
+      }
+    } catch (error) {
+      console.error('Error creating contact:', error);
+      // Still allow the call even if contact creation fails
+      if (owner?.phone) {
+        Linking.openURL(`tel:${owner.phone}`);
+      }
     }
   };
 
@@ -518,6 +631,28 @@ console.log("propertyData", propertyData);
         duration: 3000,
       });
       return;
+    }
+
+    // Create contact record before navigating to chat
+    try {
+      const contactResponse = await createContact({
+        propertyId: propertyId,
+        propertyName: property?.name || pgProperty?.name || 'Property',
+        clientId: owner._id || owner.id,
+        clientName: owner?.name || 'Property Owner',
+        clientPhone: owner?.phone || '',
+        contactMethod: 'chat',
+        contactType: 'inquiry',
+        message: `Interested in ${property?.name || pgProperty?.name || 'property'}`,
+      });
+
+      if (!contactResponse.success) {
+        // Still allow navigation even if contact creation fails
+        console.warn('Failed to create contact:', contactResponse.message);
+      }
+    } catch (error) {
+      console.error('Error creating contact:', error);
+      // Still allow navigation even if contact creation fails
     }
 
     props.navigation.navigate('MessageList', {
@@ -607,19 +742,24 @@ console.log("propertyData", propertyData);
             <View style={[HomeStyle.PgListContainer, { paddingHorizontal: 20 }]}>
               <View style={[HomeStyle.imageListContainer]}>
                 <View style={{ position: 'relative' }}>
-                  {mainImage ? (
-                    <FastImage
-                      source={{ uri: mainImage }}
-                      style={[HomeStyle.pgImgaeBig]}
-                      borderRadius={10}
-                    />
-                  ) : (
-                    <Image
-                      source={IMAGES.property}
-                      style={[HomeStyle.pgImgaeBig]}
-                      borderRadius={10}
-                    />
-                  )}
+                  <TouchableOpacity
+                    activeOpacity={0.9}
+                    onPress={() => openImageViewer(selectedImageIndex)}
+                    style={{ width: '100%' }}>
+                    {mainImage ? (
+                      <FastImage
+                        source={{ uri: mainImage }}
+                        style={[HomeStyle.pgImgaeBig]}
+                        borderRadius={10}
+                      />
+                    ) : (
+                      <Image
+                        source={IMAGES.property}
+                        style={[HomeStyle.pgImgaeBig]}
+                        borderRadius={10}
+                      />
+                    )}
+                  </TouchableOpacity>
                   {/* Heart Icon Overlay */}
                   <TouchableOpacity
                     onPress={toggleWishlist}
@@ -660,12 +800,17 @@ console.log("propertyData", propertyData);
                   <Icons
                     key={'rate' + index}
                     iconSetName={'Ionicons'}
-                    iconName={index < rating ? 'star' : 'star-outline'}
+                    iconName={index < reviewCount ? 'star' : 'star-outline'}
                     iconColor={Colors.rating}
                     iconSize={24}
                   />
                 ))}
               </View>
+              <Text style={[HomeStyle.reviewText, { marginTop: 5 }]}>
+                {reviewCount > 0
+                  ? `${reviewCount} review${reviewCount > 1 ? 's' : ''}`
+                  : 'No reviews yet'}
+              </Text>
               <Text style={[HomeStyle.pgDesc]}>
                 {description}
               </Text>
@@ -789,15 +934,13 @@ console.log("propertyData", propertyData);
                   </MapView>
                 ) : (
                   <View style={{ width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', backgroundColor: Colors.lightWhite }}>
-                    <Icons
-                      iconSetName={'Ionicons'}
-                      iconName={'location-outline'}
-                      iconColor={Colors.gray}
-                      iconSize={40}
+                    <EmptyState
+                      image={IMAGES.noMap}
+                      title="Location data not available"
+                      description="Map location is not available for this property"
+                      containerStyle={{ paddingVertical: 20 }}
+                      imageStyle={{ width: 150, height: 150 }}
                     />
-                    <Text style={[HomeStyle.pgDesc, { marginTop: 10, textAlign: 'center' }]}>
-                      Location data not available
-                    </Text>
                   </View>
                 )}
               </View>
@@ -811,33 +954,47 @@ console.log("propertyData", propertyData);
                 <Text
                   style={[
                     HomeStyle.screenTitle,
-                    { ...LayoutStyle.marginBottom20 },
+                    { ...LayoutStyle.marginBottom20, marginTop: reviews.length > 0  ? 0 : 20 },
                   ]}>
                   {'Reviews'}
                 </Text>
                 {reviews.length > 0 ? (
                   <FlatList
-                    data={reviews.slice(0, 2)}
+                    data={showAllReviews ? reviews : reviews.slice(0, 2)}
                     renderItem={renderReviewList}
                     scrollEnabled={false}
                     keyExtractor={(item, index) => item._id?.toString() || index.toString()}
                   />
                 ) : (
-                  <Text style={[HomeStyle.pgDesc, { textAlign: 'center', paddingVertical: 20 }]}>
-                    No reviews yet
-                  </Text>
+                  <EmptyState
+                    image={IMAGES.reviewsNot}
+                    title="No reviews yet"
+                    description="Be the first to review this property"
+                    containerStyle={{ paddingVertical: 20 }}
+                    imageStyle={{ width: 150, height: 150 }}
+                  />
                 )}
-                {reviews.length > 2 && <TouchableOpacity style={{ alignItems: 'center', marginTop: 10 }}>
-                  <View style={[HomeStyle.iconViewAll, { flexDirection: 'row', alignItems: 'center' }]}>
-                    <Text style={[HomeStyle.viewallTextIcon]}>{'View more'}</Text>
-                    <Icons
-                      iconSetName={'MaterialIcons'}
-                      iconName={'keyboard-arrow-down'}
-                      iconColor={Colors.gray}
-                      iconSize={26}
-                    />
-                  </View>
-                </TouchableOpacity>}
+                {reviews.length > 2 && !showAllReviews && (
+                  <TouchableOpacity
+                    style={{ alignItems: 'center', marginVertical: 10 }}
+                    onPress={() => setShowAllReviews(true)}
+                  >
+                    <View
+                      style={[
+                        HomeStyle.iconViewAll,
+                        { flexDirection: 'row', alignItems: 'center' },
+                      ]}
+                    >
+                      <Text style={[HomeStyle.viewallTextIcon]}>{'View more'}</Text>
+                      <Icons
+                        iconSetName={'MaterialIcons'}
+                        iconName={'keyboard-arrow-down'}
+                        iconColor={Colors.gray}
+                        iconSize={26}
+                      />
+                    </View>
+                  </TouchableOpacity>
+                )}
               </View>
               <View>
                 <Text
@@ -863,7 +1020,7 @@ console.log("propertyData", propertyData);
                 )}
               </View>
               {propertyData && (
-                <View style={[HomeStyle.btnBookingContainer, { paddingHorizontal: 20, marginBottom: 65 }]}>
+                <View style={[HomeStyle.btnBookingContainer, { paddingHorizontal: 20, marginVertical: 65 }]}>
                   <Button
                     onPress={() => gotoContactClick()}
                     btnStyle={[HomeStyle.btnRadius]}
@@ -961,6 +1118,102 @@ console.log("propertyData", propertyData);
             );
           }}
         />
+        
+        {/* Full Screen Image Viewer Modal */}
+        <Modal
+          visible={isImageViewerVisible}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={closeImageViewer}
+          statusBarTranslucent={true}>
+          <View style={{
+            flex: 1,
+            backgroundColor: 'rgba(0, 0, 0, 0.95)',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+            {/* Close Button */}
+            <TouchableOpacity
+              onPress={closeImageViewer}
+              style={{
+                position: 'absolute',
+                top: Platform.OS === 'ios' ? 50 : 40,
+                right: 20,
+                zIndex: 10,
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                borderRadius: 20,
+                padding: 10,
+              }}
+              activeOpacity={0.7}>
+              <Icons
+                iconSetName={'Ionicons'}
+                iconName={'close'}
+                iconColor={Colors.white}
+                iconSize={28}
+              />
+            </TouchableOpacity>
+
+            {/* Image Counter */}
+            {images.length > 1 && (
+              <View style={{
+                position: 'absolute',
+                top: Platform.OS === 'ios' ? 50 : 40,
+                left: 20,
+                zIndex: 10,
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                borderRadius: 15,
+                paddingHorizontal: 15,
+                paddingVertical: 8,
+              }}>
+                <Text style={{
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: '600',
+                }}>
+                  {currentImageIndex + 1} / {images.length}
+                </Text>
+              </View>
+            )}
+
+            {/* Image Carousel */}
+            {images.length > 0 ? (
+              <FlatList
+                ref={imageCarouselRef}
+                data={images}
+                renderItem={renderFullScreenImage}
+                keyExtractor={(item, index) => index.toString()}
+                horizontal={true}
+                pagingEnabled={true}
+                showsHorizontalScrollIndicator={false}
+                onMomentumScrollEnd={onImageScroll}
+                getItemLayout={(data, index) => ({
+                  length: deviceWidth,
+                  offset: deviceWidth * index,
+                  index,
+                })}
+                onScrollToIndexFailed={(info) => {
+                  // Fallback: scroll to offset if scrollToIndex fails
+                  const wait = new Promise(resolve => setTimeout(resolve, 500));
+                  wait.then(() => {
+                    imageCarouselRef.current?.scrollToOffset({
+                      offset: info.averageItemLength * info.index,
+                      animated: false,
+                    });
+                  });
+                }}
+                style={{ flex: 1, width: deviceWidth }}
+              />
+            ) : (
+              <View style={{ width: deviceWidth, height: deviceHight, justifyContent: 'center', alignItems: 'center' }}>
+                <Image
+                  source={IMAGES.property}
+                  style={{ width: deviceWidth, height: deviceHight }}
+                  resizeMode="contain"
+                />
+              </View>
+            )}
+          </View>
+        </Modal>
        
         {/* Simple bottom sheet with Call button */}
         {/* <BottomSheet

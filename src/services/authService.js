@@ -189,15 +189,22 @@ export const healthCheck = async () => {
  */
 export const deleteUserAccount = async () => {
   try {
-    return await apiDelete('auth/profile', {
+    const response = await apiDelete('auth/profile', {
       requireAuth: true,
     });
+    
+    // Log response for debugging
+    console.log('Delete account response:', response);
+    
+    return response;
   } catch (error) {
+    console.error('Delete account error:', error);
     return {
       success: false,
       data: null,
       message: error.message || 'Failed to delete account',
       error: error.message,
+      status: error.status,
     };
   }
 };

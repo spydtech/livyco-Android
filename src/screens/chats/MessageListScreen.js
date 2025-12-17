@@ -13,11 +13,12 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import React, { useRef, useState, useEffect, useCallback } from 'react';
-import { Icons } from '../../components';
+import { Icons, EmptyState } from '../../components';
 import FastImage from 'react-native-fast-image';
 import Colors from '../../styles/Colors';
 import ChatStyle from '../../styles/ChatStyle';
 import LayoutStyle from '../../styles/LayoutStyle';
+import IMAGES from '../../assets/Images';
 import { CommonActions } from '@react-navigation/native';
 import socketService from '../../services/socketService';
 import { getMessages, sendMessage } from '../../services/chatService';
@@ -329,11 +330,12 @@ console.log("item", item, currentUserId);
               }, 100);
             }}
             ListEmptyComponent={
-              <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingTop: 50 }}>
-                <Text style={{ color: Colors.grayText, ...LayoutStyle.fontSize12 }}>
-                  No messages yet. Start the conversation!
-                </Text>
-              </View>
+              <EmptyState
+                image={IMAGES.noChat}
+                title="No messages yet"
+                description="Start the conversation!"
+                containerStyle={{paddingTop: 50}}
+              />
             }
           />
         )}

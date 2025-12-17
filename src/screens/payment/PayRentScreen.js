@@ -28,6 +28,7 @@ import { showMessage } from 'react-native-flash-message';
 import RazorpayCheckout from 'react-native-razorpay';
 import { RAZORPAY_KEY_ID } from '../../config/BaseUrl';
 import moment from 'moment';
+import { apiGet } from '../../utils/apiCall';
 
 const PayRentScreen = props => {
   const [rating, setRating] = useState(4);
@@ -35,6 +36,10 @@ const PayRentScreen = props => {
   const [rentDetails, setRentDetails] = useState(null);
   const [loading, setLoading] = useState(false);
   const [processing, setProcessing] = useState(false);
+  const [isPaymentCompleted, setIsPaymentCompleted] = useState(false);
+  const isCompleted =
+    isPaymentCompleted ||
+    (rentDetails?.status || '').toString().toLowerCase() === 'completed';
 
   const gotoHistory = () => {
     props.navigation.navigate('PayTab', { screen: 'History' });
@@ -48,6 +53,9 @@ const PayRentScreen = props => {
         if (isGuest) {
           props.navigation.navigate('HomeTab');
           showGuestRestrictionAlert(props.navigation);
+        } else {
+          // Refresh rent details and payment status when screen comes into focus
+          fetchPendingRent();
         }
       };
       checkGuestStatus();
@@ -82,12 +90,98 @@ const PayRentScreen = props => {
         floating: true,
       });
       setRentDetails(null);
+      setIsPaymentCompleted(false);
       setLoading(false);
       return;
     }
 
     setRentDetails(response.data);
+    
+    // Check if there's a completed rent payment for this property
+    if (response.data?.propertyId) {
+      await checkCompletedPayment(response.data.propertyId);
+    } else {
+      setIsPaymentCompleted(false);
+    }
+    
     setLoading(false);
+  };
+
+  const checkCompletedPayment = async (propertyId) => {
+    try {
+      const bookingsResponse = await apiGet('bookings/user');
+      
+      if (!bookingsResponse.success) {
+        console.log('Failed to fetch bookings:', bookingsResponse.message);
+        setIsPaymentCompleted(false);
+        return;
+      }
+
+      const bookings = 
+        bookingsResponse.data?.bookings ||
+        bookingsResponse.data?.data ||
+        (Array.isArray(bookingsResponse.data) ? bookingsResponse.data : []);
+
+      // Find the booking with matching propertyId
+      const matchingBooking = bookings.find(booking => {
+        const bookingPropertyId = 
+          booking.property?._id || 
+          booking.property?.id || 
+          booking.propertyId?._id || 
+          booking.propertyId?.id || 
+          booking.propertyId;
+        
+        return String(bookingPropertyId) === String(propertyId);
+      });
+
+      if (!matchingBooking || !matchingBooking.payments || matchingBooking.payments.length === 0) {
+        setIsPaymentCompleted(false);
+        return;
+      }
+
+      // Filter payments with type "rent" and status "completed"
+      const rentPayments = matchingBooking.payments.filter(
+        payment => 
+          payment.type === 'rent' && 
+          payment.status === 'completed'
+      );
+
+      if (rentPayments.length === 0) {
+        setIsPaymentCompleted(false);
+        return;
+      }
+
+      // Sort by date (latest first) and get the most recent one
+      const sortedPayments = rentPayments.sort((a, b) => {
+        const dateA = new Date(a.date || a.paidDate || 0);
+        const dateB = new Date(b.date || b.paidDate || 0);
+        return dateB - dateA; // Descending order (latest first)
+      });
+
+      const latestRentPayment = sortedPayments[0];
+      
+      // Check if this is the latest payment among ALL payments (not just rent)
+      const allPayments = matchingBooking.payments || [];
+      const sortedAllPayments = allPayments.sort((a, b) => {
+        const dateA = new Date(a.date || a.paidDate || 0);
+        const dateB = new Date(b.date || b.paidDate || 0);
+        return dateB - dateA; // Descending order (latest first)
+      });
+
+      const latestPaymentOverall = sortedAllPayments[0];
+      const latestRentPaymentDate = new Date(latestRentPayment.date || latestRentPayment.paidDate || 0);
+      const latestPaymentOverallDate = new Date(latestPaymentOverall.date || latestPaymentOverall.paidDate || 0);
+
+      // Check if the latest rent payment is also the latest payment overall
+      if (latestRentPaymentDate.getTime() === latestPaymentOverallDate.getTime()) {
+        setIsPaymentCompleted(true);
+      } else {
+        setIsPaymentCompleted(false);
+      }
+    } catch (error) {
+      console.error('Error checking completed payment:', error);
+      setIsPaymentCompleted(false);
+    }
   };
 
   useEffect(() => {
@@ -202,7 +296,8 @@ const PayRentScreen = props => {
           type: 'success',
           floating: true,
         });
-        fetchPendingRent();
+        // Refresh rent details and check for completed payment
+        await fetchPendingRent();
         props.navigation.navigate('PayTab', { screen: 'History' });
       } else {
         showMessage({
@@ -248,15 +343,16 @@ const PayRentScreen = props => {
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{ padding: 20, flex: 1, justifyContent: "space-between" }}
         showsVerticalScrollIndicator={false}>
+      {rentDetails ? (
         <View style={[PaymentStyle.payContainer]}>
           <Image source={IMAGES.bed} style={[PaymentStyle.pgImg]} />
           <Text style={[PaymentStyle.propName]}>
-            {rentDetails?.propertyName || 'Property Name'}
+            {rentDetails.propertyName || 'Property Name'}
           </Text>
           <View style={[PaymentStyle.checkDate]}>
             <Text style={[PaymentStyle.checkIn]}>{'Check in Date - '}</Text>
             <Text style={[PaymentStyle.checkIn]}>
-              {rentDetails?.moveInDate
+              {rentDetails.moveInDate
                 ? moment(rentDetails.moveInDate).format('DD/MM/YYYY')
                 : '00/00/0000'}
             </Text>
@@ -302,20 +398,35 @@ const PayRentScreen = props => {
             </TouchableOpacity>
           </View>
         </View>
-        <Button
+      ) : (
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <Text style={[PaymentStyle.reviewText, { textAlign: 'center' }]}>
+            {'No pay rent request found'}
+          </Text>
+        </View>
+      )}
+      {rentDetails && <Button
           btnName={
             loading
               ? 'Loading...'
               : processing
                 ? 'Processing...'
+              : isCompleted
+                ? 'Completed'
                 : rentDetails?.amount
                   ? `Pay ${formatCurrency(rentDetails.amount)}`
                   : 'Pay Rent'
           }
           btnStyle={[PaymentStyle.btnRadius, { marginBottom: 20 }]}
-          disabled={loading || processing || !rentDetails}
+          bgColor={isCompleted ? Colors.green : undefined}
+          disabled={loading || processing || !rentDetails || isCompleted}
           onPress={handlePayRent}
-        />
+        />}
       </ScrollView>
     </KeyboardAvoidingView>
   );

@@ -22,11 +22,10 @@ import CommonStyles from '../../styles/CommonStyles';
 import { deviceHight } from '../../utils/DeviceInfo';
 import FilterComponent from './FilterComponent';
 import { CommonActions } from '@react-navigation/native';
-import { getAllProperties } from '../../services/homeService';
+import { getAllProperties, getReviewsByProperty } from '../../services/homeService';
 import FastImage from 'react-native-fast-image';
 
 const TrendingScreen = props => {
-  const [rating, setRating] = useState(4);
   const [selected, setSelected] = useState(null);
   const [sortByModal, setSortByModal] = useState(false);
   const [isFilterl, setIsFilterl] = useState(false);
@@ -35,6 +34,7 @@ const TrendingScreen = props => {
   const [originalList, setOriginalList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterData, setFilterData] = useState(null);
+  const [ratingsMap, setRatingsMap] = useState({});
 
   useEffect(() => {
     fetchPGList();
@@ -60,11 +60,63 @@ const TrendingScreen = props => {
         );
         setOriginalList(approvedPGProperties);
         setPgList(approvedPGProperties);
+        fetchPropertyRatings(approvedPGProperties);
       }
     } catch (error) {
       console.error('Error fetching PG list:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchPropertyRatings = async properties => {
+    try {
+      const ratingResults = await Promise.all(
+        properties.map(async item => {
+          const propertyId = item?.property?._id;
+          if (!propertyId) {
+            return null;
+          }
+          try {
+            const response = await getReviewsByProperty(propertyId);
+            console.log("reviews response", response);
+            
+            if (response.success && Array.isArray(response.data)) {
+              const reviews = response.data;
+              const reviewCount = reviews.length;
+              const avgRating =
+                reviewCount > 0
+                  ? reviews.reduce(
+                      (sum, review) => sum + (review.rating || 0),
+                      0,
+                    ) / reviewCount
+                  : 0;
+              return { propertyId, reviewCount, avgRating };
+            }
+          } catch (err) {
+            console.error(
+              'Error fetching reviews for property:',
+              propertyId,
+              err,
+            );
+          }
+          return { propertyId, reviewCount: 0, avgRating: 0 };
+        }),
+      );
+
+      console.log("Rating Results", ratingResults);
+      
+
+      const ratingLookup = {};
+      ratingResults
+        .filter(Boolean)
+        .forEach(({ propertyId, reviewCount, avgRating }) => {
+          ratingLookup[propertyId] = { reviewCount, avgRating };
+        });
+
+      setRatingsMap(prev => ({ ...prev, ...ratingLookup }));
+    } catch (err) {
+      console.error('Error fetching property ratings:', err);
     }
   };
 
@@ -207,9 +259,6 @@ const TrendingScreen = props => {
   const gotoBooking = propertyData => {
     props.navigation.navigate('PGBooking', { propertyData });
   };
-  const handleRating = selectedRating => {
-    setRating(selectedRating);
-  };
   const renderPGList = ({ item, index }) => {
     if (!item || !item.property || !item.pgProperty) return null;
 
@@ -238,6 +287,10 @@ const TrendingScreen = props => {
     // Get amenities (first few for display)
     const amenities = pgProperty.amenities || [];
     const displayAmenities = amenities.slice(0, 7);
+    const ratingInfo = ratingsMap[property._id] || {};
+    const averageRating = ratingInfo.avgRating || 0;
+    const reviewCount = ratingInfo.reviewCount || 0;
+    const roundedRating = Math.round(averageRating);
 
     return (
       <TouchableOpacity
@@ -281,13 +334,23 @@ const TrendingScreen = props => {
                   <Icons
                     key={'rate' + idx}
                     iconSetName={'Ionicons'}
-                    iconName={idx < rating ? 'star' : 'star-outline'}
+                    iconName={idx < reviewCount ? 'star' : 'star-outline'}
                     iconColor={Colors.rating}
                     iconSize={18}
                   />
                 ))}
               </View>
-              <Text style={[HomeStyle.reviewText]}>{'  49 reviews'}</Text>
+              <Text
+                style={[HomeStyle.reviewText, { flexShrink: 1 }]}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                {`  ${
+                  reviewCount > 0
+                    ? `${reviewCount} review${reviewCount > 1 ? 's' : ''}`
+                    : 'No reviews yet'
+                }`}
+              </Text>
             </View>
             <View
               style={{
