@@ -54,5 +54,7 @@ const IMAGES = {
   noPaymentHistory: require('./images/no-data/no-payment-history.png'),
   noWishlist: require('./images/no-data/no-wishlist.png'),
   reviewsNot: require('./images/no-data/reviews-not.png'),
+  noStays: require('./images/no-data/no-stays.png'),
+  noTickets: require('./images/no-data/no-tickets.png'),
 };
 export default IMAGES;

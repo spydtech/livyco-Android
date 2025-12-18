@@ -13,7 +13,7 @@ import {
 import React, { useCallback, useEffect, useState } from 'react';
 import PaymentStyle from '../../styles/PaymentStyle';
 import Colors from '../../styles/Colors';
-import { Button, Icons } from '../../components';
+import { Button, EmptyState, Icons } from '../../components';
 import IMAGES from '../../assets/Images';
 import CommonStyles from '../../styles/CommonStyles';
 import { CommonActions, useFocusEffect } from '@react-navigation/native';
@@ -96,41 +96,41 @@ const PayRentScreen = props => {
     }
 
     setRentDetails(response.data);
-    
+
     // Check if there's a completed rent payment for this property
     if (response.data?.propertyId) {
       await checkCompletedPayment(response.data.propertyId);
     } else {
       setIsPaymentCompleted(false);
     }
-    
+
     setLoading(false);
   };
 
   const checkCompletedPayment = async (propertyId) => {
     try {
       const bookingsResponse = await apiGet('bookings/user');
-      
+
       if (!bookingsResponse.success) {
         console.log('Failed to fetch bookings:', bookingsResponse.message);
         setIsPaymentCompleted(false);
         return;
       }
 
-      const bookings = 
+      const bookings =
         bookingsResponse.data?.bookings ||
         bookingsResponse.data?.data ||
         (Array.isArray(bookingsResponse.data) ? bookingsResponse.data : []);
 
       // Find the booking with matching propertyId
       const matchingBooking = bookings.find(booking => {
-        const bookingPropertyId = 
-          booking.property?._id || 
-          booking.property?.id || 
-          booking.propertyId?._id || 
-          booking.propertyId?.id || 
+        const bookingPropertyId =
+          booking.property?._id ||
+          booking.property?.id ||
+          booking.propertyId?._id ||
+          booking.propertyId?.id ||
           booking.propertyId;
-        
+
         return String(bookingPropertyId) === String(propertyId);
       });
 
@@ -141,8 +141,8 @@ const PayRentScreen = props => {
 
       // Filter payments with type "rent" and status "completed"
       const rentPayments = matchingBooking.payments.filter(
-        payment => 
-          payment.type === 'rent' && 
+        payment =>
+          payment.type === 'rent' &&
           payment.status === 'completed'
       );
 
@@ -159,7 +159,7 @@ const PayRentScreen = props => {
       });
 
       const latestRentPayment = sortedPayments[0];
-      
+
       // Check if this is the latest payment among ALL payments (not just rent)
       const allPayments = matchingBooking.payments || [];
       const sortedAllPayments = allPayments.sort((a, b) => {
@@ -343,84 +343,87 @@ const PayRentScreen = props => {
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{ padding: 20, flex: 1, justifyContent: "space-between" }}
         showsVerticalScrollIndicator={false}>
-      {rentDetails ? (
-        <View style={[PaymentStyle.payContainer]}>
-          <Image source={IMAGES.bed} style={[PaymentStyle.pgImg]} />
-          <Text style={[PaymentStyle.propName]}>
-            {rentDetails.propertyName || 'Property Name'}
-          </Text>
-          <View style={[PaymentStyle.checkDate]}>
-            <Text style={[PaymentStyle.checkIn]}>{'Check in Date - '}</Text>
-            <Text style={[PaymentStyle.checkIn]}>
-              {rentDetails.moveInDate
-                ? moment(rentDetails.moveInDate).format('DD/MM/YYYY')
-                : '00/00/0000'}
+        {rentDetails ? (
+          <View style={[PaymentStyle.payContainer]}>
+            <Image source={IMAGES.bed} style={[PaymentStyle.pgImg]} />
+            <Text style={[PaymentStyle.propName]}>
+              {rentDetails.propertyName || 'Property Name'}
             </Text>
-          </View>
-          <View>
-            <Text style={[PaymentStyle.reviewText]}>{'Drop a review'}</Text>
-            <View style={[PaymentStyle.rateImg]}>
-              {Array.from({ length: 5 }, (_, index) => (
-                <TouchableOpacity
-                  key={'rate' + index}
-                  onPress={() => handleRating(index + 1)}>
-                  <Icons
-                    iconSetName={'Ionicons'}
-                    iconName={index < rating ? 'star' : 'star-outline'}
-                    iconColor={Colors.rating}
-                    iconSize={18}
-                  />
-                </TouchableOpacity>
-              ))}
-            </View>
-            <TextInput
-              style={PaymentStyle.textarea}
-              multiline={true}
-              numberOfLines={4}
-              placeholder="Type something here..."
-              value={reason}
-              onChangeText={text => setReason(text)}
-              maxLength={200}
-            />
-            <Text style={[PaymentStyle.textCount]}>{`${reason.length}/200`}</Text>
-            <TouchableOpacity onPress={() => gotoHistory()} style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 20 }}>
-              <Text style={[PaymentStyle.historyText]}>
-                {'Payment History'}
+            <View style={[PaymentStyle.checkDate]}>
+              <Text style={[PaymentStyle.checkIn]}>{'Check in Date - '}</Text>
+              <Text style={[PaymentStyle.checkIn]}>
+                {rentDetails.moveInDate
+                  ? moment(rentDetails.moveInDate).format('DD/MM/YYYY')
+                  : '00/00/0000'}
               </Text>
-              <View style={[PaymentStyle.arrowIcon]}>
-                <Icons
-                  iconSetName={'MaterialIcons'}
-                  iconName={'arrow-forward-ios'}
-                  iconColor={Colors.black}
-                  iconSize={16}
-                />
+            </View>
+            <View>
+              <Text style={[PaymentStyle.reviewText]}>{'Drop a review'}</Text>
+              <View style={[PaymentStyle.rateImg]}>
+                {Array.from({ length: 5 }, (_, index) => (
+                  <TouchableOpacity
+                    key={'rate' + index}
+                    onPress={() => handleRating(index + 1)}>
+                    <Icons
+                      iconSetName={'Ionicons'}
+                      iconName={index < rating ? 'star' : 'star-outline'}
+                      iconColor={Colors.rating}
+                      iconSize={18}
+                    />
+                  </TouchableOpacity>
+                ))}
               </View>
-            </TouchableOpacity>
+              <TextInput
+                style={PaymentStyle.textarea}
+                multiline={true}
+                numberOfLines={4}
+                placeholder="Type something here..."
+                value={reason}
+                onChangeText={text => setReason(text)}
+                maxLength={200}
+              />
+              <Text style={[PaymentStyle.textCount]}>{`${reason.length}/200`}</Text>
+              <TouchableOpacity onPress={() => gotoHistory()} style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 20 }}>
+                <Text style={[PaymentStyle.historyText]}>
+                  {'Payment History'}
+                </Text>
+                <View style={[PaymentStyle.arrowIcon]}>
+                  <Icons
+                    iconSetName={'MaterialIcons'}
+                    iconName={'arrow-forward-ios'}
+                    iconColor={Colors.black}
+                    iconSize={16}
+                  />
+                </View>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      ) : (
-        <View
-          style={{
-            flex: 1,
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
-          <Text style={[PaymentStyle.reviewText, { textAlign: 'center' }]}>
-            {'No pay rent request found'}
-          </Text>
-        </View>
-      )}
-      {rentDetails && <Button
+        ) : (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <EmptyState
+              image={IMAGES.noPaymentHistory}
+              title="No pay rent request found"
+              description=""
+              containerStyle={{ paddingTop: 50 }}
+            />
+          </View>
+        )}
+        {rentDetails && <Button
           btnName={
             loading
               ? 'Loading...'
               : processing
                 ? 'Processing...'
-              : isCompleted
-                ? 'Completed'
-                : rentDetails?.amount
-                  ? `Pay ${formatCurrency(rentDetails.amount)}`
-                  : 'Pay Rent'
+                : isCompleted
+                  ? 'Completed'
+                  : rentDetails?.amount
+                    ? `Pay ${formatCurrency(rentDetails.amount)}`
+                    : 'Pay Rent'
           }
           btnStyle={[PaymentStyle.btnRadius, { marginBottom: 20 }]}
           bgColor={isCompleted ? Colors.green : undefined}

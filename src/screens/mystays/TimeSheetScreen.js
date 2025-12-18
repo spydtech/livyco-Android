@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, Dimensions } from 'react-native';
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import MystaysStyle from '../../styles/MystaysStyle';
-import { Button, Icons } from '../../components';
+import { Button, EmptyState, Icons } from '../../components';
 import CommonStyles from '../../styles/CommonStyles';
 import Colors from '../../styles/Colors';
 import moment from 'moment';
@@ -10,6 +10,7 @@ import LayoutStyle from '../../styles/LayoutStyle';
 import { Calendar } from 'react-native-calendars';
 import { getMyStays } from '../../services/staysService';
 import { useNavigation } from '@react-navigation/native';
+import IMAGES from '../../assets/Images';
 
 const ACTIVE_BOOKING_STATUSES = ['approved', 'active', 'confirmed', 'pending'];
 const { width: deviceWidth } = Dimensions.get('window');
@@ -250,9 +251,12 @@ const TimeSheetScreen = () => {
   if (stays.length === 0) {
     return (
       <View style={[MystaysStyle.tabListcontainer, { justifyContent: 'center', alignItems: 'center', flex: 1, padding: 20 }]}>
-        <Text style={{ fontSize: 16, fontFamily: FontFamily.RobotoRegular, color: Colors.grayText, textAlign: 'center' }}>
-          {'No active stays found'}
-        </Text>
+        <EmptyState
+          image={IMAGES.noStays}
+          title="No active stays found"
+          description=""
+          containerStyle={{ paddingTop: 50 }}
+        />
       </View>
     );
   }

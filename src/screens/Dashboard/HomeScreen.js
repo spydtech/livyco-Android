@@ -25,7 +25,7 @@ import { deviceHight, deviceWidth } from '../../utils/DeviceInfo';
 import DatePicker from 'react-native-date-picker';
 import moment from 'moment';
 import { getUser } from '../../services/authService';
-import { getAllProperties, getApprovedReviews } from '../../services/homeService';
+import { getAllProperties, getApprovedReviews, getReviewsByProperty } from '../../services/homeService';
 import { getUserToken } from '../../utils/Api';
 import { isGuestUser, showGuestRestrictionAlert } from '../../utils/authUtils';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -45,6 +45,7 @@ const HomeScreen = props => {
   const [filteredProperties, setFilteredProperties] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [ratingsMap, setRatingsMap] = useState({});
   const [selectedGender, setSelectedGender] = useState('For Him');
   const [sharingType, setSharingType] = useState('');
   const [budget, setBudget] = useState('');
@@ -131,6 +132,8 @@ const HomeScreen = props => {
           .filter(item => item.property?.status === 'approved');
         setOriginalProperties(approvedProperties);
         setFilteredProperties(approvedProperties);
+        // Fetch ratings for all properties
+        fetchPropertyRatings(approvedProperties);
       } else {
         setOriginalProperties([]);
         setFilteredProperties([]);
@@ -145,6 +148,54 @@ const HomeScreen = props => {
       console.error('Error fetching home data:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Fetch ratings for properties
+  const fetchPropertyRatings = async properties => {
+    try {
+      const ratingResults = await Promise.all(
+        properties.map(async item => {
+          const propertyId = item?.property?._id;
+          if (!propertyId) {
+            return null;
+          }
+          try {
+            const response = await getReviewsByProperty(propertyId);
+            
+            if (response.success && Array.isArray(response.data)) {
+              const reviews = response.data;
+              const reviewCount = reviews.length;
+              const avgRating =
+                reviewCount > 0
+                  ? reviews.reduce(
+                      (sum, review) => sum + (review.rating || 0),
+                      0,
+                    ) / reviewCount
+                  : 0;
+              return { propertyId, reviewCount, avgRating };
+            }
+          } catch (err) {
+            console.error(
+              'Error fetching reviews for property:',
+              propertyId,
+              err,
+            );
+          }
+          return { propertyId, reviewCount: 0, avgRating: 0 };
+        }),
+      );
+
+      const ratingLookup = {};
+      ratingResults
+        .filter(Boolean)
+        .forEach(({ propertyId, reviewCount, avgRating }) => {
+          ratingLookup[propertyId] = { reviewCount, avgRating };
+        });
+
+      setRatingsMap(prev => ({ ...prev, ...ratingLookup }));
+    } catch (err) {
+      console.error('Error fetching property ratings:', err);
     }
   };
 
@@ -254,7 +305,11 @@ const HomeScreen = props => {
       minPrice = prices.length > 0 ? Math.min(...prices) : 0;
     }
 
-    const avgRating = 4;
+    // Get rating info from ratingsMap
+    const ratingInfo = ratingsMap[property._id] || {};
+    const averageRating = ratingInfo.avgRating || 0;
+    const reviewCount = ratingInfo.reviewCount || 0;
+    const roundedRating = Math.round(averageRating);
 
     return (
       <TouchableOpacity
@@ -292,13 +347,21 @@ const HomeScreen = props => {
                   <Icons
                     key={index}
                     iconSetName={'Ionicons'}
-                    iconName={index < avgRating ? 'star' : 'star-outline'}
+                    iconName={index < roundedRating ? 'star' : 'star-outline'}
                     iconColor={Colors.rating}
                     iconSize={16}
                   />
                 ))}
               </View>
-              <Text style={[HomeStyle.reviewText, { marginLeft: 5 }]}>{'49 reviews'}</Text>
+              <Text
+                style={[HomeStyle.reviewText, { marginLeft: 5, flexShrink: 1 }]}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                {reviewCount > 0
+                  ? `${reviewCount} review${reviewCount > 1 ? 's' : ''}`
+                  : 'No reviews yet'}
+              </Text>
             </View>
             <View style={{ ...CommonStyles.directionRowCenter, marginTop: 8, flexWrap: 'wrap' }}>
               <Icons iconSetName={'Ionicons'} iconName={'wifi'} iconColor={Colors.gray} iconSize={16} />

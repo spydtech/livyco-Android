@@ -29,6 +29,7 @@ const HelpScreen = () => {
     switch (option) {
       case 'ticket':
         // Navigate to ticket status screen
+        navigation.navigate('TicketScreen');
         break;
       case 'chat':
         // Navigate to chat support screen

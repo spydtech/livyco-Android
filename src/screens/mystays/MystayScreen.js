@@ -3,7 +3,7 @@ import React, {useState, useEffect} from 'react';
 import MystaysStyle from '../../styles/MystaysStyle';
 import IMAGES from '../../assets/Images';
 import Colors from '../../styles/Colors';
-import {Icons, Button} from '../../components';
+import {Icons, Button, EmptyState} from '../../components';
 import {useNavigation} from '@react-navigation/native';
 import {getMyStays} from '../../services/staysService';
 import moment from 'moment';
@@ -202,7 +202,12 @@ const MystayScreen = props => {
   if (!hasStays) {
     return (
       <View style={[MystaysStyle.tabListcontainer, MystaysStyle.emptyContainer]}>
-        <Text style={MystaysStyle.emptyText}>No stays found</Text>
+        <EmptyState
+          image={IMAGES.noStays}
+          title="No stays found"
+          description=""
+          containerStyle={{ paddingTop: 50 }}
+        />
       </View>
     );
   }
