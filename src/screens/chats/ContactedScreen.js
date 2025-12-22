@@ -14,7 +14,7 @@ import React, {useState, useEffect, useCallback} from 'react';
 import {Swipeable} from 'react-native-gesture-handler';
 import {useFocusEffect} from '@react-navigation/native';
 import ChatStyle from '../../styles/ChatStyle';
-import {Button, Icons, Overlay} from '../../components';
+import {Button, EmptyState, Icons, Overlay} from '../../components';
 import LayoutStyle from '../../styles/LayoutStyle';
 import {useNavigation} from '@react-navigation/native';
 import FastImage from 'react-native-fast-image';
@@ -24,6 +24,7 @@ import Dialog from 'react-native-dialog';
 import {getUserContacts, deleteContact} from '../../services/contactService';
 import {showMessage} from 'react-native-flash-message';
 import moment from 'moment';
+import IMAGES from '../../assets/Images';
 
 const ContactedScreen = props => {
   const navigation = useNavigation();
@@ -285,19 +286,15 @@ const ContactedScreen = props => {
     );
   }
 
-  if (contacts.length === 0) {
+  if (contacts && contacts.length === 0) {
     return (
       <View style={styles.emptyContainer}>
-        <Icons
-          iconName={'people-outline'}
-          iconSetName={'Ionicons'}
-          iconColor={Colors.gray}
-          iconSize={64}
-        />
-        <Text style={styles.emptyText}>No contacts yet</Text>
-        <Text style={styles.emptySubText}>
-          Contacts you make will appear here
-        </Text>
+        <EmptyState
+            image={IMAGES.noChat}
+            title="No contacts yet"
+            description="Contacts you make will appear here"
+            containerStyle={{paddingTop: 50}}
+          />
       </View>
     );
   }

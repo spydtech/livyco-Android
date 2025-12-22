@@ -209,6 +209,29 @@ export const deleteUserAccount = async () => {
   }
 };
 
+/**
+ * Sign in with Google
+ * @param {Object} data - Google sign-in data
+ * @param {string} data.token - Firebase ID token from Google Sign-In
+ * @param {string} [data.role='user'] - User role (optional)
+ * @param {string} [data.email] - User email (optional, from Google)
+ * @param {string} [data.name] - User name (optional, from Google)
+ * @param {string} [data.photo] - User photo URL (optional, from Google)
+ * @returns {Promise<Object>} Google sign-in response
+ */
+export const googleSignIn = async (data) => {
+  try {
+    return await apiPost('auth/google-signin', data, {requireAuth: false});
+  } catch (error) {
+    return {
+      success: false,
+      data: null,
+      message: error.message || 'Google sign-in failed',
+      error: error.message,
+    };
+  }
+};
+
 export default {
   register,
   checkUserExists,
@@ -220,5 +243,6 @@ export default {
   updateUserProfile,
   healthCheck,
   deleteUserAccount,
+  googleSignIn,
 };
 

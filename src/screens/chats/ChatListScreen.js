@@ -219,6 +219,19 @@ const ChatListScreen = props => {
     );
   }
 
+  if (chatList && chatList.length === 0) {
+    return (
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+         <EmptyState
+            image={IMAGES.noChat}
+            title="No conversations yet"
+            description="Start chatting with property owners!"
+            containerStyle={{paddingTop: 50}}
+          />
+      </View>
+    );
+  }
+
   return (
     <View style={{flex: 1, backgroundColor: Colors.white, width: "100%"}}>
       <FlatList
@@ -238,14 +251,16 @@ const ChatListScreen = props => {
             tintColor={Colors.secondary}
           />
         }
-        ListEmptyComponent={
-          <EmptyState
-            image={IMAGES.noChat}
-            title="No conversations yet"
-            description="Start chatting with property owners!"
-            containerStyle={{paddingTop: 50}}
-          />
-        }
+        // ListEmptyComponent={
+        //   <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: Colors.red}}>
+        //   <EmptyState
+        //     image={IMAGES.noChat}
+        //     title="No conversations yet"
+        //     description="Start chatting with property owners!"
+        //     containerStyle={{paddingTop: 50}}
+        //   />
+        //   </View>
+        // }
       />
     </View>
   );
