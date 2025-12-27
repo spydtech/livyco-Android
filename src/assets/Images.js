@@ -56,5 +56,16 @@ const IMAGES = {
   reviewsNot: require('./images/no-data/reviews-not.png'),
   noStays: require('./images/no-data/no-stays.png'),
   noTickets: require('./images/no-data/no-tickets.png'),
+  // Quick Links icons
+  searchPG: require('./images/quick-links/search-pg.png'),
+  downloadInvoice: require('./images/quick-links/download-invoice.png'),
+  vacatePG: require('./images/quick-links/vacate-pg.png'),
+  serviceRequest: require('./images/quick-links/service-request.png'),
+  foodMenu: require('./images/quick-links/food-menu.png'),
+  rentReminder: require('./images/quick-links/rent-reminder.png'),
+  request: require('./images/quick-links/request.png'),
+  paymentHistory: require('./images/quick-links/payment-history.png'),
+  wishlist: require('./images/quick-links/wishlist.png'),
+  notifyAll: require('./images/quick-links/notify-all.png'),
 };
 export default IMAGES;

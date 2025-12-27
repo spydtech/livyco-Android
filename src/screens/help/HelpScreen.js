@@ -33,6 +33,7 @@ const HelpScreen = () => {
         break;
       case 'chat':
         // Navigate to chat support screen
+        navigation.navigate('ChatbotScreen');
         break;
       case 'voice':
         // Navigate to voice support screen

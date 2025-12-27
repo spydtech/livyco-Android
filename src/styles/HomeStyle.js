@@ -1470,6 +1470,72 @@ const HomeStyle = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
   },
+  quickLinksContainer: {
+    backgroundColor: Colors.white,
+    ...LayoutStyle.marginTop20,
+    ...LayoutStyle.paddingVertical20,
+    ...LayoutStyle.paddingHorizontal20,
+  },
+  quickLinksHeader: {
+    ...CommonStyles.directionRowSB,
+    ...LayoutStyle.marginBottom15,
+    alignItems: 'center',
+  },
+  quickLinksTitle: {
+    ...LayoutStyle.fontSize18,
+    fontFamily: FontFamily.RobotoBold,
+    color: Colors.secondary,
+  },
+  quickLinksGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  quickLinkItem: {
+    width: (deviceWidth - 60) / 4,
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  quickLinkIconContainer: {
+    width: 60,
+    height: 60,
+    borderRadius: 12,
+    backgroundColor: Colors.secondary,
+    ...CommonStyles.directionRowCenter,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
+    position: 'relative',
+  },
+  quickLinkIcon: {
+    width: 40,
+    height: 40,
+    resizeMode: 'contain',
+  },
+  quickLinkBadge: {
+    position: 'absolute',
+    top: -5,
+    right: -5,
+    backgroundColor: Colors.red,
+    borderRadius: 10,
+    minWidth: 20,
+    height: 20,
+    ...CommonStyles.directionRowCenter,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 5,
+  },
+  quickLinkBadgeText: {
+    color: Colors.white,
+    fontSize: 10,
+    fontFamily: FontFamily.RobotoBold,
+  },
+  quickLinkLabel: {
+    ...LayoutStyle.fontSize12,
+    fontFamily: FontFamily.RobotoMedium,
+    color: Colors.blackText,
+    textAlign: 'center',
+  },
 });
 
 export default HomeStyle;

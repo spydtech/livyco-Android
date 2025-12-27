@@ -12,7 +12,7 @@ import {
   ActivityIndicator,
   Dimensions,
 } from 'react-native';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import HomeStyle from '../../styles/HomeStyle';
 import Colors from '../../styles/Colors';
 import FastImage from 'react-native-fast-image';
@@ -26,6 +26,8 @@ import DatePicker from 'react-native-date-picker';
 import moment from 'moment';
 import { getUser } from '../../services/authService';
 import { getAllProperties, getApprovedReviews, getReviewsByProperty } from '../../services/homeService';
+import { getMyStays } from '../../services/staysService';
+import { getUserTickets } from '../../services/ticketService';
 import { getUserToken } from '../../utils/Api';
 import { isGuestUser, showGuestRestrictionAlert } from '../../utils/authUtils';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -53,6 +55,11 @@ const HomeScreen = props => {
   const [moveInDate, setMoveInDate] = useState('');
   const [moveInDateOpen, setMoveInDateOpen] = useState(false);
   const [cityModalVisible, setCityModalVisible] = useState(false);
+  const [hasRecentBookings, setHasRecentBookings] = useState(false);
+  const [serviceRequestCount, setServiceRequestCount] = useState(0);
+  const scrollViewRef = useRef(null);
+  const searchSectionRef = useRef(null);
+  const [searchSectionY, setSearchSectionY] = useState(0);
 
   // Dropdown data
   const sharingTypeData = [
@@ -143,6 +150,60 @@ const HomeScreen = props => {
       const reviewsResponse = await getApprovedReviews();
       if (reviewsResponse.success) {
         setReviews(reviewsResponse.data.slice(0, 1));
+      }
+
+      // Check for active stay with recent payment
+      if (token) {
+        const bookingsResponse = await getMyStays();
+        let hasActiveStayWithPayment = false;
+
+        if (bookingsResponse.success && bookingsResponse.data && bookingsResponse.data.length > 0) {
+          const activeStatuses = ['approved', 'confirmed', 'checked_in', 'active'];
+          
+          // Find active bookings
+          const activeBookings = bookingsResponse.data.filter(booking => {
+            const status = (booking.bookingStatus || '').toLowerCase().trim();
+            return activeStatuses.includes(status);
+          });
+
+          // Check if any active booking has a recent completed payment
+          if (activeBookings.length > 0) {
+            hasActiveStayWithPayment = activeBookings.some(booking => {
+              const payments = booking.payments || [];
+              
+              // Check for completed payments
+              const completedPayments = payments.filter(payment => {
+                const paymentStatus = (payment.status || '').toLowerCase().trim();
+                if (paymentStatus !== 'completed') {
+                  return false;
+                }
+
+                // Check if payment is recent (within last 30 days)
+                const paymentDate = payment.date || payment.paidDate || payment.createdAt || payment.updatedAt;
+                if (!paymentDate) {
+                  return false;
+                }
+
+                const paymentDateTime = new Date(paymentDate);
+                const now = new Date();
+                const daysDifference = (now - paymentDateTime) / (1000 * 60 * 60 * 24); // Convert to days
+                
+                // Consider payment "recent" if it's within the last 30 days
+                return daysDifference <= 30;
+              });
+
+              return completedPayments.length > 0;
+            });
+          }
+        }
+
+        setHasRecentBookings(hasActiveStayWithPayment);
+
+        // Fetch service request count
+        const ticketsResponse = await getUserTickets();
+        if (ticketsResponse.success) {
+          setServiceRequestCount(ticketsResponse.count || 0);
+        }
       }
     } catch (error) {
       console.error('Error fetching home data:', error);
@@ -495,6 +556,120 @@ const HomeScreen = props => {
     setCityModalVisible(false);
   };
 
+  // Quick Links navigation handlers
+  const handleQuickLinkPress = (linkType) => {
+    switch (linkType) {
+      case 'searchPG':
+        // Scroll to search section
+        if (scrollViewRef.current && searchSectionY > 0) {
+          scrollViewRef.current.scrollTo({ y: searchSectionY - 20, animated: true });
+        }
+        break;
+      case 'downloadInvoice':
+        props.navigation.navigate('History');
+        break;
+      case 'vacatePG':
+        props.navigation.navigate('VacateRoom');
+        break;
+      case 'serviceRequest':
+        props.navigation.navigate('TicketScreen');
+        break;
+      case 'foodMenu':
+        props.navigation.navigate('FoodManu');
+        break;
+      case 'rentReminder':
+        // Navigate to MystaysTab and open Timesheet tab
+        props.navigation.navigate('MystaysTab', { initialTab: 'TimeSheet' });
+        break;
+      // Wallet and My Attendance are commented out as per requirement
+      // case 'wallet':
+      //   props.navigation.navigate('Wallet');
+      //   break;
+      // case 'myAttendance':
+      //   props.navigation.navigate('MyAttendance');
+      //   break;
+      case 'request':
+        props.navigation.navigate('ChangeRequest');
+        break;
+      case 'paymentHistory':
+        props.navigation.navigate('PayTab', { screen: 'History' });
+        break;
+      case 'wishlist':
+        props.navigation.navigate('Wishlist');
+        break;
+      case 'notifyAll':
+        props.navigation.navigate('Notification');
+        break;
+      default:
+        break;
+    }
+  };
+
+  // Render Quick Links section
+  const renderQuickLinks = () => {
+    if (!hasRecentBookings) {
+      return null;
+    }
+
+    const quickLinks = [
+      { id: 'searchPG', label: 'Search PG', icon: IMAGES.searchPG },
+      { id: 'downloadInvoice', label: 'Download Invoice', icon: IMAGES.downloadInvoice },
+      { id: 'vacatePG', label: 'Vacate PG', icon: IMAGES.vacatePG },
+      { 
+        id: 'serviceRequest', 
+        label: 'Service Request', 
+        icon: IMAGES.serviceRequest,
+        badge: serviceRequestCount > 0 ? serviceRequestCount : null
+      },
+      { id: 'foodMenu', label: 'Food Menu', icon: IMAGES.foodMenu },
+      { id: 'rentReminder', label: 'Rent Reminder', icon: IMAGES.rentReminder },
+      // Wallet and My Attendance are commented out as per requirement
+      // { id: 'wallet', label: 'Wallet', icon: IMAGES.wallet },
+      // { id: 'myAttendance', label: 'My Attendance', icon: IMAGES.myAttendance },
+      { id: 'request', label: 'Request', icon: IMAGES.request },
+      { id: 'paymentHistory', label: 'Payment History', icon: IMAGES.paymentHistory },
+      { id: 'wishlist', label: 'Wishlist', icon: IMAGES.wishlist },
+      { id: 'notifyAll', label: 'Notify All', icon: IMAGES.notifyAll },
+    ];
+
+    return (
+      <View style={HomeStyle.quickLinksContainer}>
+        <View style={HomeStyle.quickLinksHeader}>
+          <Text style={HomeStyle.quickLinksTitle}>Quick Links</Text>
+          <TouchableOpacity>
+            <Icons
+              iconSetName={'Ionicons'}
+              iconName={'chevron-forward'}
+              iconColor={Colors.secondary}
+              iconSize={20}
+            />
+          </TouchableOpacity>
+        </View>
+        <View style={HomeStyle.quickLinksGrid}>
+          {quickLinks.map((link) => (
+            <TouchableOpacity
+              key={link.id}
+              style={HomeStyle.quickLinkItem}
+              onPress={() => handleQuickLinkPress(link.id)}
+            >
+              <View style={HomeStyle.quickLinkIconContainer}>
+                <Image source={link.icon} style={HomeStyle.quickLinkIcon} />
+                {link.badge && link.badge > 0 && (
+                  <View style={HomeStyle.quickLinkBadge}>
+                    <Text style={HomeStyle.quickLinkBadgeText}>
+                      {link.badge > 9 ? '9+' : link.badge}
+                    </Text>
+                  </View>
+                )}
+              </View>
+              <Text style={HomeStyle.quickLinkLabel}>{link.label}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </View>
+    );
+  };
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.white }} edges={['top']}>
       <KeyboardAvoidingView
@@ -549,6 +724,7 @@ const HomeScreen = props => {
           </View>
 
           <ScrollView
+            ref={scrollViewRef}
             keyboardShouldPersistTaps="handled"
             contentContainerStyle={{
               flexGrow: 1,
@@ -559,8 +735,18 @@ const HomeScreen = props => {
             {/* Promotional Banner */}
             {renderPromotionalBanner()}
 
+            {/* Quick Links Section */}
+            {renderQuickLinks()}
+
             {/* Search Section */}
-            <View style={HomeStyle.searchView}>
+            <View 
+              ref={searchSectionRef} 
+              style={HomeStyle.searchView}
+              onLayout={(event) => {
+                const { y } = event.nativeEvent.layout;
+                setSearchSectionY(y);
+              }}
+            >
               {/* Yellow Background Container */}
               <View style={HomeStyle.searchContainer}>
                 {/* Gender Filter Buttons */}

@@ -17,13 +17,14 @@ import Colors from '../../styles/Colors';
 import LayoutStyle from '../../styles/LayoutStyle';
 import MystayScreen from './MystayScreen';
 import TimeSheetScreen from './TimeSheetScreen';
-import {CommonActions, useNavigation, useFocusEffect} from '@react-navigation/native';
+import {CommonActions, useNavigation, useFocusEffect, useRoute} from '@react-navigation/native';
 import {isGuestUser, showGuestRestrictionAlert} from '../../utils/authUtils';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const MystaysScreen = () => {
   const navigation = useNavigation();
-  const [selectedTab, setSelectedTab] = useState('Mystay');
+  const route = useRoute();
+  const [selectedTab, setSelectedTab] = useState(route.params?.initialTab || 'Mystay');
 
   // Check guest status when screen comes into focus
   useFocusEffect(
@@ -34,10 +35,16 @@ const MystaysScreen = () => {
           // Redirect to HomeTab if guest
           navigation.navigate('HomeTab');
           showGuestRestrictionAlert(navigation);
+          return;
+        }
+        
+        // Set initial tab from route params if provided
+        if (route.params?.initialTab) {
+          setSelectedTab(route.params.initialTab);
         }
       };
       checkGuestStatus();
-    }, [navigation])
+    }, [navigation, route.params])
   );
 
   const renderTabContent = () => {

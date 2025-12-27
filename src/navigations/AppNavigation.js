@@ -51,6 +51,7 @@ import NotificationScreen from '../screens/Dashboard/NotificationScreen';
 import Registerotp from '../screens/auth/Registerotp';
 import HelpScreen from '../screens/help/HelpScreen';
 import TicketScreen from '../screens/help/TicketScreen';
+import ChatbotScreen from '../screens/help/ChatbotScreen';
 import TermsAndConditionsScreen from '../screens/terms/TermsAndConditionsScreen';
 
 const Stack = createNativeStackNavigator();
@@ -138,6 +139,7 @@ function ProfileStackScreen() {
       <ProfileStack.Screen name="History" component={HistoryScreen} />
       <ProfileStack.Screen name="Help" component={HelpScreen} />
       <ProfileStack.Screen name="TicketScreen" component={TicketScreen} />
+      <ProfileStack.Screen name="ChatbotScreen" component={ChatbotScreen} />
       <ProfileStack.Screen name="TermsAndConditions" component={TermsAndConditionsScreen} />
     </ProfileStack.Navigator>
   );
