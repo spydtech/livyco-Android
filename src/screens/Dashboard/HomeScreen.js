@@ -1194,7 +1194,9 @@ const HomeScreen = props => {
 
           {/* Floating Chat Button */}
           <>
-            <TouchableOpacity style={[HomeStyle.chatContainer]}>
+            <TouchableOpacity 
+              style={[HomeStyle.chatContainer]}
+              onPress={() => props.navigation.navigate('ChatbotScreen')}>
               <Image source={IMAGES.chat} style={[HomeStyle.chatImg]} />
             </TouchableOpacity>
           </>

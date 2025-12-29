@@ -40,6 +40,14 @@ const TrendingScreen = props => {
     fetchPGList();
   }, []);
 
+  // Handle initial filter data from route params
+  useEffect(() => {
+    const initialFilterData = props.route?.params?.filterData;
+    if (initialFilterData) {
+      setFilterData(initialFilterData);
+    }
+  }, [props.route?.params?.filterData]);
+
   useEffect(() => {
     if (originalList.length > 0) {
       applyFiltersAndSort();
