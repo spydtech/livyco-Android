@@ -1,10 +1,10 @@
 // API Configuration
 // Set to 'development' for local development or 'production' for live server
-const ENVIRONMENT = __DEV__ ? 'development' : 'production';
+const ENVIRONMENT = !__DEV__ ? 'development' : 'production';
 
 // API URLs
 const API_URLS = {
-  development: 'http://192.168.1.14:5000/api/', // Local development server - UPDATE THIS IP!
+  development: 'http://192.168.0.8:5000/api/', // Local development server - UPDATE THIS IP!
   production: 'https://api.livyco.com/api/', // Production server (update if different)
   // Alternative production URL: 'http://82.29.161.78:5000/api/'
 };

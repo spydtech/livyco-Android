@@ -4,7 +4,7 @@
  */
 
 export const isDevelopment = () => {
-  return __DEV__;
+  return !__DEV__;
 };
 
 export const isProduction = () => {
@@ -12,7 +12,7 @@ export const isProduction = () => {
 };
 
 export const getEnvironment = () => {
-  return __DEV__ ? 'development' : 'production';
+  return !__DEV__ ? 'development' : 'production';
 };
 
 // Static OTP for development mode
