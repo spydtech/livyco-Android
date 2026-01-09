@@ -32,6 +32,7 @@ const LoginScreen = props => {
   // Configure Google Sign-In on component mount
   useEffect(() => {
     GoogleSignin.configure({
+      iosClientId: "948960032829-e0101c3o4f1dci47tf45q0e19uq5rcth.apps.googleusercontent.com",
       webClientId: '948960032829-u4a5t24tob5qp9p8ksc2ibe90beah108.apps.googleusercontent.com', // From google-services.json (client_type: 3)
       offlineAccess: true, // if you want to access Google API on behalf of the user FROM YOUR SERVER
       scopes: ['profile', 'email'], // Request profile and email scopes

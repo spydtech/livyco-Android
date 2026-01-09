@@ -12,6 +12,7 @@ import AuthStyle from '../../styles/AuthStyle';
 import IMAGES from '../../assets/Images';
 import LinearGradient from 'react-native-linear-gradient';
 import {Icons} from '../../components';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import Colors from '../../styles/Colors';
 import CommonStyles from '../../styles/CommonStyles';
 const OnboardingScreen = props => {

@@ -7,26 +7,182 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		02D3F93D91114BB39BF3846D /* chat-support.png in Resources */ = {isa = PBXBuildFile; fileRef = 9231398C4951484E9211E7DD /* chat-support.png */; };
+		06B1581A6FEE47918E416C6C /* indian_flag.png in Resources */ = {isa = PBXBuildFile; fileRef = 3939128CC5CB400C92911427 /* indian_flag.png */; };
+		08FC80554A27495193D49B6D /* wallet-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 392807C85E4C4846844722B3 /* wallet-icon.png */; };
+		1114790C61D9428FA351D6C9 /* no-stays.png in Resources */ = {isa = PBXBuildFile; fileRef = 438D4D291C8849CFB9322551 /* no-stays.png */; };
+		115512AE790646DFA8368D2A /* food-menu.png in Resources */ = {isa = PBXBuildFile; fileRef = 5F8BB30F32124CDAB23122AB /* food-menu.png */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
+		1555CD766C54438D80FFE669 /* Roboto-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 37D5BD08FF6F4DA7972A44A4 /* Roboto-SemiBold.ttf */; };
+		1AD7D09562954C809F46B7D5 /* request.png in Resources */ = {isa = PBXBuildFile; fileRef = B2A7E4C8BE544435940F2876 /* request.png */; };
+		1D5945F54C1547F5AD13A5F5 /* rent-reminder.png in Resources */ = {isa = PBXBuildFile; fileRef = 2E9A7F04932F43E197187525 /* rent-reminder.png */; };
+		1FC0E3B321034BCE91B31CDA /* Roboto-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 29CCF6905A4147ACA4CD50E3 /* Roboto-Medium.ttf */; };
+		217A105FF12E450D9AF81AC2 /* hydrabad.png in Resources */ = {isa = PBXBuildFile; fileRef = F79F8A7DB7CF428685B351D8 /* hydrabad.png */; };
+		266890AD06AC413A84BCFDE4 /* download-invoice.png in Resources */ = {isa = PBXBuildFile; fileRef = 8CA2FC0B654D4CC2959CC940 /* download-invoice.png */; };
+		2B5D77950E0E472EA6CF1288 /* success_check.png in Resources */ = {isa = PBXBuildFile; fileRef = 4104E3D4AB0641A68F259650 /* success_check.png */; };
+		2E2355B0C7A645268C64B28C /* notify-all.png in Resources */ = {isa = PBXBuildFile; fileRef = 721120713321421FA1E7566F /* notify-all.png */; };
+		30B151F59D28432F9221AC1F /* wishlist.png in Resources */ = {isa = PBXBuildFile; fileRef = A634E8D11395474EB4D8FF96 /* wishlist.png */; };
+		31CF84FA3370485B9B84DF29 /* bed.png in Resources */ = {isa = PBXBuildFile; fileRef = B4CB6B22FB9249EDB711AE6F /* bed.png */; };
+		349DD0FD248D4B809429680B /* no-notification.png in Resources */ = {isa = PBXBuildFile; fileRef = E416305ACC164662B347B4C3 /* no-notification.png */; };
+		34C1089195484210916F974F /* points.png in Resources */ = {isa = PBXBuildFile; fileRef = 6E854E57D8E54D8391ACEE49 /* points.png */; };
+		384CE7A94AD441DE86D586E2 /* chat.png in Resources */ = {isa = PBXBuildFile; fileRef = 003067B1B6C442DC943C1C3B /* chat.png */; };
+		394775D0481F4E34977C4D63 /* boarding2.png in Resources */ = {isa = PBXBuildFile; fileRef = 001065731766487F954EDF4E /* boarding2.png */; };
 		3AB87C312F0F89A100317083 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3AB87C302F0F89A100317083 /* GoogleService-Info.plist */; };
+		3C592AD051AB4E63922D1FFB /* search-pg.png in Resources */ = {isa = PBXBuildFile; fileRef = 91F564D1108E480282000366 /* search-pg.png */; };
+		3E6BCBC8D9ED439196C60295 /* mumbai.png in Resources */ = {isa = PBXBuildFile; fileRef = DC588FE7A54B416DA8FE1D08 /* mumbai.png */; };
+		42D950427DA94EBE8703D9EC /* Roboto-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7885B198846E4A39B526A919 /* Roboto-Bold.ttf */; };
+		490D6166263B4B7993CF02F7 /* search_img.png in Resources */ = {isa = PBXBuildFile; fileRef = 3F364656859F4960A0596523 /* search_img.png */; };
+		494260BB500845C294A01C20 /* filter.png in Resources */ = {isa = PBXBuildFile; fileRef = 78F742A8EC56456E8CD475EE /* filter.png */; };
+		4DF6B5E227F9459886962C80 /* wallet.png in Resources */ = {isa = PBXBuildFile; fileRef = 5942771829B2449791714BC5 /* wallet.png */; };
+		4EA9D8328061446BA0049D48 /* pune.png in Resources */ = {isa = PBXBuildFile; fileRef = EF71B08FB6B04C958EA55089 /* pune.png */; };
+		5157F9AB44EB4365BC0C313E /* no-payment-history.png in Resources */ = {isa = PBXBuildFile; fileRef = 135A2F235CBF43B2BEF00D3C /* no-payment-history.png */; };
+		5483F705102F48BA8F2A169E /* credit-card.png in Resources */ = {isa = PBXBuildFile; fileRef = 026490DA139C44019EE10100 /* credit-card.png */; };
+		55C00EE8AE4048FBADFBC834 /* logo.png in Resources */ = {isa = PBXBuildFile; fileRef = 4C3835B1CAC540F68849DAD6 /* logo.png */; };
+		55EEB4E0C2224032BBDA12F6 /* boarding3.png in Resources */ = {isa = PBXBuildFile; fileRef = F53193AC5F0C44CDA19374B1 /* boarding3.png */; };
+		59A474ACC1B94439A5754E5F /* vacate-pg.png in Resources */ = {isa = PBXBuildFile; fileRef = C756B7D6EEA347CC8BC5312F /* vacate-pg.png */; };
+		5B8554C4C9544D878CC09465 /* ahmedabad.png in Resources */ = {isa = PBXBuildFile; fileRef = 91C12CC729DC4D238E97ACA3 /* ahmedabad.png */; };
+		65A53C448ECF40F68F25C232 /* Roboto-Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 940523FCEF30477289DBA104 /* Roboto-Thin.ttf */; };
+		6BD03FB15C8A41AE8C02442B /* banglore.png in Resources */ = {isa = PBXBuildFile; fileRef = 65D4046BB0124CDD80C34B17 /* banglore.png */; };
+		74B3E28E91D9451AB72B67AF /* review.png in Resources */ = {isa = PBXBuildFile; fileRef = 37AA07D6D2EC4051BDBCA4DC /* review.png */; };
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
+		7893BF2E58204ECFBB36D7F4 /* food.png in Resources */ = {isa = PBXBuildFile; fileRef = 3E8F55BF5C4A4E328C12E60C /* food.png */; };
+		79A06BBDD9AF4915B20FAAA8 /* banner.png in Resources */ = {isa = PBXBuildFile; fileRef = C417901564924746A2340933 /* banner.png */; };
+		7BABD3EC5F0D4926A16151B3 /* office.png in Resources */ = {isa = PBXBuildFile; fileRef = DA9A3854992A437CA46DFA5F /* office.png */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		8D90060394D92A71F2AC76D2 /* Pods_Livyco.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 333C775A67C68E569712B41F /* Pods_Livyco.framework */; };
+		81F59CE1A4044C178A47C0B8 /* Roboto-ExtraLight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 857B6ED35B534184AEB502D4 /* Roboto-ExtraLight.ttf */; };
+		866DEBBFE1474FE0B30A3322 /* chandigrah.png in Resources */ = {isa = PBXBuildFile; fileRef = C5E207E9667B403D9A4E14BB /* chandigrah.png */; };
+		88646A3AE5974B2CB58E3D62 /* music_girl.png in Resources */ = {isa = PBXBuildFile; fileRef = 7EB2B5CAB9E34495B183D657 /* music_girl.png */; };
+		8B5F0A498F634D5ABE080555 /* kochi.png in Resources */ = {isa = PBXBuildFile; fileRef = 5AA0C721C8314886BA9A055F /* kochi.png */; };
+		8D33A9D1000340928A10A323 /* no-map.png in Resources */ = {isa = PBXBuildFile; fileRef = 8C1B996604C949169FAA9A94 /* no-map.png */; };
+		92AF39DB99E541BD9F64C327 /* property.png in Resources */ = {isa = PBXBuildFile; fileRef = 1593533D402643728AD52074 /* property.png */; };
+		96C4ADA36A46430B86C77023 /* reviews-not.png in Resources */ = {isa = PBXBuildFile; fileRef = 90923229CFAA472385D0272D /* reviews-not.png */; };
+		97F8ACCF987DF0D4BBB93047 /* Pods_Livyco.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37D070076E67B05A5B179E88 /* Pods_Livyco.framework */; };
+		9A8B41AE55B745638874A43C /* logo-2.png in Resources */ = {isa = PBXBuildFile; fileRef = FB55B9BF2664484EB5D15368 /* logo-2.png */; };
+		9ABC366E9A924FF385A2D4C9 /* boarding1.png in Resources */ = {isa = PBXBuildFile; fileRef = 7680D5FA1A1F42AB9E66B304 /* boarding1.png */; };
+		A005B4DEB6C84324AF402C6F /* Images.js in Resources */ = {isa = PBXBuildFile; fileRef = B385B96BDB6D4A2B8C28A779 /* Images.js */; };
+		A2933CDB24304D42867865EA /* form.png in Resources */ = {isa = PBXBuildFile; fileRef = 1AB6B7B7771543CF8ABFEBBF /* form.png */; };
+		A7137A34B52E4DA58A40290F /* stays.png in Resources */ = {isa = PBXBuildFile; fileRef = 42A76C11A8CC459C896E0ABF /* stays.png */; };
+		AA98B7B90E3A4361A3AEA068 /* kolkata.png in Resources */ = {isa = PBXBuildFile; fileRef = 7CAA4AD171E4424AAA654950 /* kolkata.png */; };
+		ACE2665B2A28462A88D09868 /* payment-history.png in Resources */ = {isa = PBXBuildFile; fileRef = F6579DC7DF1B468584159449 /* payment-history.png */; };
+		B2638CBDE05E4E9EAC1B7026 /* logo-3.png in Resources */ = {isa = PBXBuildFile; fileRef = 5D8380C78D9F41DE996D889D /* logo-3.png */; };
+		B33E1C72CE604793B2CBBD4E /* voice-support.png in Resources */ = {isa = PBXBuildFile; fileRef = 064AFF1022104B8A8C884CE2 /* voice-support.png */; };
+		B4E818B6D67E4C209CF66266 /* chennai.png in Resources */ = {isa = PBXBuildFile; fileRef = EDC8620AFCB54748AD5C470A /* chennai.png */; };
+		B90827EBF98F4566B4761046 /* FontFamily.js in Resources */ = {isa = PBXBuildFile; fileRef = 825A49FB1EE2461D9FE9F5BE /* FontFamily.js */; };
+		BA1E035A094E4C34A5F0113E /* app_img.png in Resources */ = {isa = PBXBuildFile; fileRef = 07357CEF082948F4B1006548 /* app_img.png */; };
+		BAFF3CFFF76F4255A504AC1E /* splashbg.png in Resources */ = {isa = PBXBuildFile; fileRef = E7020191DA94456CBEAE7EA2 /* splashbg.png */; };
+		BB0DDF30331F47FAB4180F59 /* welimg.png in Resources */ = {isa = PBXBuildFile; fileRef = 13C49EA8480949CD8D711177 /* welimg.png */; };
+		BBB64868850143B587892CD0 /* bank.png in Resources */ = {isa = PBXBuildFile; fileRef = 6D67F7B1A78A422BB752F577 /* bank.png */; };
+		BBCFE86914BD488DA50A4E15 /* receipt.png in Resources */ = {isa = PBXBuildFile; fileRef = 757F7AD23D9E453E98B0B26D /* receipt.png */; };
+		C4D2DA36F8C74F1C982A0906 /* category.png in Resources */ = {isa = PBXBuildFile; fileRef = 37D345EA97C94D98BB17AF47 /* category.png */; };
+		CBB38C6520394271BCFAE0FA /* logo-1.png in Resources */ = {isa = PBXBuildFile; fileRef = 02D93C5200004495AD0FDFC0 /* logo-1.png */; };
+		CCD2DFFC52994559BD443A0E /* no-chat.png in Resources */ = {isa = PBXBuildFile; fileRef = 7ED4D073BC694C0F8B69CF70 /* no-chat.png */; };
+		D623E7B6AAC34F9D94A5D331 /* thumbs-up.png in Resources */ = {isa = PBXBuildFile; fileRef = A916AFABDEF846E7AFE53100 /* thumbs-up.png */; };
+		DAB0D50C71A74BFAB10DF06C /* no-tickets.png in Resources */ = {isa = PBXBuildFile; fileRef = BED3E4FE1749490DA548F13C /* no-tickets.png */; };
+		DC0F932AF301436D8FF63310 /* delhi.png in Resources */ = {isa = PBXBuildFile; fileRef = 7131805AEB5B46A5932D9D73 /* delhi.png */; };
+		E0245A6CC6D346C3935B3143 /* no-wishlist.png in Resources */ = {isa = PBXBuildFile; fileRef = CD70450B5C4047E88E124575 /* no-wishlist.png */; };
 		E238304F801AD627B750D893 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
+		E4DAF41183A74C778A10D7D8 /* sort.png in Resources */ = {isa = PBXBuildFile; fileRef = C8A4482CFEB3465CB7799EA0 /* sort.png */; };
+		E4DE45BE784A40F3931D583E /* Roboto-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B0A48C4E9FFB479D84277522 /* Roboto-Regular.ttf */; };
+		E65386BB13C7462E8B5903BA /* google.png in Resources */ = {isa = PBXBuildFile; fileRef = 6BD913FCDE3045AE8281AE21 /* google.png */; };
+		E84B822B862447469667A513 /* map.png in Resources */ = {isa = PBXBuildFile; fileRef = F5A95ECF1390485A92AD37F7 /* map.png */; };
+		EAB8614F5B004B82B7DE4B54 /* ticket-status.png in Resources */ = {isa = PBXBuildFile; fileRef = 800B24449312438796A24D4D /* ticket-status.png */; };
+		EF4034A5BA2F4D6BB2A0B011 /* email-support.png in Resources */ = {isa = PBXBuildFile; fileRef = A08E82A654CF40F0B7B1D7CD /* email-support.png */; };
+		F3BCAD56BE024E1FB10AB548 /* service-request.png in Resources */ = {isa = PBXBuildFile; fileRef = A4E383FE76C74775A956C7AE /* service-request.png */; };
+		F631D1B7EF454E98AEBC1B73 /* upi.png in Resources */ = {isa = PBXBuildFile; fileRef = C6E476FC01E047B692CF2C52 /* upi.png */; };
+		FBFCE68E3700477CBBE3F461 /* Roboto-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3A7FCBE55DBE494F9343FA30 /* Roboto-Light.ttf */; };
+		FCA427C0968140FC8E5691EE /* Roboto-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F6F7C40F454642CB955DCE85 /* Roboto-ExtraBold.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		001065731766487F954EDF4E /* boarding2.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = boarding2.png; path = ../src/assets/images/boarding2.png; sourceTree = "<group>"; };
+		003067B1B6C442DC943C1C3B /* chat.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = chat.png; path = ../src/assets/images/chat.png; sourceTree = "<group>"; };
+		026490DA139C44019EE10100 /* credit-card.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "credit-card.png"; path = "../src/assets/images/credit-card.png"; sourceTree = "<group>"; };
+		02D93C5200004495AD0FDFC0 /* logo-1.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "logo-1.png"; path = "../src/assets/images/logo-1.png"; sourceTree = "<group>"; };
+		064AFF1022104B8A8C884CE2 /* voice-support.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "voice-support.png"; path = "../src/assets/images/voice-support.png"; sourceTree = "<group>"; };
+		07357CEF082948F4B1006548 /* app_img.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = app_img.png; path = ../src/assets/images/app_img.png; sourceTree = "<group>"; };
+		135A2F235CBF43B2BEF00D3C /* no-payment-history.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "no-payment-history.png"; path = "../src/assets/images/no-data/no-payment-history.png"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* Livyco.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Livyco.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = Livyco/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Livyco/Info.plist; sourceTree = "<group>"; };
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = Livyco/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		333C775A67C68E569712B41F /* Pods_Livyco.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Livyco.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		13C49EA8480949CD8D711177 /* welimg.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = welimg.png; path = ../src/assets/images/welimg.png; sourceTree = "<group>"; };
+		1593533D402643728AD52074 /* property.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = property.png; path = ../src/assets/images/property.png; sourceTree = "<group>"; };
+		1AB6B7B7771543CF8ABFEBBF /* form.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = form.png; path = ../src/assets/images/form.png; sourceTree = "<group>"; };
+		29CCF6905A4147ACA4CD50E3 /* Roboto-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Medium.ttf"; path = "../src/assets/fonts/Roboto-Medium.ttf"; sourceTree = "<group>"; };
+		2E9A7F04932F43E197187525 /* rent-reminder.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "rent-reminder.png"; path = "../src/assets/images/quick-links/rent-reminder.png"; sourceTree = "<group>"; };
+		37AA07D6D2EC4051BDBCA4DC /* review.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = review.png; path = ../src/assets/images/review.png; sourceTree = "<group>"; };
+		37D070076E67B05A5B179E88 /* Pods_Livyco.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Livyco.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		37D345EA97C94D98BB17AF47 /* category.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = category.png; path = ../src/assets/images/category.png; sourceTree = "<group>"; };
+		37D5BD08FF6F4DA7972A44A4 /* Roboto-SemiBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-SemiBold.ttf"; path = "../src/assets/fonts/Roboto-SemiBold.ttf"; sourceTree = "<group>"; };
+		392807C85E4C4846844722B3 /* wallet-icon.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "wallet-icon.png"; path = "../src/assets/images/wallet-icon.png"; sourceTree = "<group>"; };
+		3939128CC5CB400C92911427 /* indian_flag.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = indian_flag.png; path = ../src/assets/images/indian_flag.png; sourceTree = "<group>"; };
+		3A7FCBE55DBE494F9343FA30 /* Roboto-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Light.ttf"; path = "../src/assets/fonts/Roboto-Light.ttf"; sourceTree = "<group>"; };
 		3AB87C302F0F89A100317083 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
-		3B4392A12AC88292D35C810B /* Pods-Livyco.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Livyco.debug.xcconfig"; path = "Target Support Files/Pods-Livyco/Pods-Livyco.debug.xcconfig"; sourceTree = "<group>"; };
-		5709B34CF0A7D63546082F79 /* Pods-Livyco.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Livyco.release.xcconfig"; path = "Target Support Files/Pods-Livyco/Pods-Livyco.release.xcconfig"; sourceTree = "<group>"; };
+		3E8F55BF5C4A4E328C12E60C /* food.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = food.png; path = ../src/assets/images/food.png; sourceTree = "<group>"; };
+		3F364656859F4960A0596523 /* search_img.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = search_img.png; path = ../src/assets/images/search_img.png; sourceTree = "<group>"; };
+		4104E3D4AB0641A68F259650 /* success_check.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = success_check.png; path = ../src/assets/images/success_check.png; sourceTree = "<group>"; };
+		42A76C11A8CC459C896E0ABF /* stays.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = stays.png; path = ../src/assets/images/stays.png; sourceTree = "<group>"; };
+		438D4D291C8849CFB9322551 /* no-stays.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "no-stays.png"; path = "../src/assets/images/no-data/no-stays.png"; sourceTree = "<group>"; };
+		4C3835B1CAC540F68849DAD6 /* logo.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = logo.png; path = ../src/assets/images/logo.png; sourceTree = "<group>"; };
+		5942771829B2449791714BC5 /* wallet.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = wallet.png; path = ../src/assets/images/wallet.png; sourceTree = "<group>"; };
+		5AA0C721C8314886BA9A055F /* kochi.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = kochi.png; path = ../src/assets/images/kochi.png; sourceTree = "<group>"; };
+		5CBC2457C7A3986A2AEB63D0 /* Pods-Livyco.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Livyco.debug.xcconfig"; path = "Target Support Files/Pods-Livyco/Pods-Livyco.debug.xcconfig"; sourceTree = "<group>"; };
+		5D8380C78D9F41DE996D889D /* logo-3.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "logo-3.png"; path = "../src/assets/images/logo-3.png"; sourceTree = "<group>"; };
+		5F8BB30F32124CDAB23122AB /* food-menu.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "food-menu.png"; path = "../src/assets/images/quick-links/food-menu.png"; sourceTree = "<group>"; };
+		65D4046BB0124CDD80C34B17 /* banglore.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = banglore.png; path = ../src/assets/images/banglore.png; sourceTree = "<group>"; };
+		6BD913FCDE3045AE8281AE21 /* google.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = google.png; path = ../src/assets/images/google.png; sourceTree = "<group>"; };
+		6D67F7B1A78A422BB752F577 /* bank.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = bank.png; path = ../src/assets/images/bank.png; sourceTree = "<group>"; };
+		6E854E57D8E54D8391ACEE49 /* points.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = points.png; path = ../src/assets/images/points.png; sourceTree = "<group>"; };
+		7131805AEB5B46A5932D9D73 /* delhi.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = delhi.png; path = ../src/assets/images/delhi.png; sourceTree = "<group>"; };
+		721120713321421FA1E7566F /* notify-all.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "notify-all.png"; path = "../src/assets/images/quick-links/notify-all.png"; sourceTree = "<group>"; };
+		757F7AD23D9E453E98B0B26D /* receipt.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = receipt.png; path = ../src/assets/images/receipt.png; sourceTree = "<group>"; };
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = Livyco/AppDelegate.swift; sourceTree = "<group>"; };
+		7680D5FA1A1F42AB9E66B304 /* boarding1.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = boarding1.png; path = ../src/assets/images/boarding1.png; sourceTree = "<group>"; };
+		7885B198846E4A39B526A919 /* Roboto-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Bold.ttf"; path = "../src/assets/fonts/Roboto-Bold.ttf"; sourceTree = "<group>"; };
+		78F742A8EC56456E8CD475EE /* filter.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = filter.png; path = ../src/assets/images/filter.png; sourceTree = "<group>"; };
+		7CAA4AD171E4424AAA654950 /* kolkata.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = kolkata.png; path = ../src/assets/images/kolkata.png; sourceTree = "<group>"; };
+		7EB2B5CAB9E34495B183D657 /* music_girl.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = music_girl.png; path = ../src/assets/images/music_girl.png; sourceTree = "<group>"; };
+		7ED4D073BC694C0F8B69CF70 /* no-chat.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "no-chat.png"; path = "../src/assets/images/no-data/no-chat.png"; sourceTree = "<group>"; };
+		800B24449312438796A24D4D /* ticket-status.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "ticket-status.png"; path = "../src/assets/images/ticket-status.png"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = Livyco/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		825A49FB1EE2461D9FE9F5BE /* FontFamily.js */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = FontFamily.js; path = ../src/assets/FontFamily.js; sourceTree = "<group>"; };
+		857B6ED35B534184AEB502D4 /* Roboto-ExtraLight.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-ExtraLight.ttf"; path = "../src/assets/fonts/Roboto-ExtraLight.ttf"; sourceTree = "<group>"; };
+		8C1B996604C949169FAA9A94 /* no-map.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "no-map.png"; path = "../src/assets/images/no-data/no-map.png"; sourceTree = "<group>"; };
+		8CA2FC0B654D4CC2959CC940 /* download-invoice.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "download-invoice.png"; path = "../src/assets/images/quick-links/download-invoice.png"; sourceTree = "<group>"; };
+		90923229CFAA472385D0272D /* reviews-not.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "reviews-not.png"; path = "../src/assets/images/no-data/reviews-not.png"; sourceTree = "<group>"; };
+		91C12CC729DC4D238E97ACA3 /* ahmedabad.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = ahmedabad.png; path = ../src/assets/images/ahmedabad.png; sourceTree = "<group>"; };
+		91F564D1108E480282000366 /* search-pg.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "search-pg.png"; path = "../src/assets/images/quick-links/search-pg.png"; sourceTree = "<group>"; };
+		9231398C4951484E9211E7DD /* chat-support.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "chat-support.png"; path = "../src/assets/images/chat-support.png"; sourceTree = "<group>"; };
+		940523FCEF30477289DBA104 /* Roboto-Thin.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Thin.ttf"; path = "../src/assets/fonts/Roboto-Thin.ttf"; sourceTree = "<group>"; };
+		A08E82A654CF40F0B7B1D7CD /* email-support.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "email-support.png"; path = "../src/assets/images/email-support.png"; sourceTree = "<group>"; };
+		A4E383FE76C74775A956C7AE /* service-request.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "service-request.png"; path = "../src/assets/images/quick-links/service-request.png"; sourceTree = "<group>"; };
+		A634E8D11395474EB4D8FF96 /* wishlist.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = wishlist.png; path = "../src/assets/images/quick-links/wishlist.png"; sourceTree = "<group>"; };
+		A916AFABDEF846E7AFE53100 /* thumbs-up.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "thumbs-up.png"; path = "../src/assets/images/thumbs-up.png"; sourceTree = "<group>"; };
+		B0A48C4E9FFB479D84277522 /* Roboto-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Regular.ttf"; path = "../src/assets/fonts/Roboto-Regular.ttf"; sourceTree = "<group>"; };
+		B2A7E4C8BE544435940F2876 /* request.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = request.png; path = "../src/assets/images/quick-links/request.png"; sourceTree = "<group>"; };
+		B385B96BDB6D4A2B8C28A779 /* Images.js */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = Images.js; path = ../src/assets/Images.js; sourceTree = "<group>"; };
+		B4CB6B22FB9249EDB711AE6F /* bed.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = bed.png; path = ../src/assets/images/bed.png; sourceTree = "<group>"; };
+		BED3E4FE1749490DA548F13C /* no-tickets.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "no-tickets.png"; path = "../src/assets/images/no-data/no-tickets.png"; sourceTree = "<group>"; };
+		C417901564924746A2340933 /* banner.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = banner.png; path = ../src/assets/images/banner.png; sourceTree = "<group>"; };
+		C5E207E9667B403D9A4E14BB /* chandigrah.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = chandigrah.png; path = ../src/assets/images/chandigrah.png; sourceTree = "<group>"; };
+		C6E476FC01E047B692CF2C52 /* upi.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = upi.png; path = ../src/assets/images/upi.png; sourceTree = "<group>"; };
+		C756B7D6EEA347CC8BC5312F /* vacate-pg.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "vacate-pg.png"; path = "../src/assets/images/quick-links/vacate-pg.png"; sourceTree = "<group>"; };
+		C8A4482CFEB3465CB7799EA0 /* sort.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = sort.png; path = ../src/assets/images/sort.png; sourceTree = "<group>"; };
+		CD70450B5C4047E88E124575 /* no-wishlist.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "no-wishlist.png"; path = "../src/assets/images/no-data/no-wishlist.png"; sourceTree = "<group>"; };
+		CDA8E1C91F7EBECBCF6928B9 /* Pods-Livyco.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Livyco.release.xcconfig"; path = "Target Support Files/Pods-Livyco/Pods-Livyco.release.xcconfig"; sourceTree = "<group>"; };
+		DA9A3854992A437CA46DFA5F /* office.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = office.png; path = ../src/assets/images/office.png; sourceTree = "<group>"; };
+		DC588FE7A54B416DA8FE1D08 /* mumbai.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = mumbai.png; path = ../src/assets/images/mumbai.png; sourceTree = "<group>"; };
+		E416305ACC164662B347B4C3 /* no-notification.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "no-notification.png"; path = "../src/assets/images/no-data/no-notification.png"; sourceTree = "<group>"; };
+		E7020191DA94456CBEAE7EA2 /* splashbg.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = splashbg.png; path = ../src/assets/images/splashbg.png; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		EDC8620AFCB54748AD5C470A /* chennai.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = chennai.png; path = ../src/assets/images/chennai.png; sourceTree = "<group>"; };
+		EF71B08FB6B04C958EA55089 /* pune.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = pune.png; path = ../src/assets/images/pune.png; sourceTree = "<group>"; };
+		F53193AC5F0C44CDA19374B1 /* boarding3.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = boarding3.png; path = ../src/assets/images/boarding3.png; sourceTree = "<group>"; };
+		F5A95ECF1390485A92AD37F7 /* map.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = map.png; path = ../src/assets/images/map.png; sourceTree = "<group>"; };
+		F6579DC7DF1B468584159449 /* payment-history.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "payment-history.png"; path = "../src/assets/images/quick-links/payment-history.png"; sourceTree = "<group>"; };
+		F6F7C40F454642CB955DCE85 /* Roboto-ExtraBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-ExtraBold.ttf"; path = "../src/assets/fonts/Roboto-ExtraBold.ttf"; sourceTree = "<group>"; };
+		F79F8A7DB7CF428685B351D8 /* hydrabad.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = hydrabad.png; path = ../src/assets/images/hydrabad.png; sourceTree = "<group>"; };
+		FB55B9BF2664484EB5D15368 /* logo-2.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "logo-2.png"; path = "../src/assets/images/logo-2.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -34,7 +190,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8D90060394D92A71F2AC76D2 /* Pods_Livyco.framework in Frameworks */,
+				97F8ACCF987DF0D4BBB93047 /* Pods_Livyco.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -58,7 +214,7 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				333C775A67C68E569712B41F /* Pods_Livyco.framework */,
+				37D070076E67B05A5B179E88 /* Pods_Livyco.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -78,6 +234,7 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
+				A6EE1C981B1C46A4805BDC60 /* Resources */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -92,11 +249,97 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		A6EE1C981B1C46A4805BDC60 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				29CCF6905A4147ACA4CD50E3 /* Roboto-Medium.ttf */,
+				3A7FCBE55DBE494F9343FA30 /* Roboto-Light.ttf */,
+				B0A48C4E9FFB479D84277522 /* Roboto-Regular.ttf */,
+				857B6ED35B534184AEB502D4 /* Roboto-ExtraLight.ttf */,
+				F6F7C40F454642CB955DCE85 /* Roboto-ExtraBold.ttf */,
+				37D5BD08FF6F4DA7972A44A4 /* Roboto-SemiBold.ttf */,
+				7885B198846E4A39B526A919 /* Roboto-Bold.ttf */,
+				940523FCEF30477289DBA104 /* Roboto-Thin.ttf */,
+				825A49FB1EE2461D9FE9F5BE /* FontFamily.js */,
+				392807C85E4C4846844722B3 /* wallet-icon.png */,
+				13C49EA8480949CD8D711177 /* welimg.png */,
+				37D345EA97C94D98BB17AF47 /* category.png */,
+				5942771829B2449791714BC5 /* wallet.png */,
+				9231398C4951484E9211E7DD /* chat-support.png */,
+				07357CEF082948F4B1006548 /* app_img.png */,
+				F79F8A7DB7CF428685B351D8 /* hydrabad.png */,
+				65D4046BB0124CDD80C34B17 /* banglore.png */,
+				C417901564924746A2340933 /* banner.png */,
+				37AA07D6D2EC4051BDBCA4DC /* review.png */,
+				A634E8D11395474EB4D8FF96 /* wishlist.png */,
+				5F8BB30F32124CDAB23122AB /* food-menu.png */,
+				91F564D1108E480282000366 /* search-pg.png */,
+				A4E383FE76C74775A956C7AE /* service-request.png */,
+				F6579DC7DF1B468584159449 /* payment-history.png */,
+				721120713321421FA1E7566F /* notify-all.png */,
+				B2A7E4C8BE544435940F2876 /* request.png */,
+				8CA2FC0B654D4CC2959CC940 /* download-invoice.png */,
+				2E9A7F04932F43E197187525 /* rent-reminder.png */,
+				C756B7D6EEA347CC8BC5312F /* vacate-pg.png */,
+				F5A95ECF1390485A92AD37F7 /* map.png */,
+				064AFF1022104B8A8C884CE2 /* voice-support.png */,
+				3939128CC5CB400C92911427 /* indian_flag.png */,
+				F53193AC5F0C44CDA19374B1 /* boarding3.png */,
+				91C12CC729DC4D238E97ACA3 /* ahmedabad.png */,
+				001065731766487F954EDF4E /* boarding2.png */,
+				4104E3D4AB0641A68F259650 /* success_check.png */,
+				B4CB6B22FB9249EDB711AE6F /* bed.png */,
+				757F7AD23D9E453E98B0B26D /* receipt.png */,
+				7680D5FA1A1F42AB9E66B304 /* boarding1.png */,
+				C6E476FC01E047B692CF2C52 /* upi.png */,
+				CD70450B5C4047E88E124575 /* no-wishlist.png */,
+				7ED4D073BC694C0F8B69CF70 /* no-chat.png */,
+				BED3E4FE1749490DA548F13C /* no-tickets.png */,
+				90923229CFAA472385D0272D /* reviews-not.png */,
+				135A2F235CBF43B2BEF00D3C /* no-payment-history.png */,
+				438D4D291C8849CFB9322551 /* no-stays.png */,
+				E416305ACC164662B347B4C3 /* no-notification.png */,
+				8C1B996604C949169FAA9A94 /* no-map.png */,
+				FB55B9BF2664484EB5D15368 /* logo-2.png */,
+				5D8380C78D9F41DE996D889D /* logo-3.png */,
+				3E8F55BF5C4A4E328C12E60C /* food.png */,
+				02D93C5200004495AD0FDFC0 /* logo-1.png */,
+				1593533D402643728AD52074 /* property.png */,
+				DA9A3854992A437CA46DFA5F /* office.png */,
+				4C3835B1CAC540F68849DAD6 /* logo.png */,
+				42A76C11A8CC459C896E0ABF /* stays.png */,
+				3F364656859F4960A0596523 /* search_img.png */,
+				6E854E57D8E54D8391ACEE49 /* points.png */,
+				5AA0C721C8314886BA9A055F /* kochi.png */,
+				78F742A8EC56456E8CD475EE /* filter.png */,
+				C8A4482CFEB3465CB7799EA0 /* sort.png */,
+				A08E82A654CF40F0B7B1D7CD /* email-support.png */,
+				800B24449312438796A24D4D /* ticket-status.png */,
+				026490DA139C44019EE10100 /* credit-card.png */,
+				6D67F7B1A78A422BB752F577 /* bank.png */,
+				EF71B08FB6B04C958EA55089 /* pune.png */,
+				1AB6B7B7771543CF8ABFEBBF /* form.png */,
+				E7020191DA94456CBEAE7EA2 /* splashbg.png */,
+				7EB2B5CAB9E34495B183D657 /* music_girl.png */,
+				6BD913FCDE3045AE8281AE21 /* google.png */,
+				C5E207E9667B403D9A4E14BB /* chandigrah.png */,
+				003067B1B6C442DC943C1C3B /* chat.png */,
+				A916AFABDEF846E7AFE53100 /* thumbs-up.png */,
+				DC588FE7A54B416DA8FE1D08 /* mumbai.png */,
+				7131805AEB5B46A5932D9D73 /* delhi.png */,
+				7CAA4AD171E4424AAA654950 /* kolkata.png */,
+				EDC8620AFCB54748AD5C470A /* chennai.png */,
+				B385B96BDB6D4A2B8C28A779 /* Images.js */,
+			);
+			name = Resources;
+			path = "";
+			sourceTree = "<group>";
+		};
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				3B4392A12AC88292D35C810B /* Pods-Livyco.debug.xcconfig */,
-				5709B34CF0A7D63546082F79 /* Pods-Livyco.release.xcconfig */,
+				5CBC2457C7A3986A2AEB63D0 /* Pods-Livyco.debug.xcconfig */,
+				CDA8E1C91F7EBECBCF6928B9 /* Pods-Livyco.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -108,14 +351,14 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "Livyco" */;
 			buildPhases = (
-				C38B50BA6285516D6DCD4F65 /* [CP] Check Pods Manifest.lock */,
+				61B036C8450F0D370EEF15D1 /* [CP] Check Pods Manifest.lock */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				00EEFC60759A1932668264C0 /* [CP] Embed Pods Frameworks */,
-				E235C05ADACE081382539298 /* [CP] Copy Pods Resources */,
-				2DEB223A9C82C36240ACBAF5 /* [CP-User] [RNFB] Core Configuration */,
+				19010E41471541B1393E069B /* [CP] Embed Pods Frameworks */,
+				D0FACD3352DE609B311F2296 /* [CP] Copy Pods Resources */,
+				E38F65B82E1F293517068172 /* [CP-User] [RNFB] Core Configuration */,
 			);
 			buildRules = (
 			);
@@ -166,6 +409,84 @@
 				3AB87C312F0F89A100317083 /* GoogleService-Info.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				E238304F801AD627B750D893 /* PrivacyInfo.xcprivacy in Resources */,
+				1FC0E3B321034BCE91B31CDA /* Roboto-Medium.ttf in Resources */,
+				FBFCE68E3700477CBBE3F461 /* Roboto-Light.ttf in Resources */,
+				E4DE45BE784A40F3931D583E /* Roboto-Regular.ttf in Resources */,
+				81F59CE1A4044C178A47C0B8 /* Roboto-ExtraLight.ttf in Resources */,
+				FCA427C0968140FC8E5691EE /* Roboto-ExtraBold.ttf in Resources */,
+				1555CD766C54438D80FFE669 /* Roboto-SemiBold.ttf in Resources */,
+				42D950427DA94EBE8703D9EC /* Roboto-Bold.ttf in Resources */,
+				65A53C448ECF40F68F25C232 /* Roboto-Thin.ttf in Resources */,
+				B90827EBF98F4566B4761046 /* FontFamily.js in Resources */,
+				08FC80554A27495193D49B6D /* wallet-icon.png in Resources */,
+				BB0DDF30331F47FAB4180F59 /* welimg.png in Resources */,
+				C4D2DA36F8C74F1C982A0906 /* category.png in Resources */,
+				4DF6B5E227F9459886962C80 /* wallet.png in Resources */,
+				02D3F93D91114BB39BF3846D /* chat-support.png in Resources */,
+				BA1E035A094E4C34A5F0113E /* app_img.png in Resources */,
+				217A105FF12E450D9AF81AC2 /* hydrabad.png in Resources */,
+				6BD03FB15C8A41AE8C02442B /* banglore.png in Resources */,
+				79A06BBDD9AF4915B20FAAA8 /* banner.png in Resources */,
+				74B3E28E91D9451AB72B67AF /* review.png in Resources */,
+				30B151F59D28432F9221AC1F /* wishlist.png in Resources */,
+				115512AE790646DFA8368D2A /* food-menu.png in Resources */,
+				3C592AD051AB4E63922D1FFB /* search-pg.png in Resources */,
+				F3BCAD56BE024E1FB10AB548 /* service-request.png in Resources */,
+				ACE2665B2A28462A88D09868 /* payment-history.png in Resources */,
+				2E2355B0C7A645268C64B28C /* notify-all.png in Resources */,
+				1AD7D09562954C809F46B7D5 /* request.png in Resources */,
+				266890AD06AC413A84BCFDE4 /* download-invoice.png in Resources */,
+				1D5945F54C1547F5AD13A5F5 /* rent-reminder.png in Resources */,
+				59A474ACC1B94439A5754E5F /* vacate-pg.png in Resources */,
+				E84B822B862447469667A513 /* map.png in Resources */,
+				B33E1C72CE604793B2CBBD4E /* voice-support.png in Resources */,
+				06B1581A6FEE47918E416C6C /* indian_flag.png in Resources */,
+				55EEB4E0C2224032BBDA12F6 /* boarding3.png in Resources */,
+				5B8554C4C9544D878CC09465 /* ahmedabad.png in Resources */,
+				394775D0481F4E34977C4D63 /* boarding2.png in Resources */,
+				2B5D77950E0E472EA6CF1288 /* success_check.png in Resources */,
+				31CF84FA3370485B9B84DF29 /* bed.png in Resources */,
+				BBCFE86914BD488DA50A4E15 /* receipt.png in Resources */,
+				9ABC366E9A924FF385A2D4C9 /* boarding1.png in Resources */,
+				F631D1B7EF454E98AEBC1B73 /* upi.png in Resources */,
+				E0245A6CC6D346C3935B3143 /* no-wishlist.png in Resources */,
+				CCD2DFFC52994559BD443A0E /* no-chat.png in Resources */,
+				DAB0D50C71A74BFAB10DF06C /* no-tickets.png in Resources */,
+				96C4ADA36A46430B86C77023 /* reviews-not.png in Resources */,
+				5157F9AB44EB4365BC0C313E /* no-payment-history.png in Resources */,
+				1114790C61D9428FA351D6C9 /* no-stays.png in Resources */,
+				349DD0FD248D4B809429680B /* no-notification.png in Resources */,
+				8D33A9D1000340928A10A323 /* no-map.png in Resources */,
+				9A8B41AE55B745638874A43C /* logo-2.png in Resources */,
+				B2638CBDE05E4E9EAC1B7026 /* logo-3.png in Resources */,
+				7893BF2E58204ECFBB36D7F4 /* food.png in Resources */,
+				CBB38C6520394271BCFAE0FA /* logo-1.png in Resources */,
+				92AF39DB99E541BD9F64C327 /* property.png in Resources */,
+				7BABD3EC5F0D4926A16151B3 /* office.png in Resources */,
+				55C00EE8AE4048FBADFBC834 /* logo.png in Resources */,
+				A7137A34B52E4DA58A40290F /* stays.png in Resources */,
+				490D6166263B4B7993CF02F7 /* search_img.png in Resources */,
+				34C1089195484210916F974F /* points.png in Resources */,
+				8B5F0A498F634D5ABE080555 /* kochi.png in Resources */,
+				494260BB500845C294A01C20 /* filter.png in Resources */,
+				E4DAF41183A74C778A10D7D8 /* sort.png in Resources */,
+				EF4034A5BA2F4D6BB2A0B011 /* email-support.png in Resources */,
+				EAB8614F5B004B82B7DE4B54 /* ticket-status.png in Resources */,
+				5483F705102F48BA8F2A169E /* credit-card.png in Resources */,
+				BBB64868850143B587892CD0 /* bank.png in Resources */,
+				4EA9D8328061446BA0049D48 /* pune.png in Resources */,
+				A2933CDB24304D42867865EA /* form.png in Resources */,
+				BAFF3CFFF76F4255A504AC1E /* splashbg.png in Resources */,
+				88646A3AE5974B2CB58E3D62 /* music_girl.png in Resources */,
+				E65386BB13C7462E8B5903BA /* google.png in Resources */,
+				866DEBBFE1474FE0B30A3322 /* chandigrah.png in Resources */,
+				384CE7A94AD441DE86D586E2 /* chat.png in Resources */,
+				D623E7B6AAC34F9D94A5D331 /* thumbs-up.png in Resources */,
+				3E6BCBC8D9ED439196C60295 /* mumbai.png in Resources */,
+				DC0F932AF301436D8FF63310 /* delhi.png in Resources */,
+				AA98B7B90E3A4361A3AEA068 /* kolkata.png in Resources */,
+				B4E818B6D67E4C209CF66266 /* chennai.png in Resources */,
+				A005B4DEB6C84324AF402C6F /* Images.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -188,7 +509,7 @@
 			shellPath = /bin/sh;
 			shellScript = "set -e\n\nWITH_ENVIRONMENT=\"$REACT_NATIVE_PATH/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"$REACT_NATIVE_PATH/scripts/react-native-xcode.sh\"\n\n/bin/sh -c \"$WITH_ENVIRONMENT $REACT_NATIVE_XCODE\"\n";
 		};
-		00EEFC60759A1932668264C0 /* [CP] Embed Pods Frameworks */ = {
+		19010E41471541B1393E069B /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -205,20 +526,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Livyco/Pods-Livyco-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		2DEB223A9C82C36240ACBAF5 /* [CP-User] [RNFB] Core Configuration */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(INFOPLIST_PATH)",
-			);
-			name = "[CP-User] [RNFB] Core Configuration";
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "#!/usr/bin/env bash\n#\n# Copyright (c) 2016-present Invertase Limited & Contributors\n#\n# Licensed under the Apache License, Version 2.0 (the \"License\");\n# you may not use this library except in compliance with the License.\n# You may obtain a copy of the License at\n#\n#   http://www.apache.org/licenses/LICENSE-2.0\n#\n# Unless required by applicable law or agreed to in writing, software\n# distributed under the License is distributed on an \"AS IS\" BASIS,\n# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n# See the License for the specific language governing permissions and\n# limitations under the License.\n#\n\n##########################################################################\n##########################################################################\n#\n#  NOTE THAT IF YOU CHANGE THIS FILE YOU MUST RUN pod install AFTERWARDS\n#\n#  This file is installed as an Xcode build script in the project file\n#  by cocoapods, and you will not see your changes until you pod install\n#\n##########################################################################\n##########################################################################\n\nset -e\n\n_MAX_LOOKUPS=2;\n_SEARCH_RESULT=''\n_RN_ROOT_EXISTS=''\n_CURRENT_LOOKUPS=1\n_JSON_ROOT=\"'react-native'\"\n_JSON_FILE_NAME='firebase.json'\n_JSON_OUTPUT_BASE64='e30=' # { }\n_CURRENT_SEARCH_DIR=${PROJECT_DIR}\n_PLIST_BUDDY=/usr/libexec/PlistBuddy\n_TARGET_PLIST=\"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\"\n_DSYM_PLIST=\"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Info.plist\"\n\n# plist arrays\n_PLIST_ENTRY_KEYS=()\n_PLIST_ENTRY_TYPES=()\n_PLIST_ENTRY_VALUES=()\n\nfunction setPlistValue {\n  echo \"note:      setting plist entry '$1' of type '$2' in file '$4'\"\n  ${_PLIST_BUDDY} -c \"Add :$1 $2 '$3'\" $4 || echo \"note:      '$1' already exists\"\n}\n\nfunction getFirebaseJsonKeyValue () {\n  if [[ ${_RN_ROOT_EXISTS} ]]; then\n    ruby -Ku -e \"require 'rubygems';require 'json'; output=JSON.parse('$1'); puts output[$_JSON_ROOT]['$2']\"\n  else\n    echo \"\"\n  fi;\n}\n\nfunction jsonBoolToYesNo () {\n  if [[ $1 == \"false\" ]]; then\n    echo \"NO\"\n  elif [[ $1 == \"true\" ]]; then\n    echo \"YES\"\n  else echo \"NO\"\n  fi\n}\n\necho \"note: -> RNFB build script started\"\necho \"note: 1) Locating ${_JSON_FILE_NAME} file:\"\n\nif [[ -z ${_CURRENT_SEARCH_DIR} ]]; then\n  _CURRENT_SEARCH_DIR=$(pwd)\nfi;\n\nwhile true; do\n  _CURRENT_SEARCH_DIR=$(dirname \"$_CURRENT_SEARCH_DIR\")\n  if [[ \"$_CURRENT_SEARCH_DIR\" == \"/\" ]] || [[ ${_CURRENT_LOOKUPS} -gt ${_MAX_LOOKUPS} ]]; then break; fi;\n  echo \"note:      ($_CURRENT_LOOKUPS of $_MAX_LOOKUPS) Searching in '$_CURRENT_SEARCH_DIR' for a ${_JSON_FILE_NAME} file.\"\n  _SEARCH_RESULT=$(find \"$_CURRENT_SEARCH_DIR\" -maxdepth 2 -name ${_JSON_FILE_NAME} -print | /usr/bin/head -n 1)\n  if [[ ${_SEARCH_RESULT} ]]; then\n    echo \"note:      ${_JSON_FILE_NAME} found at $_SEARCH_RESULT\"\n    break;\n  fi;\n  _CURRENT_LOOKUPS=$((_CURRENT_LOOKUPS+1))\ndone\n\nif [[ ${_SEARCH_RESULT} ]]; then\n  _JSON_OUTPUT_RAW=$(cat \"${_SEARCH_RESULT}\")\n  if ! _RN_ROOT_EXISTS=$(ruby -Ku -e \"require 'json'; output=JSON.parse('$_JSON_OUTPUT_RAW'); puts output[$_JSON_ROOT]\"); then\n    echo \"error: Failed to parse firebase.json, check for syntax errors.\"\n    exit 1\n  fi\n\n  if [[ ${_RN_ROOT_EXISTS} ]]; then\n    if ! python3 --version >/dev/null 2>&1; then echo \"error: python3 not found, firebase.json file processing error.\" && exit 1; fi\n    _JSON_OUTPUT_BASE64=$(python3 -c 'import json,sys,base64;print(base64.b64encode(bytes(json.dumps(json.loads(open('\"'${_SEARCH_RESULT}'\"', '\"'rb'\"').read())['${_JSON_ROOT}']), '\"'utf-8'\"')).decode())' || echo \"e30=\")\n  fi\n\n  _PLIST_ENTRY_KEYS+=(\"firebase_json_raw\")\n  _PLIST_ENTRY_TYPES+=(\"string\")\n  _PLIST_ENTRY_VALUES+=(\"$_JSON_OUTPUT_BASE64\")\n\n  # config.app_data_collection_default_enabled\n  _APP_DATA_COLLECTION_ENABLED=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"app_data_collection_default_enabled\")\n  if [[ $_APP_DATA_COLLECTION_ENABLED ]]; then\n    _PLIST_ENTRY_KEYS+=(\"FirebaseDataCollectionDefaultEnabled\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_APP_DATA_COLLECTION_ENABLED\")\")\n  fi\n\n  # config.analytics_auto_collection_enabled\n  _ANALYTICS_AUTO_COLLECTION=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"analytics_auto_collection_enabled\")\n  if [[ $_ANALYTICS_AUTO_COLLECTION ]]; then\n    _PLIST_ENTRY_KEYS+=(\"FIREBASE_ANALYTICS_COLLECTION_ENABLED\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_ANALYTICS_AUTO_COLLECTION\")\")\n  fi\n\n  # config.analytics_collection_deactivated\n  _ANALYTICS_DEACTIVATED=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"analytics_collection_deactivated\")\n  if [[ $_ANALYTICS_DEACTIVATED ]]; then\n    _PLIST_ENTRY_KEYS+=(\"FIREBASE_ANALYTICS_COLLECTION_DEACTIVATED\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_ANALYTICS_DEACTIVATED\")\")\n  fi\n\n  # config.analytics_idfv_collection_enabled\n  _ANALYTICS_IDFV_COLLECTION=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"analytics_idfv_collection_enabled\")\n  if [[ $_ANALYTICS_IDFV_COLLECTION ]]; then\n    _PLIST_ENTRY_KEYS+=(\"GOOGLE_ANALYTICS_IDFV_COLLECTION_ENABLED\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_ANALYTICS_IDFV_COLLECTION\")\")\n  fi\n\n  # config.analytics_default_allow_analytics_storage\n  _ANALYTICS_STORAGE=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"analytics_default_allow_analytics_storage\")\n  if [[ $_ANALYTICS_STORAGE ]]; then\n    _PLIST_ENTRY_KEYS+=(\"GOOGLE_ANALYTICS_DEFAULT_ALLOW_ANALYTICS_STORAGE\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_ANALYTICS_STORAGE\")\")\n  fi\n\n  # config.analytics_default_allow_ad_storage\n  _ANALYTICS_AD_STORAGE=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"analytics_default_allow_ad_storage\")\n  if [[ $_ANALYTICS_AD_STORAGE ]]; then\n    _PLIST_ENTRY_KEYS+=(\"GOOGLE_ANALYTICS_DEFAULT_ALLOW_AD_STORAGE\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_ANALYTICS_AD_STORAGE\")\")\n  fi\n\n  # config.analytics_default_allow_ad_user_data\n  _ANALYTICS_AD_USER_DATA=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"analytics_default_allow_ad_user_data\")\n  if [[ $_ANALYTICS_AD_USER_DATA ]]; then\n    _PLIST_ENTRY_KEYS+=(\"GOOGLE_ANALYTICS_DEFAULT_ALLOW_AD_USER_DATA\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_ANALYTICS_AD_USER_DATA\")\")\n  fi\n\n  # config.analytics_default_allow_ad_personalization_signals\n  _ANALYTICS_PERSONALIZATION=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"analytics_default_allow_ad_personalization_signals\")\n  if [[ $_ANALYTICS_PERSONALIZATION ]]; then\n    _PLIST_ENTRY_KEYS+=(\"GOOGLE_ANALYTICS_DEFAULT_ALLOW_AD_PERSONALIZATION_SIGNALS\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_ANALYTICS_PERSONALIZATION\")\")\n  fi\n\n  # config.analytics_registration_with_ad_network_enabled\n  _ANALYTICS_REGISTRATION_WITH_AD_NETWORK=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"google_analytics_registration_with_ad_network_enabled\")\n  if [[ $_ANALYTICS_REGISTRATION_WITH_AD_NETWORK ]]; then\n    _PLIST_ENTRY_KEYS+=(\"GOOGLE_ANALYTICS_REGISTRATION_WITH_AD_NETWORK_ENABLED\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_ANALYTICS_REGISTRATION_WITH_AD_NETWORK\")\")\n  fi\n\n  # config.google_analytics_automatic_screen_reporting_enabled\n  _ANALYTICS_AUTO_SCREEN_REPORTING=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"google_analytics_automatic_screen_reporting_enabled\")\n  if [[ $_ANALYTICS_AUTO_SCREEN_REPORTING ]]; then\n    _PLIST_ENTRY_KEYS+=(\"FirebaseAutomaticScreenReportingEnabled\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_ANALYTICS_AUTO_SCREEN_REPORTING\")\")\n  fi\n\n  # config.perf_auto_collection_enabled\n  _PERF_AUTO_COLLECTION=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"perf_auto_collection_enabled\")\n  if [[ $_PERF_AUTO_COLLECTION ]]; then\n    _PLIST_ENTRY_KEYS+=(\"firebase_performance_collection_enabled\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_PERF_AUTO_COLLECTION\")\")\n  fi\n\n  # config.perf_collection_deactivated\n  _PERF_DEACTIVATED=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"perf_collection_deactivated\")\n  if [[ $_PERF_DEACTIVATED ]]; then\n    _PLIST_ENTRY_KEYS+=(\"firebase_performance_collection_deactivated\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_PERF_DEACTIVATED\")\")\n  fi\n\n  # config.messaging_auto_init_enabled\n  _MESSAGING_AUTO_INIT=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"messaging_auto_init_enabled\")\n  if [[ $_MESSAGING_AUTO_INIT ]]; then\n    _PLIST_ENTRY_KEYS+=(\"FirebaseMessagingAutoInitEnabled\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_MESSAGING_AUTO_INIT\")\")\n  fi\n\n  # config.in_app_messaging_auto_colllection_enabled\n  _FIAM_AUTO_INIT=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"in_app_messaging_auto_collection_enabled\")\n  if [[ $_FIAM_AUTO_INIT ]]; then\n    _PLIST_ENTRY_KEYS+=(\"FirebaseInAppMessagingAutomaticDataCollectionEnabled\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_FIAM_AUTO_INIT\")\")\n  fi\n\n  # config.app_check_token_auto_refresh\n  _APP_CHECK_TOKEN_AUTO_REFRESH=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"app_check_token_auto_refresh\")\n  if [[ $_APP_CHECK_TOKEN_AUTO_REFRESH ]]; then\n    _PLIST_ENTRY_KEYS+=(\"FirebaseAppCheckTokenAutoRefreshEnabled\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_APP_CHECK_TOKEN_AUTO_REFRESH\")\")\n  fi\n\n  # config.crashlytics_disable_auto_disabler - undocumented for now - mainly for debugging, document if becomes useful\n  _CRASHLYTICS_AUTO_DISABLE_ENABLED=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"crashlytics_disable_auto_disabler\")\n  if [[ $_CRASHLYTICS_AUTO_DISABLE_ENABLED == \"true\" ]]; then\n    echo \"Disabled Crashlytics auto disabler.\" # do nothing\n  else\n    _PLIST_ENTRY_KEYS+=(\"FirebaseCrashlyticsCollectionEnabled\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"NO\")\n  fi\nelse\n  _PLIST_ENTRY_KEYS+=(\"firebase_json_raw\")\n  _PLIST_ENTRY_TYPES+=(\"string\")\n  _PLIST_ENTRY_VALUES+=(\"$_JSON_OUTPUT_BASE64\")\n  echo \"warning:   A firebase.json file was not found, whilst this file is optional it is recommended to include it to configure firebase services in React Native Firebase.\"\nfi;\n\necho \"note: 2) Injecting Info.plist entries: \"\n\n# Log out the keys we're adding\nfor i in \"${!_PLIST_ENTRY_KEYS[@]}\"; do\n  echo \"    ->  $i) ${_PLIST_ENTRY_KEYS[$i]}\" \"${_PLIST_ENTRY_TYPES[$i]}\" \"${_PLIST_ENTRY_VALUES[$i]}\"\ndone\n\nfor plist in \"${_TARGET_PLIST}\" \"${_DSYM_PLIST}\" ; do\n  if [[ -f \"${plist}\" ]]; then\n\n    # paths with spaces break the call to setPlistValue. temporarily modify\n    # the shell internal field separator variable (IFS), which normally\n    # includes spaces, to consist only of line breaks\n    oldifs=$IFS\n    IFS=\"\n\"\n\n    for i in \"${!_PLIST_ENTRY_KEYS[@]}\"; do\n      setPlistValue \"${_PLIST_ENTRY_KEYS[$i]}\" \"${_PLIST_ENTRY_TYPES[$i]}\" \"${_PLIST_ENTRY_VALUES[$i]}\" \"${plist}\"\n    done\n\n    # restore the original internal field separator value\n    IFS=$oldifs\n  else\n    echo \"warning:   A Info.plist build output file was not found (${plist})\"\n  fi\ndone\n\necho \"note: <- RNFB build script finished\"\n";
-		};
-		C38B50BA6285516D6DCD4F65 /* [CP] Check Pods Manifest.lock */ = {
+		61B036C8450F0D370EEF15D1 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -240,7 +548,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		E235C05ADACE081382539298 /* [CP] Copy Pods Resources */ = {
+		D0FACD3352DE609B311F2296 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -256,6 +564,19 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Livyco/Pods-Livyco-resources.sh\"\n";
 			showEnvVarsInLog = 0;
+		};
+		E38F65B82E1F293517068172 /* [CP-User] [RNFB] Core Configuration */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/$(INFOPLIST_PATH)",
+			);
+			name = "[CP-User] [RNFB] Core Configuration";
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "#!/usr/bin/env bash\n#\n# Copyright (c) 2016-present Invertase Limited & Contributors\n#\n# Licensed under the Apache License, Version 2.0 (the \"License\");\n# you may not use this library except in compliance with the License.\n# You may obtain a copy of the License at\n#\n#   http://www.apache.org/licenses/LICENSE-2.0\n#\n# Unless required by applicable law or agreed to in writing, software\n# distributed under the License is distributed on an \"AS IS\" BASIS,\n# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n# See the License for the specific language governing permissions and\n# limitations under the License.\n#\n\n##########################################################################\n##########################################################################\n#\n#  NOTE THAT IF YOU CHANGE THIS FILE YOU MUST RUN pod install AFTERWARDS\n#\n#  This file is installed as an Xcode build script in the project file\n#  by cocoapods, and you will not see your changes until you pod install\n#\n##########################################################################\n##########################################################################\n\nset -e\n\n_MAX_LOOKUPS=2;\n_SEARCH_RESULT=''\n_RN_ROOT_EXISTS=''\n_CURRENT_LOOKUPS=1\n_JSON_ROOT=\"'react-native'\"\n_JSON_FILE_NAME='firebase.json'\n_JSON_OUTPUT_BASE64='e30=' # { }\n_CURRENT_SEARCH_DIR=${PROJECT_DIR}\n_PLIST_BUDDY=/usr/libexec/PlistBuddy\n_TARGET_PLIST=\"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\"\n_DSYM_PLIST=\"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Info.plist\"\n\n# plist arrays\n_PLIST_ENTRY_KEYS=()\n_PLIST_ENTRY_TYPES=()\n_PLIST_ENTRY_VALUES=()\n\nfunction setPlistValue {\n  echo \"note:      setting plist entry '$1' of type '$2' in file '$4'\"\n  ${_PLIST_BUDDY} -c \"Add :$1 $2 '$3'\" $4 || echo \"note:      '$1' already exists\"\n}\n\nfunction getFirebaseJsonKeyValue () {\n  if [[ ${_RN_ROOT_EXISTS} ]]; then\n    ruby -Ku -e \"require 'rubygems';require 'json'; output=JSON.parse('$1'); puts output[$_JSON_ROOT]['$2']\"\n  else\n    echo \"\"\n  fi;\n}\n\nfunction jsonBoolToYesNo () {\n  if [[ $1 == \"false\" ]]; then\n    echo \"NO\"\n  elif [[ $1 == \"true\" ]]; then\n    echo \"YES\"\n  else echo \"NO\"\n  fi\n}\n\necho \"note: -> RNFB build script started\"\necho \"note: 1) Locating ${_JSON_FILE_NAME} file:\"\n\nif [[ -z ${_CURRENT_SEARCH_DIR} ]]; then\n  _CURRENT_SEARCH_DIR=$(pwd)\nfi;\n\nwhile true; do\n  _CURRENT_SEARCH_DIR=$(dirname \"$_CURRENT_SEARCH_DIR\")\n  if [[ \"$_CURRENT_SEARCH_DIR\" == \"/\" ]] || [[ ${_CURRENT_LOOKUPS} -gt ${_MAX_LOOKUPS} ]]; then break; fi;\n  echo \"note:      ($_CURRENT_LOOKUPS of $_MAX_LOOKUPS) Searching in '$_CURRENT_SEARCH_DIR' for a ${_JSON_FILE_NAME} file.\"\n  _SEARCH_RESULT=$(find \"$_CURRENT_SEARCH_DIR\" -maxdepth 2 -name ${_JSON_FILE_NAME} -print | /usr/bin/head -n 1)\n  if [[ ${_SEARCH_RESULT} ]]; then\n    echo \"note:      ${_JSON_FILE_NAME} found at $_SEARCH_RESULT\"\n    break;\n  fi;\n  _CURRENT_LOOKUPS=$((_CURRENT_LOOKUPS+1))\ndone\n\nif [[ ${_SEARCH_RESULT} ]]; then\n  _JSON_OUTPUT_RAW=$(cat \"${_SEARCH_RESULT}\")\n  if ! _RN_ROOT_EXISTS=$(ruby -Ku -e \"require 'json'; output=JSON.parse('$_JSON_OUTPUT_RAW'); puts output[$_JSON_ROOT]\"); then\n    echo \"error: Failed to parse firebase.json, check for syntax errors.\"\n    exit 1\n  fi\n\n  if [[ ${_RN_ROOT_EXISTS} ]]; then\n    if ! python3 --version >/dev/null 2>&1; then echo \"error: python3 not found, firebase.json file processing error.\" && exit 1; fi\n    _JSON_OUTPUT_BASE64=$(python3 -c 'import json,sys,base64;print(base64.b64encode(bytes(json.dumps(json.loads(open('\"'${_SEARCH_RESULT}'\"', '\"'rb'\"').read())['${_JSON_ROOT}']), '\"'utf-8'\"')).decode())' || echo \"e30=\")\n  fi\n\n  _PLIST_ENTRY_KEYS+=(\"firebase_json_raw\")\n  _PLIST_ENTRY_TYPES+=(\"string\")\n  _PLIST_ENTRY_VALUES+=(\"$_JSON_OUTPUT_BASE64\")\n\n  # config.app_data_collection_default_enabled\n  _APP_DATA_COLLECTION_ENABLED=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"app_data_collection_default_enabled\")\n  if [[ $_APP_DATA_COLLECTION_ENABLED ]]; then\n    _PLIST_ENTRY_KEYS+=(\"FirebaseDataCollectionDefaultEnabled\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_APP_DATA_COLLECTION_ENABLED\")\")\n  fi\n\n  # config.analytics_auto_collection_enabled\n  _ANALYTICS_AUTO_COLLECTION=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"analytics_auto_collection_enabled\")\n  if [[ $_ANALYTICS_AUTO_COLLECTION ]]; then\n    _PLIST_ENTRY_KEYS+=(\"FIREBASE_ANALYTICS_COLLECTION_ENABLED\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_ANALYTICS_AUTO_COLLECTION\")\")\n  fi\n\n  # config.analytics_collection_deactivated\n  _ANALYTICS_DEACTIVATED=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"analytics_collection_deactivated\")\n  if [[ $_ANALYTICS_DEACTIVATED ]]; then\n    _PLIST_ENTRY_KEYS+=(\"FIREBASE_ANALYTICS_COLLECTION_DEACTIVATED\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_ANALYTICS_DEACTIVATED\")\")\n  fi\n\n  # config.analytics_idfv_collection_enabled\n  _ANALYTICS_IDFV_COLLECTION=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"analytics_idfv_collection_enabled\")\n  if [[ $_ANALYTICS_IDFV_COLLECTION ]]; then\n    _PLIST_ENTRY_KEYS+=(\"GOOGLE_ANALYTICS_IDFV_COLLECTION_ENABLED\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_ANALYTICS_IDFV_COLLECTION\")\")\n  fi\n\n  # config.analytics_default_allow_analytics_storage\n  _ANALYTICS_STORAGE=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"analytics_default_allow_analytics_storage\")\n  if [[ $_ANALYTICS_STORAGE ]]; then\n    _PLIST_ENTRY_KEYS+=(\"GOOGLE_ANALYTICS_DEFAULT_ALLOW_ANALYTICS_STORAGE\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_ANALYTICS_STORAGE\")\")\n  fi\n\n  # config.analytics_default_allow_ad_storage\n  _ANALYTICS_AD_STORAGE=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"analytics_default_allow_ad_storage\")\n  if [[ $_ANALYTICS_AD_STORAGE ]]; then\n    _PLIST_ENTRY_KEYS+=(\"GOOGLE_ANALYTICS_DEFAULT_ALLOW_AD_STORAGE\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_ANALYTICS_AD_STORAGE\")\")\n  fi\n\n  # config.analytics_default_allow_ad_user_data\n  _ANALYTICS_AD_USER_DATA=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"analytics_default_allow_ad_user_data\")\n  if [[ $_ANALYTICS_AD_USER_DATA ]]; then\n    _PLIST_ENTRY_KEYS+=(\"GOOGLE_ANALYTICS_DEFAULT_ALLOW_AD_USER_DATA\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_ANALYTICS_AD_USER_DATA\")\")\n  fi\n\n  # config.analytics_default_allow_ad_personalization_signals\n  _ANALYTICS_PERSONALIZATION=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"analytics_default_allow_ad_personalization_signals\")\n  if [[ $_ANALYTICS_PERSONALIZATION ]]; then\n    _PLIST_ENTRY_KEYS+=(\"GOOGLE_ANALYTICS_DEFAULT_ALLOW_AD_PERSONALIZATION_SIGNALS\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_ANALYTICS_PERSONALIZATION\")\")\n  fi\n\n  # config.analytics_registration_with_ad_network_enabled\n  _ANALYTICS_REGISTRATION_WITH_AD_NETWORK=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"google_analytics_registration_with_ad_network_enabled\")\n  if [[ $_ANALYTICS_REGISTRATION_WITH_AD_NETWORK ]]; then\n    _PLIST_ENTRY_KEYS+=(\"GOOGLE_ANALYTICS_REGISTRATION_WITH_AD_NETWORK_ENABLED\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_ANALYTICS_REGISTRATION_WITH_AD_NETWORK\")\")\n  fi\n\n  # config.google_analytics_automatic_screen_reporting_enabled\n  _ANALYTICS_AUTO_SCREEN_REPORTING=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"google_analytics_automatic_screen_reporting_enabled\")\n  if [[ $_ANALYTICS_AUTO_SCREEN_REPORTING ]]; then\n    _PLIST_ENTRY_KEYS+=(\"FirebaseAutomaticScreenReportingEnabled\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_ANALYTICS_AUTO_SCREEN_REPORTING\")\")\n  fi\n\n  # config.perf_auto_collection_enabled\n  _PERF_AUTO_COLLECTION=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"perf_auto_collection_enabled\")\n  if [[ $_PERF_AUTO_COLLECTION ]]; then\n    _PLIST_ENTRY_KEYS+=(\"firebase_performance_collection_enabled\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_PERF_AUTO_COLLECTION\")\")\n  fi\n\n  # config.perf_collection_deactivated\n  _PERF_DEACTIVATED=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"perf_collection_deactivated\")\n  if [[ $_PERF_DEACTIVATED ]]; then\n    _PLIST_ENTRY_KEYS+=(\"firebase_performance_collection_deactivated\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_PERF_DEACTIVATED\")\")\n  fi\n\n  # config.messaging_auto_init_enabled\n  _MESSAGING_AUTO_INIT=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"messaging_auto_init_enabled\")\n  if [[ $_MESSAGING_AUTO_INIT ]]; then\n    _PLIST_ENTRY_KEYS+=(\"FirebaseMessagingAutoInitEnabled\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_MESSAGING_AUTO_INIT\")\")\n  fi\n\n  # config.in_app_messaging_auto_colllection_enabled\n  _FIAM_AUTO_INIT=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"in_app_messaging_auto_collection_enabled\")\n  if [[ $_FIAM_AUTO_INIT ]]; then\n    _PLIST_ENTRY_KEYS+=(\"FirebaseInAppMessagingAutomaticDataCollectionEnabled\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_FIAM_AUTO_INIT\")\")\n  fi\n\n  # config.app_check_token_auto_refresh\n  _APP_CHECK_TOKEN_AUTO_REFRESH=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"app_check_token_auto_refresh\")\n  if [[ $_APP_CHECK_TOKEN_AUTO_REFRESH ]]; then\n    _PLIST_ENTRY_KEYS+=(\"FirebaseAppCheckTokenAutoRefreshEnabled\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_APP_CHECK_TOKEN_AUTO_REFRESH\")\")\n  fi\n\n  # config.crashlytics_disable_auto_disabler - undocumented for now - mainly for debugging, document if becomes useful\n  _CRASHLYTICS_AUTO_DISABLE_ENABLED=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"crashlytics_disable_auto_disabler\")\n  if [[ $_CRASHLYTICS_AUTO_DISABLE_ENABLED == \"true\" ]]; then\n    echo \"Disabled Crashlytics auto disabler.\" # do nothing\n  else\n    _PLIST_ENTRY_KEYS+=(\"FirebaseCrashlyticsCollectionEnabled\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"NO\")\n  fi\nelse\n  _PLIST_ENTRY_KEYS+=(\"firebase_json_raw\")\n  _PLIST_ENTRY_TYPES+=(\"string\")\n  _PLIST_ENTRY_VALUES+=(\"$_JSON_OUTPUT_BASE64\")\n  echo \"warning:   A firebase.json file was not found, whilst this file is optional it is recommended to include it to configure firebase services in React Native Firebase.\"\nfi;\n\necho \"note: 2) Injecting Info.plist entries: \"\n\n# Log out the keys we're adding\nfor i in \"${!_PLIST_ENTRY_KEYS[@]}\"; do\n  echo \"    ->  $i) ${_PLIST_ENTRY_KEYS[$i]}\" \"${_PLIST_ENTRY_TYPES[$i]}\" \"${_PLIST_ENTRY_VALUES[$i]}\"\ndone\n\nfor plist in \"${_TARGET_PLIST}\" \"${_DSYM_PLIST}\" ; do\n  if [[ -f \"${plist}\" ]]; then\n\n    # paths with spaces break the call to setPlistValue. temporarily modify\n    # the shell internal field separator variable (IFS), which normally\n    # includes spaces, to consist only of line breaks\n    oldifs=$IFS\n    IFS=\"\n\"\n\n    for i in \"${!_PLIST_ENTRY_KEYS[@]}\"; do\n      setPlistValue \"${_PLIST_ENTRY_KEYS[$i]}\" \"${_PLIST_ENTRY_TYPES[$i]}\" \"${_PLIST_ENTRY_VALUES[$i]}\" \"${plist}\"\n    done\n\n    # restore the original internal field separator value\n    IFS=$oldifs\n  else\n    echo \"warning:   A Info.plist build output file was not found (${plist})\"\n  fi\ndone\n\necho \"note: <- RNFB build script finished\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -273,7 +594,7 @@
 /* Begin XCBuildConfiguration section */
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3B4392A12AC88292D35C810B /* Pods-Livyco.debug.xcconfig */;
+			baseConfigurationReference = 5CBC2457C7A3986A2AEB63D0 /* Pods-Livyco.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -291,7 +612,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.livyco;
 				PRODUCT_NAME = Livyco;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -301,7 +622,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5709B34CF0A7D63546082F79 /* Pods-Livyco.release.xcconfig */;
+			baseConfigurationReference = CDA8E1C91F7EBECBCF6928B9 /* Pods-Livyco.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -318,7 +639,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.livyco;
 				PRODUCT_NAME = Livyco;
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";

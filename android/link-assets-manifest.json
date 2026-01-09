@@ -1,0 +1,317 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "src/assets/FontFamily.js",
+      "sha1": "b21ad8369daa87ab63208b068a79f951db6d8ff2"
+    },
+    {
+      "path": "src/assets/images/wallet-icon.png",
+      "sha1": "821f18437e4a98d914a68d616eecfd9c9a8ab2f4"
+    },
+    {
+      "path": "src/assets/images/welimg.png",
+      "sha1": "b915cc61f70fd7503ab494c2665a880a7c10c0eb"
+    },
+    {
+      "path": "src/assets/images/category.png",
+      "sha1": "087e6f277ed87e6cb0772c1a8f5b8264ed9e2edb"
+    },
+    {
+      "path": "src/assets/images/wallet.png",
+      "sha1": "f1d1fd4e1d3cb2ed09b8a841f2fa03af9928c250"
+    },
+    {
+      "path": "src/assets/images/chat-support.png",
+      "sha1": "ca1c5b893d2dfcb799ba13eef7a0e8101161043d"
+    },
+    {
+      "path": "src/assets/images/app_img.png",
+      "sha1": "4b875b333c755839f3a8b992a362bbf02f053e32"
+    },
+    {
+      "path": "src/assets/images/hydrabad.png",
+      "sha1": "8514e2d37595c54305ed6d7b1c4386642bbefff9"
+    },
+    {
+      "path": "src/assets/images/banglore.png",
+      "sha1": "468cbcb9ef8a45ef7a221ca9b50f0e40de0c76e8"
+    },
+    {
+      "path": "src/assets/images/banner.png",
+      "sha1": "1db36f8f11a978639545856828f6567c76525db1"
+    },
+    {
+      "path": "src/assets/images/review.png",
+      "sha1": "b70ec3c77586c6eafa8a4c25b4a09fd29da83270"
+    },
+    {
+      "path": "src/assets/images/quick-links/wishlist.png",
+      "sha1": "740c937191b101d85b5cb7963262c8d439645b11"
+    },
+    {
+      "path": "src/assets/images/quick-links/food-menu.png",
+      "sha1": "e2b56b80a5169ff879a6a7d9f27bacd5452b3680"
+    },
+    {
+      "path": "src/assets/images/quick-links/search-pg.png",
+      "sha1": "2475fa379b5a38f8c1d4816255812581c5f1c052"
+    },
+    {
+      "path": "src/assets/images/quick-links/service-request.png",
+      "sha1": "ec0057a3336c3ab34bc633443603715552540ed1"
+    },
+    {
+      "path": "src/assets/images/quick-links/payment-history.png",
+      "sha1": "f9eee35188e593bf1d2858606a1fa2bb5e30545d"
+    },
+    {
+      "path": "src/assets/images/quick-links/notify-all.png",
+      "sha1": "91b55ea7f51a77451e39ea3aaf83bca7864332c6"
+    },
+    {
+      "path": "src/assets/images/quick-links/request.png",
+      "sha1": "b09f743098fa2ea78bb9f19690e8bb260063bb66"
+    },
+    {
+      "path": "src/assets/images/quick-links/download-invoice.png",
+      "sha1": "b45fdde9c40bf70979e1694df82ff6226121d8de"
+    },
+    {
+      "path": "src/assets/images/quick-links/rent-reminder.png",
+      "sha1": "91a6e9fce11c35f55a97c51c5cf33eee4eec9ee8"
+    },
+    {
+      "path": "src/assets/images/quick-links/vacate-pg.png",
+      "sha1": "d511ee22a50419280f4011b3fee3e86615c21cd1"
+    },
+    {
+      "path": "src/assets/images/map.png",
+      "sha1": "b594253f442a5cd8fe6b3618f1bef179d38fbc6b"
+    },
+    {
+      "path": "src/assets/images/voice-support.png",
+      "sha1": "c39a826f43a83f8e739006be168b023e8a2b163c"
+    },
+    {
+      "path": "src/assets/images/indian_flag.png",
+      "sha1": "c2b27aa2dfe05b78a5d6d5b550850d3866a96e4f"
+    },
+    {
+      "path": "src/assets/images/boarding3.png",
+      "sha1": "31e6e3b555b6960505852f327c33dab64d8cdfdc"
+    },
+    {
+      "path": "src/assets/images/ahmedabad.png",
+      "sha1": "dba1029830849525030dc6220b2887acd80811ae"
+    },
+    {
+      "path": "src/assets/images/boarding2.png",
+      "sha1": "3a078ac0244cc19db407a80645c8e7c80fac8d08"
+    },
+    {
+      "path": "src/assets/images/success_check.png",
+      "sha1": "bad26dba989501381131f6d3d072ddf37cc260a9"
+    },
+    {
+      "path": "src/assets/images/bed.png",
+      "sha1": "f263754f3594062b351b014cbfaa7fa219603225"
+    },
+    {
+      "path": "src/assets/images/receipt.png",
+      "sha1": "5bd415813e9d943c87639d2138941726dd4b56bb"
+    },
+    {
+      "path": "src/assets/images/boarding1.png",
+      "sha1": "7a686502e87f58824be333ad5e3db23961ccd84f"
+    },
+    {
+      "path": "src/assets/images/upi.png",
+      "sha1": "882b37caadeb0729bbe89e6ed6a231b2bd4e7d36"
+    },
+    {
+      "path": "src/assets/images/no-data/no-wishlist.png",
+      "sha1": "c9330fe7c21b4ba7d98a6e25acbafd64b4f611e5"
+    },
+    {
+      "path": "src/assets/images/no-data/no-chat.png",
+      "sha1": "924c56bf84b7fb0ef404587061247051ec9ff8db"
+    },
+    {
+      "path": "src/assets/images/no-data/no-tickets.png",
+      "sha1": "592c91ee67be462fec553aaa36d46db53e41ce3f"
+    },
+    {
+      "path": "src/assets/images/no-data/reviews-not.png",
+      "sha1": "86775cc6ba7e62ce225a454ed76b59fcd68affc5"
+    },
+    {
+      "path": "src/assets/images/no-data/no-payment-history.png",
+      "sha1": "81f6e00699bbbb19e6efc1b64b0eb7a03cde339c"
+    },
+    {
+      "path": "src/assets/images/no-data/no-stays.png",
+      "sha1": "22552fc3015d1afc56bbe467020bbc62fb1b881a"
+    },
+    {
+      "path": "src/assets/images/no-data/no-notification.png",
+      "sha1": "9cc8a2add291a25b731b826a11a8e4d2f995ac0b"
+    },
+    {
+      "path": "src/assets/images/no-data/no-map.png",
+      "sha1": "a8f9a2f44decebd02d198b9d8a935faab99cbbba"
+    },
+    {
+      "path": "src/assets/images/logo-2.png",
+      "sha1": "80b8998b69d1acb44f89306d19113b3426711ee2"
+    },
+    {
+      "path": "src/assets/images/logo-3.png",
+      "sha1": "1cff4588ac272222b01a1d1a984a6d218c1125a8"
+    },
+    {
+      "path": "src/assets/images/food.png",
+      "sha1": "24193d934f44c07d495e932e2a97e8d199233519"
+    },
+    {
+      "path": "src/assets/images/logo-1.png",
+      "sha1": "46bfd39bb7e884939a663a9dae056461351aaeee"
+    },
+    {
+      "path": "src/assets/images/property.png",
+      "sha1": "8126a9ad4eb527c384c4e93fa7c52d5b9fd058db"
+    },
+    {
+      "path": "src/assets/images/office.png",
+      "sha1": "f8bf546c5e71d6d3a5ce66f206af872cab42d28f"
+    },
+    {
+      "path": "src/assets/images/logo.png",
+      "sha1": "c920390d4626b45b3d60ce1b86250f83fa26da13"
+    },
+    {
+      "path": "src/assets/images/stays.png",
+      "sha1": "d4fc0ec1411f14b0846e3ae13ab5a6908115eb9e"
+    },
+    {
+      "path": "src/assets/images/search_img.png",
+      "sha1": "f0aeac6c6b7d07d62c0f81fab6c90f37f9ddf7a4"
+    },
+    {
+      "path": "src/assets/images/points.png",
+      "sha1": "ccf35213f57e7ee8cac3d0f5d74223523906c6fb"
+    },
+    {
+      "path": "src/assets/images/kochi.png",
+      "sha1": "d14454dcf566cae0c22e43cde7fb78e10b61a98d"
+    },
+    {
+      "path": "src/assets/images/filter.png",
+      "sha1": "292f24b6f34cb71426860aa4dfabacdb57e669b2"
+    },
+    {
+      "path": "src/assets/images/sort.png",
+      "sha1": "8f4ed7f5302558ac7707b0a9f86f5be6d847f4cb"
+    },
+    {
+      "path": "src/assets/images/email-support.png",
+      "sha1": "7111d2c7fd60780d438cb25510b636a45145b4ee"
+    },
+    {
+      "path": "src/assets/images/ticket-status.png",
+      "sha1": "7e40f60022617f1fc87f810d26517510f7b88630"
+    },
+    {
+      "path": "src/assets/images/credit-card.png",
+      "sha1": "bf81413b02ab2dd1903118a0ac0da7c308007122"
+    },
+    {
+      "path": "src/assets/images/bank.png",
+      "sha1": "5189f493e8763bf26c688b267ca53ca93b339820"
+    },
+    {
+      "path": "src/assets/images/pune.png",
+      "sha1": "ab7444a883d41009009bb118068924c2d6b9a39e"
+    },
+    {
+      "path": "src/assets/images/form.png",
+      "sha1": "966abf282c72f49060fedeb88b008fab9ed0ce06"
+    },
+    {
+      "path": "src/assets/images/splashbg.png",
+      "sha1": "1b68811a2c994831fa6f13ce47cead575d6543de"
+    },
+    {
+      "path": "src/assets/images/music_girl.png",
+      "sha1": "e74f159634fb28cc50316d8be0d10efea3c24819"
+    },
+    {
+      "path": "src/assets/images/google.png",
+      "sha1": "7f876254271fa145a1dfc0b71ab8b37d2dc2f7d6"
+    },
+    {
+      "path": "src/assets/images/chandigrah.png",
+      "sha1": "d68d1f75baefcea6a0ed99564a03a45f025fa0ec"
+    },
+    {
+      "path": "src/assets/images/chat.png",
+      "sha1": "bd19833c8c3326d7128829763a8afa79b35351e6"
+    },
+    {
+      "path": "src/assets/images/thumbs-up.png",
+      "sha1": "034f30161b754cd708904da8d4b8d9bf56f0975c"
+    },
+    {
+      "path": "src/assets/images/mumbai.png",
+      "sha1": "7efc5a46520f3917bfa5a1defbe3fcfb99725998"
+    },
+    {
+      "path": "src/assets/images/delhi.png",
+      "sha1": "2161944f7756ec1d7121b43b4855c72cbd074c61"
+    },
+    {
+      "path": "src/assets/images/kolkata.png",
+      "sha1": "ab4f45c43113795f226f49f1494fe0ebf320c3e2"
+    },
+    {
+      "path": "src/assets/images/chennai.png",
+      "sha1": "9fb9d362813a7b28275c0cee62ea41ca24151422"
+    },
+    {
+      "path": "src/assets/fonts/Roboto-Medium.ttf",
+      "sha1": "fa5192203f85ddb667579e1bdf26f12098bb873b"
+    },
+    {
+      "path": "src/assets/fonts/Roboto-Light.ttf",
+      "sha1": "318b44c0a32848f78bf11d4fbf3355d00647a796"
+    },
+    {
+      "path": "src/assets/fonts/Roboto-Regular.ttf",
+      "sha1": "3bff51436aa7eb995d84cfc592cc63e1316bb400"
+    },
+    {
+      "path": "src/assets/fonts/Roboto-ExtraLight.ttf",
+      "sha1": "df556e64732e5c272349e13cb5f87591a1ae779b"
+    },
+    {
+      "path": "src/assets/fonts/Roboto-ExtraBold.ttf",
+      "sha1": "3dbfd71b6fbcfbd8e7ee8a8dd033dc5aaad63249"
+    },
+    {
+      "path": "src/assets/fonts/Roboto-SemiBold.ttf",
+      "sha1": "9ca139684fe902c8310dd82991648376ac9838db"
+    },
+    {
+      "path": "src/assets/fonts/Roboto-Bold.ttf",
+      "sha1": "508c35dee818addce6cc6d1fb6e42f039da5a7cf"
+    },
+    {
+      "path": "src/assets/fonts/Roboto-Thin.ttf",
+      "sha1": "8e098a207d2ace83e873d02b76acba903d819f74"
+    },
+    {
+      "path": "src/assets/Images.js",
+      "sha1": "79538670ecae8a862170d6ca31f033e2a652d969"
+    }
+  ]
+}
